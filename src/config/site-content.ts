@@ -281,8 +281,8 @@ export const siteContent = {
 
   // Pricing Page
   pricing: {
-    title: "Choose the perfect plan to elevate your food marketing with dishtasticAI.",
-    subtitle: "Select from our flexible pricing options tailored for every restaurant's needs.",
+    title: "Our pricing",
+    subtitle: "Choose the perfect plan to elevate your food marketing with DishtasticAI.",
     plans: [
       {
         cta: "Start Free",
