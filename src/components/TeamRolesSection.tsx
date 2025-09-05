@@ -1,4 +1,4 @@
-import { ChefHat, UserCheck, Users, ShoppingCart, BarChart3, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { siteContent } from "@/config/site-content";
 import * as icons from 'lucide-react';
 import { useState, useEffect } from "react";
@@ -6,11 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
 
-const iconMap = {
-  ChefHat,
-  UserCheck,
-  Users
-};
 
 const DynamicSvgIcon = ({ url, className = '', ...props }) => {
   const [svgContent, setSvgContent] = useState('');
@@ -115,7 +110,6 @@ const TeamRolesSection = () => {
         {/* Role Blocks Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 text-left order-3 md:order-2">
           {siteContent.teamRoles.roles.map((role, index) => {
-            const IconComponent = iconMap[role.icon as keyof typeof iconMap];
             return (
               <div key={index} className="space-y-4 bg-[#f2f8f3] p-8 rounded-[1rem]">
                 {/* Icon */}
