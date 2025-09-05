@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* PrepShiftPro Brand Colors */
+    --background: 142 20% 97%; /* Soft white #F2F8F3 */
+    --foreground: 210 20% 15%;
+    
+    /* Orange Primary - Configurable via site-content.ts */
+    --primary: 12 99% 65%; /* Orange for MenuProfitMax */
+    --primary-foreground: 0 0% 100%;
+    
+    /* Deep Navy */
+    --navy: 213 56% 13%; /* Deep navy #112231 */
+    --navy-foreground: 0 0% 100%;
+    
+    /* Teal CTA */
+    --cta: 190 71% 43%; /* Teal #219EBC */
+    --cta-foreground: 0 0% 100%;
+    
+    /* Green CTA Background */
+    --green-cta: 142 69% 58%; /* Green #4ADE80 */
+    --green-cta-foreground: 0 0% 100%;
+    
+    /* Footer Colors */
+    --footer-bg: 270 100% 3%; /* Near black #0A0011 */
+    --footer-text: 120 17% 95%; /* Light beige #F2F8F3 */
+    --footer-heading: 234 100% 82%; /* Soft blue #A9B4FF */
+    
+    /* Custom Footer Text Color */
+    --footer-custom-text: 35 9% 19%; /* #31302e */
+    
+    /* Light green background for feature cards */
+    --card-light-green: 142 20% 96%; /* #f2f8f3 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 20% 15%;
+
+    --secondary: 142 15% 94%;
+    --secondary-foreground: 210 20% 15%;
+
+    --muted: 142 15% 94%;
+    --muted-foreground: 215 16% 47%;
+    --role-description: 0 0% 3.1%;
+
+    --accent: 142 15% 94%;
+    --accent-foreground: 210 20% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 142 20% 90%;
+    --input: 142 20% 90%;
+    --ring: 12 99% 65%;
+
+    --radius: 0.75rem;
+    
+    /* Custom Gradients */
+    --gradient-coral: linear-gradient(135deg, hsl(8 100% 62%), hsl(8 85% 55%));
+    --gradient-hero: linear-gradient(135deg, hsl(142 20% 97%), hsl(142 25% 95%));
+    --gradient-navy: linear-gradient(135deg, hsl(213 56% 13%), hsl(213 56% 16%));
+    --gradient-blue-cta: linear-gradient(135deg, hsl(219 78% 58%), hsl(219 78% 65%));
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Testimonial colors */
+    --coral-400: 16 75% 65%;
+    --sage-50: 120 13% 96%;
+    --sage-100: 120 15% 92%;
+    --sage-600: 120 25% 45%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h2 {
+    color: #191918;
+    font-size: 20px;
+    font-weight: 300;
+    max-width: 700px;
+  }
+}
