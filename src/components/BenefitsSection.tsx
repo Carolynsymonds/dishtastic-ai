@@ -20,6 +20,24 @@ const BenefitsSection = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {benefits.map((benefit, index) => {
               const IconComponent = iconMap[benefit.icon as keyof typeof iconMap];
+              
+              // Add fallback if icon component is not found
+              if (!IconComponent) {
+                console.warn(`Icon not found: ${benefit.icon}`);
+                return (
+                  <div key={index} className="flex flex-col md:flex-row items-center gap-3 md:p6 p-2 rounded-lg shadow-sm border border-primary/65">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-4 h-4 bg-primary/20 rounded" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm text-slate-900 md:text-left text-center">
+                        {benefit.title}
+                      </h3>
+                    </div>
+                  </div>
+                );
+              }
+              
               return (
                 <div key={index} className="flex flex-col md:flex-row items-center gap-3 md:p6 p-2 rounded-lg shadow-sm border border-primary/65">
                   <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
