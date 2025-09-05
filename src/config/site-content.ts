@@ -66,23 +66,23 @@ export const siteContent = {
 
   // Team Roles Section
   teamRoles: {
-    title: "Tools for Every Role in Your Restaurant",
-    subtitle: "Empower your team with specialized tools and insights.",
+    title: "Empowering Every Role in Your Kitchen",
+    subtitle: "From the back of house to the front, Dishtastic AI helps your team focus on what they do best — while we handle the food visuals.",
     roles: [
       {
-        icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/team-role-icons/7f131ee6-3b09-40a2-b133-4b201a430239/kitchen-manager-1756215053691.svg+xml",
+        icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/team-role-icons/619f2705-40d9-4d74-a302-ae6d74edf89e/kitchen-manager-1757063011397.svg+xml",
         title: "Kitchen Manager",
-        description: "Oversee kitchen operations, manage inventory, and ensure food quality."
+        description: "Spend less time worrying about photography. Keep your focus on smooth kitchen operations while still showcasing your dishes at their best."
       },
       {
-        icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/team-role-icons/7f131ee6-3b09-40a2-b133-4b201a430239/financial-supervisor-1756215054712.svg+xml",
-        title: "Financial Supervisor",
-        description: "Monitor financial performance, manage budgets, and analyze profit margins."
+        icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/team-role-icons/619f2705-40d9-4d74-a302-ae6d74edf89e/marketing-supervisor-1757063021065.svg+xml",
+        title: "Marketing Supervisor",
+        description: "Launch campaigns faster with a library of ready-to-use, mouth-watering food images and videos — no costly photoshoots needed."
       },
       {
-        icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/team-role-icons/7f131ee6-3b09-40a2-b133-4b201a430239/staff-member-1756215064570.svg+xml",
+        icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/team-role-icons/619f2705-40d9-4d74-a302-ae6d74edf89e/staff-member-1757063035732.svg+xml",
         title: "Staff Member",
-        description: "Utilize tools for daily tasks, manage orders, and submit invoices."
+        description: "Highlight the meals you create every day. With just a few taps, turn dishes into scroll-stopping content that fills tables."
       }
     ]
   },
