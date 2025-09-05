@@ -17,7 +17,7 @@ export const siteContent = {
 
   // Brand and Logo
   brand: {
-    name: "dishtasticAI",
+    name: "DishtasticAI",
     logoUrl: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1757064302915-64m77fgtyb7.png",
     primaryColor: "12 99% 65%",
     footerLogoUrl: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1757064307754-pdis0fguey.png"
@@ -190,7 +190,7 @@ export const siteContent = {
 
   // Features Page
   featuresPage: {
-    title: "Everything dishtasticAI Offers",
+    title: "Everything DishtasticAI Offers",
     benefits: [
       {
         icon: "TrendingUp",
