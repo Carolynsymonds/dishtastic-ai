@@ -43,23 +43,23 @@ export const siteContent = {
 
   // Features Section
   features: {
-    title: "Menu Costing Made Simple",
-    subtitle: "Revolutionize your kitchen operations with these powerful capabilities.",
+    title: "Core Features",
+    subtitle: "Discover the unique capabilities of DishtasticAI.",
     items: [
       {
-        icon: "/lovable-uploads/cd909169-fdc5-4959-8640-b478cc3c5198.png",
-        title: "Ingredient Costing",
-        description: "Breaks down cost per dish in real-time."
+        icon: "https://img.recraft.ai/eErxBEsBjaVN3kLdyB5AweZpOECF4KuTLqqD--t01XE/rs:fit:512:512:0/raw:1/plain/abs://external/images/08827a74-d68f-4bce-950c-397624161217",
+        title: "Instantly Generate Stunning Food Imagery & Videos",
+        description: "Transform any dish into scroll-stopping content in seconds."
       },
       {
-        icon: "/lovable-uploads/0abb7956-aef2-4ac6-a711-5faf5d1350a9.png",
-        title: "Profit Margins",
-        description: "Instantly shows profitability of each menu item."
+        icon: "https://img.recraft.ai/b3o7zzEzBjiXutVOV_kN8e-uOnlzTKpMPfziDtNACMg/rs:fit:512:512:0/raw:1/plain/abs://external/images/7d10bc04-3a6d-4688-b0ca-4eaaf652da4e",
+        title: "Boost Sales with Appetite-Driven Marketing",
+        description: "Mouth-watering visuals that turn hungry browsers into paying customers."
       },
       {
-        icon: "/lovable-uploads/2c3acdb8-e7ea-4e9f-bbe3-f76f3126f9f4.png",
-        title: "Supplier Comparison",
-        description: "Compare costs across vendors."
+        icon: "https://img.recraft.ai/FfUz-HHG2bzoRrEEgZmd9JNNIJFT79JGzkdd5GULPC8/rs:fit:512:512:0/raw:1/plain/abs://external/images/92ab3b1d-9620-4dd3-9cf7-07ffa947e0c8",
+        title: "Save Time & Cut Marketing Costs",
+        description: "Create more, spend less, and keep your tables full."
       }
     ]
   },
@@ -137,76 +137,52 @@ export const siteContent = {
 
   // All Features Section
   allFeatures: {
-    title: "From Invoices to Inventory — All in One Place",
-    ctaText: "Explore our features",
-    subtitle: "Everything you need to succeed.",
+    title: "Complete Feature Set",
+    ctaText: "Explore all features",
+    subtitle: "Everything you need to succeed in the foodservice industry.",
     financialTools: {
       title: "Financial Tools",
       features: [
         {
-          icon: "Settings",
+          icon: "Palette",
           isNew: false,
-          title: "POS & Accounting Integrations",
-          description: "Integrate with existing POS and accounting systems."
+          title: "Brand Style Guide Integration",
+          description: "Ensure consistency with your brand's identity."
         },
         {
-          icon: "Wifi",
+          icon: "Settings",
           isNew: false,
-          title: "Mobile App for Invoice Upload",
-          description: "Use our mobile app to upload invoices on the go."
+          title: "Image Refinement & Enhancement",
+          description: "Polish your visuals for maximum appeal."
+        },
+        {
+          icon: "Cpu",
+          isNew: false,
+          title: "AI-Optimized for Realism",
+          description: "Leverage AI for realistic content generation."
         }
       ]
     },
     operationalManagement: {
-      title: "Complete Cost & Operations Control",
+      title: "Operational Management Features",
       features: [
-        {
-          icon: "FileText",
-          isNew: false,
-          title: "Automated Invoice Processing",
-          description: "Simplify invoice management with automated processing."
-        },
-        {
-          icon: "Receipt",
-          isNew: false,
-          title: "Bill Payment & AP Automation",
-          description: "Automate accounts payable and streamline bill payments."
-        },
         {
           icon: "Utensils",
           isNew: false,
-          title: "Real-time Food & Labor Cost Tracking",
-          description: "Track food and labor costs in real-time to manage expenses."
+          title: "Instant High-Quality Food Imagery",
+          description: "Generate images that captivate your audience."
         },
         {
-          icon: "Settings",
+          icon: "Video",
           isNew: false,
-          title: "Daily Controllable P&L Reports",
-          description: "Receive daily reports for better financial control."
+          title: "AI-Generated Food Videos",
+          description: "Create engaging video content effortlessly."
         },
         {
-          icon: "Box",
+          icon: "ClipboardList",
           isNew: false,
-          title: "Inventory Management & Usage Tracking",
-          description: "Manage inventory and track usage efficiently."
-        },
-        {
-          icon: "Calculator",
-          isNew: false,
-          title: "Recipe/Menu Cost Analysis",
-          description: "Analyze recipes and menus to optimize costs."
-        },
-        {
-          icon: "ShoppingCart",
-          isNew: false,
-          title: "Order Management & Vendor Ordering",
-          description: "Manage orders and vendor relationships seamlessly."
-        },
-        {
-          icon: "DollarSign",
-          isNew: false,
-          title: "Price Alerts for Cost Changes",
-          description: "Get alerts for ingredient price changes to adjust pricing."
+          title: "Project Boards & Team Collaboration",
+          description: "Collaborate with your team in real-time."
         }
       ]
     }
