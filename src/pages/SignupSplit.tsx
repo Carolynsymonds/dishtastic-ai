@@ -299,9 +299,7 @@ const SignupSplit = () => {
           <div className="space-y-4">
             <Quote className="w-8 h-8 text-primary" />
             <blockquote className="text-lg text-gray-800 leading-relaxed italic">
-              "MenuProfitMax transformed how I understand my restaurant's profitability. 
-              The real-time ingredient costing and profit margin analysis helped me increase 
-              our bottom line by 23% in just three months."
+              "Dishtastic AI transformed the way we showcase our menu. The AI-generated images and videos made our dishes irresistible online — helping us boost average order value by 14% in just a few weeks."
             </blockquote>
             <div>
               <div className="font-semibold text-gray-900">Elinor B.</div>
