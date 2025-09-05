@@ -178,7 +178,7 @@ const SignupSplit = () => {
               Welcome to {siteContent.brand.name}
             </h1>
             <p className="text-lg text-gray-700 mb-6">
-              Boost Restaurant Profits with Smarter Menu Costing
+              Bring Your Dishes to Life with AI
             </p>
             <p className="text-sm text-gray-500 flex items-center justify-center gap-2 mb-8">
               <ShieldCheck size={16} className="text-gray-500" />
