@@ -58,7 +58,7 @@ export function AppSidebar() {
           <img 
             src={siteContent.brand.logoUrl} 
             alt={`${siteContent.brand.name} Logo`} 
-            className="h-20 w-auto"
+            className="h-12 w-auto"
           />
         </div>
       </SidebarHeader>
