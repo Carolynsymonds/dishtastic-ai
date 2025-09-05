@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Package, Plus, Search, Bell, Settings, BarChart3, TrendingUp, Calendar, DollarSign, Warehouse, ChefHat, Trash2, Calculator, ClipboardList, CheckCircle2 } from "lucide-react";
+import { Camera, Video, Palette, Search, Bell, Settings, BarChart3, TrendingUp, Calendar, Image, Sparkles, Zap, Eye, Layout, CheckCircle2 } from "lucide-react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
@@ -16,12 +16,12 @@ import { siteContent } from "@/config/site-content";
 
 const Application = () => {
   
-  const [menuData] = useState([
-    { id: 1, name: "Margherita Pizza", cost: "$8.50", profit: "$6.50", margin: "43%", status: "profitable" },
-    { id: 2, name: "Caesar Salad", cost: "$4.20", profit: "$7.80", margin: "65%", status: "excellent" },
-    { id: 3, name: "Beef Burger", cost: "$12.30", profit: "$2.70", margin: "18%", status: "low-margin" },
-    { id: 4, name: "Pasta Carbonara", cost: "$6.80", profit: "$8.20", margin: "55%", status: "profitable" },
-    { id: 5, name: "Fish & Chips", cost: "$14.50", profit: "$0.50", margin: "3%", status: "critical" }
+  const [contentData] = useState([
+    { id: 1, name: "Margherita Pizza", images: 24, videos: 8, engagement: "12.4K", status: "trending" },
+    { id: 2, name: "Caesar Salad", images: 18, videos: 5, engagement: "8.7K", status: "popular" },
+    { id: 3, name: "Beef Burger", images: 32, videos: 12, engagement: "15.2K", status: "viral" },
+    { id: 4, name: "Pasta Carbonara", images: 16, videos: 6, engagement: "9.3K", status: "growing" },
+    { id: 5, name: "Fish & Chips", images: 12, videos: 3, engagement: "5.1K", status: "new" }
   ]);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -55,12 +55,13 @@ const Application = () => {
     window.location.href = '/';
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case "profitable": return "bg-green-100 text-green-800";
-      case "excellent": return "bg-blue-100 text-blue-800";
-      case "low-margin": return "bg-yellow-100 text-yellow-800";
-      case "critical": return "bg-red-100 text-red-800";
+      case "trending": return "bg-green-100 text-green-800";
+      case "popular": return "bg-blue-100 text-blue-800";
+      case "viral": return "bg-purple-100 text-purple-800";  
+      case "growing": return "bg-orange-100 text-orange-800";
+      case "new": return "bg-gray-100 text-gray-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -74,37 +75,71 @@ const Application = () => {
           <div className="p-6">
             {/* Today's Snapshot */}
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground">Menu Performance Overview</h2>
-              <p className="text-sm text-muted-foreground">Real-time cost analysis and profit margins</p>
+              <h2 className="text-2xl font-bold text-foreground">Content Performance Overview</h2>
+              <p className="text-sm text-muted-foreground">AI-generated food imagery and video performance insights</p>
             </div>
             
             {/* KPI Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-              <MetricCard 
-                title="Total Menu Items" 
-                value="47" 
-                change="+2.3%" 
+              <MetricCard
+                title="Images Generated"
+                value="1,247"
+                change="+23%"
+                changeLabel="this month"
               />
-              <MetricCard 
-                title="Average Food Cost" 
-                value="$9.26" 
-                change="-1.8%" 
+              <MetricCard
+                title="Videos Created"
+                value="342"
+                change="+18%"
+                changeLabel="across all dishes"
               />
-              <MetricCard 
-                title="Average Profit Margin" 
-                value="38%" 
-                change="+3.2%" 
+              <MetricCard
+                title="Top Performer"
+                value="Beef Burger"
+                change="15.2K"
+                changeLabel="engagement"
               />
-              <MetricCard 
-                title="Low Margin Items" 
-                value="8" 
-                change="-2.1%" 
+              <MetricCard
+                title="Brand Templates"
+                value="127"
+                change="+8"
+                changeLabel="new templates added"
               />
             </div>
             
-            {/* Profit by Menu Category */}
+            {/* Content Performance Section */}
             <div className="mb-6">
-              <ProfitByMenuCategory />
+              <Card>
+                <CardHeader>
+                  <CardTitle>Dish Content Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {contentData.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
+                            <Image className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium">{item.name}</h4>
+                            <p className="text-sm text-muted-foreground">Images: {item.images} | Videos: {item.videos}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <p className="font-medium">{item.engagement}</p>
+                            <p className="text-sm text-muted-foreground">Total Engagement</p>
+                          </div>
+                          <Badge className={getStatusBadge(item.status)}>
+                            {item.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           
           </div>
@@ -130,7 +165,7 @@ const Application = () => {
             <div className="space-y-2">
               <h3 className="text-xl font-bold">You're All Set!</h3>
               <p className="text-sm text-muted-foreground">Your {siteContent.brand.name} dashboard is on its way.</p>
-              <p className="text-sm text-muted-foreground">You'll soon gain early access to our Beta program — and get a chance to shape the future of menu costing alongside us.</p>
+              <p className="text-sm text-muted-foreground">You'll soon gain early access to our Beta program — and get a chance to shape the future of food imagery creation alongside us.</p>
               <p className="text-sm text-muted-foreground">Stay tuned — exciting updates are coming your way.</p>
             </div>
             <Button onClick={handleRedirectToPreview} className="w-full">

@@ -2,18 +2,18 @@ import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { 
   Home, 
-  ShoppingCart, 
-  Package2, 
-  Truck, 
+  Camera, 
+  Video, 
+  Palette, 
   BarChart3, 
-  UtensilsCrossed, 
-  AlertTriangle,
+  Layout, 
+  Zap,
   Eye,
   Settings,
-  Calculator,
+  Sparkles,
   TrendingUp,
   Users,
-  DollarSign
+  Image
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -32,11 +32,11 @@ import { siteContent } from "@/config/site-content";
 
 const navigationItems = [
   { title: "Dashboard", url: "/app", icon: Home },
-  { title: "Inventory", url: "/app/inventory", icon: Package2 },
-  { title: "Menu Analysis", url: "/app/menu-analysis", icon: Calculator },
-  { title: "Suppliers", url: "/app/suppliers", icon: Truck },
-  { title: "Cost Tracking", url: "/app/cost-tracking", icon: DollarSign },
-  { title: "Reports", url: "/app/reports", icon: BarChart3 },
+  { title: "Image Generator", url: "/app/image-generator", icon: Camera },
+  { title: "Video Creator", url: "/app/video-creator", icon: Video },
+  { title: "Brand Studio", url: "/app/brand-studio", icon: Palette },
+  { title: "Templates", url: "/app/templates", icon: Layout },
+  { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
 ];
 
 export function AppSidebar() {
