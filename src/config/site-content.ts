@@ -1,7 +1,7 @@
 export const siteContent = {
   // Analytics Configuration
   analytics: {
-    googleAnalyticsId: "G-WS625DG4GT"
+    googleAnalyticsId: "G-2SDJG3KLPW"
   },
 
   // Theme Configuration
