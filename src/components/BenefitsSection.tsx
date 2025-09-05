@@ -1,12 +1,13 @@
-import { TrendingUp, BarChart3, DollarSign, Zap, Shield } from "lucide-react";
+import { TrendingUp, BarChart3, DollarSign, Zap, Shield, Clock } from "lucide-react";
 import { siteContent } from "@/config/site-content";
 
 const iconMap = {
-  TrendingUp,
-  BarChart3,
-  DollarSign,
-  Zap,
-  Shield
+  "trending-up": TrendingUp,
+  "bar-chart-3": BarChart3,
+  "dollar-sign": DollarSign,
+  "zap": Zap,
+  "shield": Shield,
+  "clock": Clock
 };
 
 const BenefitsSection = () => {
