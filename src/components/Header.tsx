@@ -54,7 +54,7 @@ const Header = () => {
               <img 
                 src={siteContent.brand.logoUrl}  
                 alt={`${siteContent.brand.name} Logo`} 
-                className="h-32 w-auto hover:opacity-80 transition-opacity"
+                className="h-16 w-auto hover:opacity-80 transition-opacity"
                 />
             </Link>
             
