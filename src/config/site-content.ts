@@ -89,8 +89,8 @@ export const siteContent = {
 
   // Feature Intro Section
   featureIntro: {
-    title: "Unlock the Full Potential of Your Menu",
-    description: "MenuProfitMax equips foodservice businesses with powerful tools to manage costs, track profits, and ensure optimal pricing."
+    title: "Unleash Your Culinary Creativity",
+    description: "With DishtasticAI, you can effortlessly create stunning food imagery and videos that elevate your restaurant's marketing strategy."
   },
 
   // Split Screen Section
@@ -190,93 +190,93 @@ export const siteContent = {
 
   // Features Page
   featuresPage: {
-    title: "Everything MenuProfitMax Offers",
+    title: "Everything dishtasticAI Offers",
     benefits: [
       {
         icon: "TrendingUp",
-        title: "Boost Profitability"
+        title: "Increase Customer Engagement"
       },
       {
         icon: "DollarSign",
-        title: "Reduce Costs"
+        title: "Maximize ROI on Marketing Spend"
       },
       {
-        icon: "BarChart3",
-        title: "Data-Driven Decisions"
+        icon: "Zap",
+        title: "Enhance Brand Visibility"
       },
       {
-        icon: "Shield",
-        title: "Streamlined Operations"
+        icon: "Clock",
+        title: "Streamline Content Creation Process"
       }
     ],
     features: [
       {
         items: [
           {
-            icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/feature-icon-0-1756215065573.svg+xml",
-            name: "Ingredient Costing",
-            description: "Breaks down cost per dish in real-time."
+            icon: "https://img.recraft.ai/eErxBEsBjaVN3kLdyB5AweZpOECF4KuTLqqD--t01XE/rs:fit:512:512:0/raw:1/plain/abs://external/images/08827a74-d68f-4bce-950c-397624161217",
+            name: "Instantly Generate Stunning Food Imagery & Videos",
+            description: "Transform any dish into scroll-stopping content in seconds."
           },
           {
-            icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/feature-icon-1-1756215082435.svg+xml",
-            name: "Profit Margins",
-            description: "Instantly shows profitability of each menu item."
+            icon: "https://img.recraft.ai/b3o7zzEzBjiXutVOV_kN8e-uOnlzTKpMPfziDtNACMg/rs:fit:512:512:0/raw:1/plain/abs://external/images/7d10bc04-3a6d-4688-b0ca-4eaaf652da4e",
+            name: "Boost Sales with Appetite-Driven Marketing",
+            description: "Mouth-watering visuals that turn hungry browsers into paying customers."
           },
           {
-            icon: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/feature-icon-2-1756215066377.svg+xml",
-            name: "Supplier Comparison",
-            description: "Compare costs across vendors."
+            icon: "https://img.recraft.ai/FfUz-HHG2bzoRrEEgZmd9JNNIJFT79JGzkdd5GULPC8/rs:fit:512:512:0/raw:1/plain/abs://external/images/92ab3b1d-9620-4dd3-9cf7-07ffa947e0c8",
+            name: "Save Time & Cut Marketing Costs",
+            description: "Create more, spend less, and keep your tables full."
           }
         ],
-        title: "Cost Management Insights"
+        title: "Elevate Your Culinary Marketing"
       },
       {
         items: [
           {
-            icon: "Zap",
-            name: "Dynamic Pricing Optimization",
-            description: "Automatically adjust your menu prices based on ingredient cost changes and market trends to maximize profitability."
-          },
-          {
             icon: "BarChart3",
-            name: "Comprehensive Analytics Dashboard",
-            description: "Access a real-time analytics dashboard that provides insights into menu performance, customer preferences, and financial metrics."
+            name: "Real-Time Analytics Dashboard",
+            description: "Monitor the performance of your food imagery and videos with in-depth analytics to drive data-driven decisions."
           },
           {
-            icon: "Box",
-            name: "Automated Inventory Replenishment",
-            description: "Set thresholds for inventory levels and automate reorder processes, ensuring you never run out of key ingredients."
+            icon: "Calendar",
+            name: "Automated Social Media Posting",
+            description: "Schedule and post your stunning food visuals automatically to maintain a consistent online presence."
+          },
+          {
+            icon: "Link",
+            name: "Integrations with E-commerce Platforms",
+            description: "Seamlessly connect with your favorite e-commerce platforms to enhance your online food marketing efforts."
+          },
+          {
+            icon: "Layout",
+            name: "Customizable Templates",
+            description: "Utilize a library of customizable templates to create consistent and branded marketing content effortlessly."
           },
           {
             icon: "Users",
-            name: "Supplier Performance Tracking",
-            description: "Evaluate supplier reliability and pricing trends to make informed decisions on vendor selection and negotiation."
+            name: "Collaborative Workflow Management",
+            description: "Utilize project boards and team collaboration tools to improve workflow efficiency and keep everyone aligned."
           },
           {
-            icon: "Utensils",
-            name: "Custom Recipe Scaling",
-            description: "Easily scale recipes for any volume while maintaining cost efficiency, ensuring consistency across all dishes."
+            icon: "Lightbulb",
+            name: "AI-Powered Content Suggestions",
+            description: "Get intelligent recommendations on the types of visuals and videos that resonate best with your audience."
           },
           {
-            icon: "Wifi",
-            name: "Mobile Cost Tracking",
-            description: "Track costs and expenses on-the-go via our mobile app, enabling real-time updates and decision-making."
+            icon: "Smartphone",
+            name: "Mobile-Friendly Content Creation",
+            description: "Create and edit stunning food content directly from your mobile device for on-the-go marketing."
           },
           {
-            icon: "Settings",
-            name: "Enhanced POS Integration",
-            description: "Seamlessly integrate with your existing POS systems for real-time data synchronization, improving accuracy and efficiency."
-          },
-          {
-            icon: "Shield",
-            name: "Accountability & Audit Trail",
-            description: "Keep a detailed audit trail of all financial transactions and adjustments for compliance and accountability."
+            icon: "Globe",
+            name: "Multi-Language Support",
+            description: "Reach a broader audience with multi-language support for your food marketing content."
           }
         ],
-        title: "Smart Operations Management"
+        title: "Advanced Marketing Automation Solutions"
       }
     ],
-    subtitle: "Comprehensive tools and features designed specifically for menuprofitmax users"
+    subtitle: "Comprehensive tools and features designed specifically for dishtasticai users"
   },
 
   // Pricing Page
