@@ -6,38 +6,38 @@ export const siteContent = {
 
   // Theme Configuration
   theme: {
-    primaryColor: "#fe6743", // Orange HSL values for MenuProfitMax
+    primaryColor: "#fe6444", // Orange HSL values for dishtasticAI
   },
 
    // Top Banner
   topBanner: {
-    text: "First 100 Restaurants Get MenuProfitMax Free for 12 Months (worth $1,188)",
+    text: "First 100 Restaurants Get dishtasticAI Free for 12 Months",
     buttonText: "Join Free"
   },
 
   // Brand and Logo
   brand: {
-    name: "MenuProfitMax",
-    logoUrl: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1756215588100-mwy3h116xhk.png",
+    name: "dishtasticAI",
+    logoUrl: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1757064302915-64m77fgtyb7.png",
     primaryColor: "12 99% 65%",
-    footerLogoUrl: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1756215590798-pbgytrkqoqm.png"
+    footerLogoUrl: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1757064307754-pdis0fguey.png"
   },
 
   // Headline Section
   headline: {
-    title: "Maximize Your Restaurant Profits with Smarter Menu Costing — ",
+    title: "AI image generation and editing for restaurants —",
     titleHighlight: "For Free",
-    get subtitle() { return `Be among the first to maximize restaurant profits with smarter menu costing. Early adopters get MenuProfitMax free for 12 months ($1,188 value).`; },
-    buttonText: "Try for free",
-    buttonTextLight: " for 12 months",
+    subtitle: "Experience the power of stunning food imagery and videos that drive sales and engagement, for free for 12 months.",
+    buttonText: "Try for free ",
+    buttonTextLight: "",
     disclaimer: "No credit card required"
   },
 
   // Home Page Section
   homePage: {
-    title: "Smarter Menu Costing. Bigger Profits.",
-    subtitle: "Track ingredient costs, compare suppliers, and maximize profit margins with real-time insights.",
-    buttonText: "Try for free",
+    title: "Irresistible Food Images & Videos Instantly.",
+    subtitle: "Transform your culinary creations into mouth-watering visuals that captivate and convert.",
+    buttonText: "Try for free ",
     buttonTextLight: ""
   },
 
@@ -305,46 +305,61 @@ export const siteContent = {
 
   // Pricing Page
   pricing: {
-    title: "Choose Your Plan",
-    subtitle: "Flexible pricing tailored for every restaurant size.",
+    title: "Choose the perfect plan to elevate your food marketing with dishtasticAI.",
+    subtitle: "Select from our flexible pricing options tailored for every restaurant's needs.",
     plans: [
       {
-        cta: "Try for free - for 12 months",
-        name: "Free",
+        cta: "Start Free",
+        name: "Free ",
         price: 0,
         period: "/month",
         popular: false,
         features: [
-          "Ingredient Costing: Breaks down cost per dish in real-time.",
-          "Profit Margins: Instantly shows profitability of each menu item.",
-          "Supplier Comparison: Compare costs across vendors.",
-          "Basic inventory management & usage tracking."
+          "Instant High-Quality Food Imagery",
+          "Basic Style & Background Presets",
+          "Limited Brand Style Guide Integration",
+          "Access to AI-Generated Food Videos (up to 5 videos per month)"
         ],
-        description: "Get started with Menu Profit Max for free for one year, providing essential menu costing tools."
+        description: "Experience the wonders of food imagery and videos at no cost for 12 months."
       },
       {
         cta: "Get Started",
-        name: "Standard",
-        price: "99",
+        name: "Pro",
+        price: "10",
         period: "/month",
         popular: true,
         features: [
-          "All Free plan features",
-          "Real-time food & labor cost tracking.",
-          "Daily controllable P&L reports.",
-          "Order management & vendor ordering.",
-          "Priority support included."
+          "All Free Starter Plan features",
+          "Unlimited High-Quality Food Imagery",
+          "Advanced Style & Background Presets",
+          "Image Refinement & Enhancement",
+          "Basic Project Boards & Team Collaboration"
         ],
-        description: "Unlock advanced features to optimize your menu and maximize profits."
+        description: "Unlock essential features to enhance your food marketing efforts."
+      },
+      {
+        cta: "Get Started",
+        name: "Teams",
+        price: "55",
+        period: "/month",
+        popular: false,
+        features: [
+          "All Essential Plan features",
+          "Branded Product Placement",
+          "AI-Optimized Food Videos (up to 15 videos per month)",
+          "Priority Support Service",
+          "Unlimited Variations & Iterations"
+        ],
+        description: "Get the complete toolkit for professional food marketing."
       }
     ]
   },
 
   // Hero Banner
   heroBanner: {
-    title: "Step into the future of kitchen operations",
-    get description() { return `Join hundreds of restaurants and teams using ${siteContent.brand.name} to streamline menu management, cut costs, and enhance profits—faster.`; },
-    buttonText: "Try for free",
-    buttonTextLight: " for 12 months"
+    title: "Step into the future of food imagery",
+    description: "Join hundreds of restaurants and teams using dishtasticAI to enhance their marketing and boost sales.",
+    buttonText: "Try for free ",
+    buttonTextLight: ""
   }
 };
