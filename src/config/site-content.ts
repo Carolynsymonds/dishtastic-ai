@@ -97,40 +97,40 @@ export const siteContent = {
   splitScreen: {
     sections: [
       {
-        id: "ingredientCosting",
-        image: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/split-screen-0-1756215077055.webp",
-        title: "Ingredient Costing",
+        id: "feature1",
+        image: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1757066118355-b3a177t7ow.png",
+        title: "Instantly Generate Stunning Food Imagery & Videos",
         features: [
-          "Breaks down cost per dish in real-time",
-          "Enables informed pricing decisions",
-          "Improves menu profitability"
+          "Instant High-Quality Food Imagery",
+          "AI-Generated Food Videos",
+          "Unlimited Variations & Iterations"
         ],
-        imageAlt: "Recraft generated image for Ingredient Costing",
-        description: "Get real-time insights into your ingredient costs to make informed pricing decisions."
+        imageAlt: "Uploaded image for Instantly Generate Stunning Food Imagery & Videos",
+        description: "Transform any dish into scroll-stopping content in seconds."
       },
       {
-        id: "profitMargins",
-        image: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/split-screen-1-1756215079380.webp",
-        title: "Profit Margins",
+        id: "feature2",
+        image: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1757066129033-m5lydaxbfe.png",
+        title: "Boost Sales with Appetite-Driven Marketing",
         features: [
-          "Instant profitability overview",
-          "Quickly assess menu item success",
-          "Optimize pricing strategies"
+          "Branded Product Placement",
+          "Video Templates for Social Media",
+          "Use-Case Flexibility"
         ],
-        imageAlt: "Recraft generated image for Profit Margins",
-        description: "Stay informed about the profitability of each menu item to maximize your profits."
+        imageAlt: "Uploaded image for Boost Sales with Appetite-Driven Marketing",
+        description: "Mouth-watering visuals that turn hungry browsers into paying customers."
       },
       {
-        id: "supplierComparison",
-        image: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/split-screen-2-1756215080825.webp",
-        title: "Supplier Comparison",
+        id: "feature3",
+        image: "https://brahykobgryxdjihihrk.supabase.co/storage/v1/object/public/site-images/1757066847773-waggoph8ftn.png",
+        title: "Save Time & Cut Marketing Costs",
         features: [
-          "Compare vendor prices",
-          "Reduce ingredient costs",
-          "Streamline ordering process"
+          "Style & Background Presets",
+          "Image Refinement & Enhancement",
+          "Dedicated Support Service"
         ],
-        imageAlt: "Recraft generated image for Supplier Comparison",
-        description: "Easily compare supplier costs to ensure you're getting the best prices for your ingredients."
+        imageAlt: "Uploaded image for Save Time & Cut Marketing Costs",
+        description: "Create more, spend less, and keep your tables full."
       }
     ]
   },
