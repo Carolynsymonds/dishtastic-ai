@@ -174,7 +174,7 @@ const SignupSplit = () => {
                 className="h-28 md:h-40 mx-auto md:mb-8 cursor-pointer hover:opacity-80 transition-opacity"
               />
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            <h1 className="text-xl font-bold text-gray-900 mb-4">
               Welcome to {siteContent.brand.name}
             </h1>
             <p className="text-lg text-gray-700 mb-6">
