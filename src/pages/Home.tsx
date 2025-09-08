@@ -171,7 +171,7 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative min-h-[140vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5 overflow-visible">
         {/* Background Images - Two Rows */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-1">
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-1 pt-20">
           {/* First Row */}
           <div className="flex gap-1 w-full max-w-full px-4 opacity-30">
             <img 
