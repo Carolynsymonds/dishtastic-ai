@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeroBanner from "@/components/HeroBanner";
 import { Badge } from "@/components/ui/badge";
-import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown, Send } from "lucide-react";
+import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown, ArrowUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -203,7 +203,7 @@ const Home = () => {
                     className="absolute bottom-16 right-4 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
                     title="Generate"
                   >
-                    <Send className="w-5 h-5" />
+                    <ArrowUp className="w-5 h-5" />
                   </button>
                   
                   {/* Quick Reply Chips inside textarea */}
