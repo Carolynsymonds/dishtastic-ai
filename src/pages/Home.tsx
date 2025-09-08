@@ -13,49 +13,39 @@ import FeatureIntroSection from "@/components/FeatureIntroSection";
 import SplitScreenSection from "@/components/SplitScreenSection";
 import { siteContent } from "@/config/site-content";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
-
-const DynamicSvgIcon = ({ url, className = '', ...props }) => {
+const DynamicSvgIcon = ({
+  url,
+  className = '',
+  ...props
+}) => {
   const [svgContent, setSvgContent] = useState('');
-
   useEffect(() => {
     if (!url) return;
-
-    fetch(url)
-      .then((res) => res.text())
-      .then((text) => {
-        // Process SVG to ensure it uses primary color
-        const processedSvg = text
-          .replace(/fill="[^"]*"/g, 'fill="currentColor"')
-          .replace(/stroke="[^"]*"/g, 'stroke="currentColor"')
-          .replace(/<svg([^>]*)>/, '<svg$1 class="w-full h-full">');
-        setSvgContent(processedSvg);
-      })
-      .catch((err) => {
-        console.error('Failed to load SVG:', err);
-        setSvgContent('');
-      });
+    fetch(url).then(res => res.text()).then(text => {
+      // Process SVG to ensure it uses primary color
+      const processedSvg = text.replace(/fill="[^"]*"/g, 'fill="currentColor"').replace(/stroke="[^"]*"/g, 'stroke="currentColor"').replace(/<svg([^>]*)>/, '<svg$1 class="w-full h-full">');
+      setSvgContent(processedSvg);
+    }).catch(err => {
+      console.error('Failed to load SVG:', err);
+      setSvgContent('');
+    });
   }, [url]);
-
-  return (
-    <div
-      className={`text-primary ${className}`}
-      dangerouslySetInnerHTML={{ __html: svgContent }}
-      {...props}
-    />
-  );
+  return <div className={`text-primary ${className}`} dangerouslySetInnerHTML={{
+    __html: svgContent
+  }} {...props} />;
 };
-
 const Home = () => {
-  const { navigateWithUtm } = useUtmTracking();
-  
+  const {
+    navigateWithUtm
+  } = useUtmTracking();
   const handleSignupClick = () => {
     try {
       // GA4 recommended event
-       window.gtag?.('event', 'sign_up', {
+      window.gtag?.('event', 'sign_up', {
         method: 'cta_button',
         button_id: 'signup-btn',
         button_text: 'Start Free Trial',
-        page_location: window.location.href,
+        page_location: window.location.href
       });
     } catch (e) {
       // no-op if gtag not available
@@ -71,16 +61,11 @@ const Home = () => {
       Shield: <Shield className="w-16 h-16 text-primary" />,
       Smartphone: <Smartphone className="w-16 h-16 text-primary" />
     };
-    
+
     // Check if icon is a URL (SVG) or lucide icon name
     const isUrl = item.icon.startsWith('http');
-    
     return {
-      icon: isUrl ? (
-        <DynamicSvgIcon url={item.icon} className="w-16 h-16" />
-      ) : (
-        iconMap[item.icon as keyof typeof iconMap]
-      ),
+      icon: isUrl ? <DynamicSvgIcon url={item.icon} className="w-16 h-16" /> : iconMap[item.icon as keyof typeof iconMap],
       title: item.title,
       description: item.description
     };
@@ -97,9 +82,7 @@ const Home = () => {
     popular: plan.popular,
     link: plan.name === "Free trial" ? "/free-plan" : "/signup"
   }));
-
-  return (
-    <div className="min-h-screen bg-white">
+  return <div className="min-h-screen bg-white">
       <TopBanner />
       <Header />
       
@@ -111,32 +94,10 @@ const Home = () => {
               Make A Food Dish Image or Video in Seconds
             </h1>
             
-            <p className="text-xl text-muted-foreground mx-auto leading-relaxed max-w-3xl font-light px-0">
-              {siteContent.homePage.subtitle}
-            </p>
+            
           </div>
 
-          <div className="pt-8 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-               <Button 
-                onClick={handleSignupClick}
-                className="px-6 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-md hover:shadow-lg transition-all duration-300 w-full sm:w-auto"
-              >
-                Try for free - <span className="font-light">for 12 months</span>
-              </Button>
-              <Button 
-                onClick={() => navigateWithUtm('/pricing')}
-                variant="outline" 
-                className="px-6 py-2 w-full sm:w-auto"
-              >
-                View plans
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
-              <Check size={16} className="text-primary" />
-              No credit card required
-            </p>
-          </div>
+          
         </div>
       </section>
 
@@ -148,17 +109,10 @@ const Home = () => {
           <div className="text-center">
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button 
-                  onClick={handleSignupClick}
-                  className="px-6 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-md hover:shadow-lg transition-all duration-300 w-full sm:w-auto"
-                >
+                <Button onClick={handleSignupClick} className="px-6 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-md hover:shadow-lg transition-all duration-300 w-full sm:w-auto">
                   Try for free - <span className="font-light">for 12 months</span>
                 </Button>
-                <Button 
-                  onClick={() => navigateWithUtm('/features')}
-                  variant="outline" 
-                  className="px-6 py-2 w-full sm:w-auto"
-                >
+                <Button onClick={() => navigateWithUtm('/features')} variant="outline" className="px-6 py-2 w-full sm:w-auto">
                   View features
                 </Button>
               </div>
@@ -184,16 +138,10 @@ const Home = () => {
           </div>
 
           <div className={`grid gap-8 max-w-6xl mx-auto ${plans.length === 2 ? 'md:grid-cols-2 justify-center px-16' : 'md:grid-cols-3'}`}>
-            {plans.map((plan, index) => (
-              <Card 
-                key={plan.name} 
-                className={`relative ${plan.popular ? 'ring-2 ring-primary shadow-lg' : 'border border-gray-200'} transition-all duration-200 hover:shadow-lg`}
-              >
-                {plan.popular && (
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-white">
+            {plans.map((plan, index) => <Card key={plan.name} className={`relative ${plan.popular ? 'ring-2 ring-primary shadow-lg' : 'border border-gray-200'} transition-all duration-200 hover:shadow-lg`}>
+                {plan.popular && <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-white">
                     Most Popular
-                  </Badge>
-                )}
+                  </Badge>}
                 
                 <CardHeader className="text-center pb-4">
                   <CardTitle className="text-2xl font-bold text-foreground">
@@ -213,35 +161,24 @@ const Home = () => {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                <Button 
-                  onClick={() => navigateWithUtm(plan.link)}
-                  className={`w-full ${plan.popular ? 'bg-primary hover:bg-primary/90' : ''}`}
-                  variant={plan.popular ? "default" : "outline"}
-                >
+                <Button onClick={() => navigateWithUtm(plan.link)} className={`w-full ${plan.popular ? 'bg-primary hover:bg-primary/90' : ''}`} variant={plan.popular ? "default" : "outline"}>
                   {plan.cta}
                 </Button>
 
                   <div className="space-y-3">
-                    {plan.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-start gap-3">
+                    {plan.features.map((feature, featureIndex) => <div key={featureIndex} className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                         <span className="text-muted-foreground text-sm">
                           {feature}
                         </span>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
 
           <div className="text-center mt-12">
-            <Button 
-              onClick={() => navigateWithUtm('/pricing')}
-              variant="outline" 
-              className="px-6 py-2"
-            >
+            <Button onClick={() => navigateWithUtm('/pricing')} variant="outline" className="px-6 py-2">
               View more
             </Button>
           </div>
@@ -255,8 +192,6 @@ const Home = () => {
 
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Home;
