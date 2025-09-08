@@ -177,7 +177,7 @@ const Home = () => {
             </h1>
             
             {/* Chat Box */}
-            <div className="max-w-4xl mx-auto mt-8">
+            <div className="max-w-6xl mx-auto mt-8">
               <div className="space-y-4 p-6 bg-background border border-border rounded-xl shadow-lg">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1 relative">
