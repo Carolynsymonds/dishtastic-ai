@@ -28,21 +28,12 @@ const HeadlineSection = () => {
       <div className="max-w-4xl mx-auto text-center flex flex-col md:space-y-8 animate-fade-in">
         <div className="space-y-6 mt-32 sm:mt-32 order-1">
           <h1 className="text-[42px] md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
-            Make A Food Dish Image or Video in Seconds
+            {siteContent.headline.title}<span className="text-primary">{siteContent.headline.titleHighlight}</span>
           </h1>
           
-          <div className="max-w-md mx-auto mt-8">
-            <div className="flex items-center space-x-2 p-3 bg-background border border-border rounded-lg shadow-sm">
-              <input
-                type="text"
-                placeholder="Describe your food dish..."
-                className="flex-1 bg-transparent border-none outline-none text-foreground placeholder-muted-foreground"
-              />
-              <Button size="sm" className="px-4">
-                Generate
-              </Button>
-            </div>
-          </div>
+          <h2 style={{ color: '#191918', fontSize: '20px', fontWeight: '300' }} className="mx-auto leading-relaxed px-0">
+            {siteContent.headline.subtitle}
+          </h2>
         </div>
 
         <div className="py-8 space-y-3 !mt-0 order-2 md:order-3">
