@@ -172,7 +172,7 @@ const Home = () => {
       <section className="relative min-h-[80vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5 overflow-hidden">
         {/* Background Images - Side by Side */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="flex gap-4 w-full max-w-7xl opacity-15">
+          <div className="flex gap-4 w-full max-w-7xl opacity-30">
             <img 
               src="/lovable-uploads/414772d4-1bcb-4d32-a2a1-79efdc45cdca.png" 
               alt="Lobster roll showcase" 
