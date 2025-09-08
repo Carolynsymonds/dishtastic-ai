@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeroBanner from "@/components/HeroBanner";
 import { Badge } from "@/components/ui/badge";
-import { Check, Calendar, Shield, Smartphone } from "lucide-react";
+import { Check, Calendar, Shield, Smartphone, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -97,11 +97,31 @@ const Home = () => {
             {/* Chat Box */}
             <div className="max-w-4xl mx-auto mt-8">
               <div className="flex flex-col sm:flex-row gap-4 p-6 bg-background border border-border rounded-xl shadow-lg">
-                <textarea
-                  placeholder="Describe your food dish or recipe you want to generate..."
-                  className="flex-1 min-h-[120px] px-6 py-4 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                  rows={4}
-                />
+                <div className="flex-1 relative">
+                  <textarea
+                    placeholder="Describe your food dish or recipe you want to generate..."
+                    className="w-full min-h-[120px] px-6 py-4 pr-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                    rows={4}
+                  />
+                  <button
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    className="absolute bottom-4 right-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                    title="Add image"
+                  >
+                    <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+                  </button>
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      // Handle image upload logic here
+                      console.log('Selected files:', e.target.files);
+                    }}
+                  />
+                </div>
                 <Button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-lg h-fit sm:self-end">
                   Generate
                 </Button>
