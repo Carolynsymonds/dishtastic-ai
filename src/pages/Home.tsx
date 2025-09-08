@@ -169,8 +169,53 @@ const Home = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="min-h-[80vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
+      <section className="relative min-h-[80vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5 overflow-hidden">
+        {/* Background Images */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top left - Lobster roll */}
+          <img 
+            src="/lovable-uploads/414772d4-1bcb-4d32-a2a1-79efdc45cdca.png" 
+            alt="Lobster roll showcase" 
+            className="absolute top-8 left-8 w-48 h-32 object-cover rounded-lg opacity-20 rotate-[-8deg] shadow-lg hidden lg:block"
+          />
+          
+          {/* Top right - Pizza */}
+          <img 
+            src="/lovable-uploads/ac8c5174-2398-43ea-8ede-9298108eb6cc.png" 
+            alt="Wood-fired pizza showcase" 
+            className="absolute top-12 right-12 w-40 h-40 object-cover rounded-lg opacity-20 rotate-[12deg] shadow-lg hidden lg:block"
+          />
+          
+          {/* Middle left - Poke bowl */}
+          <img 
+            src="/lovable-uploads/9b776cf4-fad8-4955-a4a2-ccbbd1ce7a96.png" 
+            alt="Poke bowl preparation showcase" 
+            className="absolute top-1/2 left-4 w-36 h-48 object-cover rounded-lg opacity-15 rotate-[-15deg] shadow-lg hidden xl:block"
+          />
+          
+          {/* Middle right - Ramen */}
+          <img 
+            src="/lovable-uploads/3019963f-d795-4f70-a8a6-9e8a0f85c0ef.png" 
+            alt="Ramen preparation showcase" 
+            className="absolute top-1/2 right-8 w-44 h-36 object-cover rounded-lg opacity-15 rotate-[8deg] shadow-lg hidden xl:block"
+          />
+          
+          {/* Bottom left - Fine dining steak */}
+          <img 
+            src="/lovable-uploads/006ae285-acc6-42fb-a3e2-b2415ed1da30.png" 
+            alt="Fine dining steak showcase" 
+            className="absolute bottom-16 left-16 w-42 h-28 object-cover rounded-lg opacity-20 rotate-[15deg] shadow-lg hidden lg:block"
+          />
+          
+          {/* Bottom right - Street taco */}
+          <img 
+            src="/lovable-uploads/cba94c88-cf1f-4568-bbdf-43bec434925e.png" 
+            alt="Street taco showcase" 
+            className="absolute bottom-20 right-20 w-32 h-44 object-cover rounded-lg opacity-20 rotate-[-12deg] shadow-lg hidden lg:block"
+          />
+        </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
           <div className="space-y-6 mt-24">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
               Make A Food Dish Image or Video in Seconds
@@ -178,7 +223,7 @@ const Home = () => {
             
             {/* Chat Box */}
             <div className="max-w-5xl mx-auto mt-8">
-              <div className="space-y-4 p-6 bg-background border border-border rounded-xl shadow-lg">
+              <div className="space-y-4 p-6 bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-lg">
                 <div className="relative">
                   <textarea
                     value={textareaValue}
