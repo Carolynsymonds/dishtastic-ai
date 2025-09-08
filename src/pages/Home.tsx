@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeroBanner from "@/components/HeroBanner";
 import { Badge } from "@/components/ui/badge";
-import { Check, Calendar, Shield, Smartphone, Plus } from "lucide-react";
+import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -38,6 +38,7 @@ const Home = () => {
   const {
     navigateWithUtm
   } = useUtmTracking();
+  const [textareaValue, setTextareaValue] = useState("");
   const handleSignupClick = () => {
     try {
       // GA4 recommended event
@@ -54,6 +55,81 @@ const Home = () => {
     // then navigate (SPA)
     navigateWithUtm('/signup');
   };
+
+  const handleChipClick = (chipText: string) => {
+    setTextareaValue(prev => prev ? `${prev} ${chipText}` : chipText);
+  };
+
+  const quickReplies = [
+    {
+      category: "Format",
+      icon: <Video className="w-4 h-4" />,
+      chips: [
+        { text: "Video", icon: <Video className="w-3 h-3" /> },
+        { text: "Image", icon: <Image className="w-3 h-3" /> }
+      ]
+    },
+    {
+      category: "Scale", 
+      icon: <Maximize2 className="w-4 h-4" />,
+      chips: [
+        { text: "2:3", icon: <Maximize2 className="w-3 h-3" /> },
+        { text: "1:1", icon: <Maximize2 className="w-3 h-3" /> },
+        { text: "16:9", icon: <Maximize2 className="w-3 h-3" /> }
+      ]
+    },
+    {
+      category: "Length",
+      icon: <Clock className="w-4 h-4" />,
+      chips: [
+        { text: "1s", icon: <Clock className="w-3 h-3" /> },
+        { text: "2s", icon: <Clock className="w-3 h-3" /> },
+        { text: "5s", icon: <Clock className="w-3 h-3" /> },
+        { text: "10s", icon: <Clock className="w-3 h-3" /> },
+        { text: "15s", icon: <Clock className="w-3 h-3" /> }
+      ]
+    },
+    {
+      category: "Video Style",
+      icon: <Camera className="w-4 h-4" />,
+      chips: [
+        { text: "Push-In Close", icon: <Camera className="w-3 h-3" /> },
+        { text: "Pull-Back Reveal", icon: <Camera className="w-3 h-3" /> },
+        { text: "Overhead Top-Down", icon: <Camera className="w-3 h-3" /> },
+        { text: "360° Dish Orbit", icon: <Camera className="w-3 h-3" /> },
+        { text: "Table Slide", icon: <Camera className="w-3 h-3" /> },
+        { text: "Tilt-Down Reveal", icon: <Camera className="w-3 h-3" /> },
+        { text: "Tilt-Up Reveal", icon: <Camera className="w-3 h-3" /> },
+        { text: "Rack Focus Shift", icon: <Camera className="w-3 h-3" /> },
+        { text: "Slow-Mo Pour", icon: <Camera className="w-3 h-3" /> },
+        { text: "Ingredient Drop", icon: <Camera className="w-3 h-3" /> },
+        { text: "Handheld Lifestyle", icon: <Camera className="w-3 h-3" /> },
+        { text: "Whip Pan", icon: <Camera className="w-3 h-3" /> },
+        { text: "Speed Ramp", icon: <Camera className="w-3 h-3" /> },
+        { text: "Drone Establishing", icon: <Camera className="w-3 h-3" /> },
+        { text: "Chef POV", icon: <Camera className="w-3 h-3" /> }
+      ]
+    },
+    {
+      category: "Background",
+      icon: <MapPin className="w-4 h-4" />,
+      chips: [
+        { text: "Plain", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Home Kitchen", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Chef's Pass", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Street Stall", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Fine Dining", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Farm Table", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Coffee Shop", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Garden Picnic", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Rooftop Bar", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Market Stand", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Backyard Grill", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Hotel Buffet", icon: <MapPin className="w-3 h-3" /> },
+        { text: "Casual Diner", icon: <MapPin className="w-3 h-3" /> }
+      ]
+    }
+  ];
   // Get features from site content - taking first 3 from the features section
   const features = siteContent.features.items.map(item => {
     const iconMap = {
@@ -96,35 +172,63 @@ const Home = () => {
             
             {/* Chat Box */}
             <div className="max-w-4xl mx-auto mt-8">
-              <div className="flex flex-col sm:flex-row gap-4 p-6 bg-background border border-border rounded-xl shadow-lg">
-                <div className="flex-1 relative">
-                  <textarea
-                    placeholder="Describe your food dish or recipe you want to generate..."
-                    className="w-full min-h-[120px] px-6 py-4 pr-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                    rows={4}
-                  />
-                  <button
-                    onClick={() => document.getElementById('image-upload')?.click()}
-                    className="absolute bottom-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
-                    title="Add image"
-                  >
-                    <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
-                  </button>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => {
-                      // Handle image upload logic here
-                      console.log('Selected files:', e.target.files);
-                    }}
-                  />
+              <div className="space-y-4 p-6 bg-background border border-border rounded-xl shadow-lg">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1 relative">
+                    <textarea
+                      value={textareaValue}
+                      onChange={(e) => setTextareaValue(e.target.value)}
+                      placeholder="Describe your food dish or recipe you want to generate..."
+                      className="w-full min-h-[120px] px-6 py-4 pr-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                      rows={4}
+                    />
+                    <button
+                      onClick={() => document.getElementById('image-upload')?.click()}
+                      className="absolute bottom-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                      title="Add image"
+                    >
+                      <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+                    </button>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        // Handle image upload logic here
+                        console.log('Selected files:', e.target.files);
+                      }}
+                    />
+                  </div>
+                  <Button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-lg h-fit sm:self-end">
+                    Generate
+                  </Button>
                 </div>
-                <Button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-lg h-fit sm:self-end">
-                  Generate
-                </Button>
+
+                {/* Quick Reply Chips */}
+                <div className="space-y-4 border-t border-border pt-4">
+                  {quickReplies.map((category) => (
+                    <div key={category.category} className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                        {category.icon}
+                        <span>{category.category}</span>
+                      </div>
+                      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                        {category.chips.map((chip) => (
+                          <button
+                            key={chip.text}
+                            onClick={() => handleChipClick(chip.text)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 active:bg-muted/60 text-foreground text-sm rounded-full whitespace-nowrap transition-colors duration-200 shadow-sm hover:shadow-md"
+                          >
+                            {chip.icon}
+                            <span>{chip.text}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             
