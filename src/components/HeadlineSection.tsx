@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import { Check, Send } from "lucide-react";
+import { Check } from "lucide-react";
 import { siteContent } from "@/config/site-content";
 import BenefitsSection from "@/components/BenefitsSection";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
@@ -29,20 +28,12 @@ const HeadlineSection = () => {
       <div className="max-w-4xl mx-auto text-center flex flex-col md:space-y-8 animate-fade-in">
         <div className="space-y-6 mt-32 sm:mt-32 order-1">
           <h1 className="text-[42px] md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
-            Make A Food Dish Image or Video in Seconds
+            {siteContent.headline.title}<span className="text-primary">{siteContent.headline.titleHighlight}</span>
           </h1>
           
-          <div className="max-w-2xl mx-auto mt-8">
-            <div className="flex gap-2 p-2 bg-background border border-input rounded-lg shadow-sm">
-              <Input 
-                placeholder="Describe the food dish you want to create..."
-                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-              <Button size="sm" className="px-4">
-                <Send size={16} />
-              </Button>
-            </div>
-          </div>
+          <h2 style={{ color: '#191918', fontSize: '20px', fontWeight: '300' }} className="mx-auto leading-relaxed px-0">
+            {siteContent.headline.subtitle}
+          </h2>
         </div>
 
         <div className="py-8 space-y-3 !mt-0 order-2 md:order-3">
