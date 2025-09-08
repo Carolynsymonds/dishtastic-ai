@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeroBanner from "@/components/HeroBanner";
 import { Badge } from "@/components/ui/badge";
-import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown } from "lucide-react";
+import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -179,27 +179,35 @@ const Home = () => {
             {/* Chat Box */}
             <div className="max-w-6xl mx-auto mt-8">
               <div className="space-y-4 p-6 bg-background border border-border rounded-xl shadow-lg">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <textarea
-                      value={textareaValue}
-                      onChange={(e) => setTextareaValue(e.target.value)}
-                      placeholder="Describe your food dish or recipe you want to generate..."
-                      className="w-full min-h-[180px] px-6 py-4 pr-12 pb-20 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                      rows={6}
-                    />
-                    
-                    {/* Add image button */}
-                    <button
-                      onClick={() => document.getElementById('image-upload')?.click()}
-                      className="absolute bottom-16 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
-                      title="Add image"
-                    >
-                      <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
-                    </button>
-                    
-                    {/* Quick Reply Chips inside textarea */}
-                    <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
+                <div className="relative">
+                  <textarea
+                    value={textareaValue}
+                    onChange={(e) => setTextareaValue(e.target.value)}
+                    placeholder="Describe your food dish or recipe you want to generate..."
+                    className="w-full min-h-[180px] px-6 py-4 pr-12 pb-20 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                    rows={6}
+                  />
+                  
+                  {/* Add image button */}
+                  <button
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    className="absolute bottom-16 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                    title="Add image"
+                  >
+                    <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+                  </button>
+                  
+                  {/* Send button */}
+                  <button
+                    onClick={() => console.log('Generate clicked')}
+                    className="absolute bottom-16 right-4 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
+                    title="Generate"
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
+                  
+                  {/* Quick Reply Chips inside textarea */}
+                  <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
                       {quickReplies.map((category) => (
                         <div key={category.category} className="relative">
                           <button
@@ -243,10 +251,6 @@ const Home = () => {
                         console.log('Selected files:', e.target.files);
                       }}
                     />
-                  </div>
-                  <Button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-lg h-fit sm:self-end">
-                    Generate
-                  </Button>
                 </div>
               </div>
             </div>
