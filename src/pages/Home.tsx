@@ -108,7 +108,7 @@ const Home = () => {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <div className="space-y-6 mt-24">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
-              {siteContent.homePage.title}
+              Make A Food Dish Image or Video in Seconds
             </h1>
             
             <p className="text-xl text-muted-foreground mx-auto leading-relaxed max-w-3xl font-light px-0">
