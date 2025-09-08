@@ -173,7 +173,7 @@ const Home = () => {
         {/* Background Images - Two Rows */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-4">
           {/* First Row */}
-          <div className="flex gap-4 w-full max-w-6xl opacity-30">
+          <div className="flex gap-4 w-full max-w-full px-8 opacity-30">
             <img 
               src="/lovable-uploads/414772d4-1bcb-4d32-a2a1-79efdc45cdca.png" 
               alt="Lobster roll showcase" 
@@ -192,7 +192,7 @@ const Home = () => {
           </div>
           
           {/* Second Row */}
-          <div className="flex gap-4 w-full max-w-6xl opacity-30">
+          <div className="flex gap-4 w-full max-w-full px-8 opacity-30">
             <img 
               src="/lovable-uploads/3019963f-d795-4f70-a8a6-9e8a0f85c0ef.png" 
               alt="Ramen preparation showcase" 
