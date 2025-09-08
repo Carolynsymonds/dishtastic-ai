@@ -184,14 +184,14 @@ const Home = () => {
                     value={textareaValue}
                     onChange={(e) => setTextareaValue(e.target.value)}
                     placeholder="Describe your food dish or recipe you want to generate..."
-                    className="w-full min-h-[140px] px-6 py-4 pr-12 pb-20 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                    rows={6}
+                    className="w-full min-h-[140px] pl-14 pr-12 py-4 pb-20 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                    rows={5}
                   />
                   
                   {/* Add image button */}
                   <button
                     onClick={() => document.getElementById('image-upload')?.click()}
-                    className="absolute bottom-16 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                    className="absolute top-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
                     title="Add image"
                   >
                     <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
