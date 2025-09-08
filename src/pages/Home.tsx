@@ -185,26 +185,26 @@ const Home = () => {
                       value={textareaValue}
                       onChange={(e) => setTextareaValue(e.target.value)}
                       placeholder="Describe your food dish or recipe you want to generate..."
-                      className="w-full min-h-[120px] px-6 py-4 pr-12 pb-16 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                      rows={4}
+                      className="w-full min-h-[180px] px-6 py-4 pr-12 pb-20 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                      rows={6}
                     />
                     
                     {/* Add image button */}
                     <button
                       onClick={() => document.getElementById('image-upload')?.click()}
-                      className="absolute bottom-12 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                      className="absolute bottom-16 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
                       title="Add image"
                     >
                       <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
                     </button>
                     
                     {/* Quick Reply Chips inside textarea */}
-                    <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1">
+                    <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
                       {quickReplies.map((category) => (
                         <div key={category.category} className="relative">
                           <button
                             onClick={() => toggleDropdown(category.category)}
-                            className="flex items-center gap-1 px-2 py-1 bg-muted hover:bg-muted/80 text-foreground text-xs rounded-md whitespace-nowrap transition-colors border border-border shadow-sm"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground text-xs rounded-md whitespace-nowrap transition-colors border border-border shadow-sm"
                           >
                             {category.icon}
                             <span>{category.category}</span>
