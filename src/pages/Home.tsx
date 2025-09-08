@@ -105,7 +105,7 @@ const Home = () => {
                   />
                   <button
                     onClick={() => document.getElementById('image-upload')?.click()}
-                    className="absolute bottom-4 right-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                    className="absolute bottom-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
                     title="Add image"
                   >
                     <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
