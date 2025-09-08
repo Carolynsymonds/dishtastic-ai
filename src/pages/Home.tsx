@@ -189,6 +189,11 @@ const Home = () => {
               alt="Poke bowl preparation showcase" 
               className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-contain rounded-lg"
             />
+            <img 
+              src="/lovable-uploads/26136666-4fcb-49fd-b5a9-13b1af964c5d.png" 
+              alt="Glazed chicken wings showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-contain rounded-lg"
+            />
           </div>
           
           {/* Second Row */}
@@ -206,6 +211,11 @@ const Home = () => {
             <img 
               src="/lovable-uploads/cba94c88-cf1f-4568-bbdf-43bec434925e.png" 
               alt="Street taco showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-contain rounded-lg"
+            />
+            <img 
+              src="/lovable-uploads/a8ad989d-7ec6-494d-83c6-f74aab6a0170.png" 
+              alt="Artisan cookies bakery showcase" 
               className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-contain rounded-lg"
             />
           </div>
