@@ -184,7 +184,7 @@ const Home = () => {
                     value={textareaValue}
                     onChange={(e) => setTextareaValue(e.target.value)}
                     placeholder="Describe your food dish or recipe you want to generate..."
-                    className="w-full min-h-[140px] pl-14 pr-12 py-4 pb-20 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                    className="w-full min-h-[140px] pl-14 pr-12 py-4 pb-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                     rows={5}
                   />
                   
@@ -200,14 +200,14 @@ const Home = () => {
                   {/* Send button */}
                   <button
                     onClick={() => console.log('Generate clicked')}
-                    className="absolute bottom-16 right-4 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
+                    className="absolute bottom-8 right-4 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
                     title="Generate"
                   >
                     <ArrowUp className="w-5 h-5" />
                   </button>
                   
                   {/* Quick Reply Chips inside textarea */}
-                  <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
+                  <div className="absolute bottom-2 left-3 right-3 flex flex-wrap gap-2">
                       {quickReplies.map((category) => (
                         <div key={category.category} className="relative">
                           <button
