@@ -170,38 +170,43 @@ const Home = () => {
       
       {/* Hero Section */}
       <section className="relative min-h-[80vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5 overflow-hidden">
-        {/* Background Images - Side by Side */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="flex gap-4 w-full max-w-7xl opacity-30">
+        {/* Background Images - Two Rows */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-4">
+          {/* First Row */}
+          <div className="flex gap-4 w-full max-w-6xl opacity-30">
             <img 
               src="/lovable-uploads/414772d4-1bcb-4d32-a2a1-79efdc45cdca.png" 
               alt="Lobster roll showcase" 
-              className="flex-1 h-96 object-cover rounded-lg"
+              className="flex-1 h-48 object-cover rounded-lg"
             />
             <img 
               src="/lovable-uploads/ac8c5174-2398-43ea-8ede-9298108eb6cc.png" 
               alt="Wood-fired pizza showcase" 
-              className="flex-1 h-96 object-cover rounded-lg"
+              className="flex-1 h-48 object-cover rounded-lg"
             />
             <img 
               src="/lovable-uploads/9b776cf4-fad8-4955-a4a2-ccbbd1ce7a96.png" 
               alt="Poke bowl preparation showcase" 
-              className="flex-1 h-96 object-cover rounded-lg"
+              className="flex-1 h-48 object-cover rounded-lg"
             />
+          </div>
+          
+          {/* Second Row */}
+          <div className="flex gap-4 w-full max-w-6xl opacity-30">
             <img 
               src="/lovable-uploads/3019963f-d795-4f70-a8a6-9e8a0f85c0ef.png" 
               alt="Ramen preparation showcase" 
-              className="flex-1 h-96 object-cover rounded-lg"
+              className="flex-1 h-48 object-cover rounded-lg"
             />
             <img 
               src="/lovable-uploads/006ae285-acc6-42fb-a3e2-b2415ed1da30.png" 
               alt="Fine dining steak showcase" 
-              className="flex-1 h-96 object-cover rounded-lg"
+              className="flex-1 h-48 object-cover rounded-lg"
             />
             <img 
               src="/lovable-uploads/cba94c88-cf1f-4568-bbdf-43bec434925e.png" 
               alt="Street taco showcase" 
-              className="flex-1 h-96 object-cover rounded-lg"
+              className="flex-1 h-48 object-cover rounded-lg"
             />
           </div>
         </div>
