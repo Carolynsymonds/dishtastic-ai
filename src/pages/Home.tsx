@@ -99,7 +99,7 @@ const Home = () => {
               <div className="flex gap-2 p-4 bg-background border border-border rounded-lg shadow-sm">
                 <input
                   type="text"
-                  placeholder="Describe your food dish or recipe you want to generate"
+                  placeholder="Describe the food dish you want to generate..."
                   className="flex-1 px-4 py-2 border border-input bg-background rounded-md text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1"
                 />
                 <Button className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground">
