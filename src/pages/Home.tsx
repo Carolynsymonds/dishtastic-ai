@@ -96,35 +96,150 @@ const Home = () => {
             
             {/* Chat Box */}
             <div className="max-w-4xl mx-auto mt-8">
-              <div className="flex flex-col sm:flex-row gap-4 p-6 bg-background border border-border rounded-xl shadow-lg">
-                <div className="flex-1 relative">
-                  <textarea
-                    placeholder="Describe your food dish or recipe you want to generate..."
-                    className="w-full min-h-[120px] px-6 py-4 pr-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                    rows={4}
-                  />
-                  <button
-                    onClick={() => document.getElementById('image-upload')?.click()}
-                    className="absolute bottom-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
-                    title="Add image"
-                  >
-                    <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
-                  </button>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => {
-                      // Handle image upload logic here
-                      console.log('Selected files:', e.target.files);
-                    }}
-                  />
+              <div className="flex flex-col gap-4 p-6 bg-background border border-border rounded-xl shadow-lg">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1 relative">
+                    <textarea
+                      placeholder="Describe your food dish or recipe you want to generate..."
+                      className="w-full min-h-[120px] px-6 py-4 pr-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                      rows={4}
+                    />
+                    <button
+                      onClick={() => document.getElementById('image-upload')?.click()}
+                      className="absolute bottom-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                      title="Add image"
+                    >
+                      <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+                    </button>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        // Handle image upload logic here
+                        console.log('Selected files:', e.target.files);
+                      }}
+                    />
+                  </div>
+                  <Button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-lg h-fit sm:self-end">
+                    Generate
+                  </Button>
                 </div>
-                <Button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-lg h-fit sm:self-end">
-                  Generate
-                </Button>
+                
+                {/* Quick Reply Chips */}
+                <div className="space-y-3 border-t border-border pt-4">
+                  {/* Format */}
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground mb-2">Format</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Video', 'Image'].map((item) => (
+                        <button
+                          key={item}
+                          className="px-3 py-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-full transition-colors"
+                          onClick={() => {
+                            const textarea = document.querySelector('textarea');
+                            if (textarea) {
+                              textarea.value += (textarea.value ? ' ' : '') + item;
+                              textarea.focus();
+                            }
+                          }}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Scale */}
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground mb-2">Scale</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['2:3', '1:1', '16:9'].map((item) => (
+                        <button
+                          key={item}
+                          className="px-3 py-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-full transition-colors"
+                          onClick={() => {
+                            const textarea = document.querySelector('textarea');
+                            if (textarea) {
+                              textarea.value += (textarea.value ? ' ' : '') + item;
+                              textarea.focus();
+                            }
+                          }}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Length */}
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground mb-2">Length</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['1s', '2s', '5s', '10s', '15s'].map((item) => (
+                        <button
+                          key={item}
+                          className="px-3 py-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-full transition-colors"
+                          onClick={() => {
+                            const textarea = document.querySelector('textarea');
+                            if (textarea) {
+                              textarea.value += (textarea.value ? ' ' : '') + item;
+                              textarea.focus();
+                            }
+                          }}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Video Style */}
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground mb-2">Video Style</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Push-In Close', 'Pull-Back Reveal', 'Overhead Top-Down', '360° Dish Orbit', 'Table Slide', 'Tilt-Down Reveal', 'Tilt-Up Reveal', 'Rack Focus Shift', 'Slow-Mo Pour', 'Ingredient Drop', 'Handheld Lifestyle', 'Whip Pan', 'Speed Ramp', 'Drone Establishing', 'Chef POV'].map((item) => (
+                        <button
+                          key={item}
+                          className="px-3 py-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-full transition-colors"
+                          onClick={() => {
+                            const textarea = document.querySelector('textarea');
+                            if (textarea) {
+                              textarea.value += (textarea.value ? ' ' : '') + item;
+                              textarea.focus();
+                            }
+                          }}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Background */}
+                  <div>
+                    <h4 className="text-xs font-medium text-muted-foreground mb-2">Background</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Plain', 'Home Kitchen', "Chef's Pass", 'Street Stall', 'Fine Dining', 'Farm Table', 'Coffee Shop', 'Garden Picnic', 'Rooftop Bar', 'Market Stand', 'Backyard Grill', 'Hotel Buffet', 'Food Truck', 'Casual Diner', 'Family Dinner'].map((item) => (
+                        <button
+                          key={item}
+                          className="px-3 py-1 text-xs bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground rounded-full transition-colors"
+                          onClick={() => {
+                            const textarea = document.querySelector('textarea');
+                            if (textarea) {
+                              textarea.value += (textarea.value ? ' ' : '') + item;
+                              textarea.focus();
+                            }
+                          }}
+                        >
+                          {item}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             
