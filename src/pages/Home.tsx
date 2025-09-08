@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeroBanner from "@/components/HeroBanner";
 import { Badge } from "@/components/ui/badge";
-import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin } from "lucide-react";
+import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -39,6 +39,7 @@ const Home = () => {
     navigateWithUtm
   } = useUtmTracking();
   const [textareaValue, setTextareaValue] = useState("");
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const handleSignupClick = () => {
     try {
       // GA4 recommended event
@@ -58,6 +59,11 @@ const Home = () => {
 
   const handleChipClick = (chipText: string) => {
     setTextareaValue(prev => prev ? `${prev} ${chipText}` : chipText);
+    setActiveDropdown(null); // Close dropdown after selection
+  };
+
+  const toggleDropdown = (category: string) => {
+    setActiveDropdown(activeDropdown === category ? null : category);
   };
 
   const quickReplies = [
@@ -179,16 +185,53 @@ const Home = () => {
                       value={textareaValue}
                       onChange={(e) => setTextareaValue(e.target.value)}
                       placeholder="Describe your food dish or recipe you want to generate..."
-                      className="w-full min-h-[120px] px-6 py-4 pr-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                      className="w-full min-h-[120px] px-6 py-4 pr-12 pb-16 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                       rows={4}
                     />
+                    
+                    {/* Add image button */}
                     <button
                       onClick={() => document.getElementById('image-upload')?.click()}
-                      className="absolute bottom-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                      className="absolute bottom-12 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
                       title="Add image"
                     >
                       <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
                     </button>
+                    
+                    {/* Quick Reply Chips inside textarea */}
+                    <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1">
+                      {quickReplies.map((category) => (
+                        <div key={category.category} className="relative">
+                          <button
+                            onClick={() => toggleDropdown(category.category)}
+                            className="flex items-center gap-1 px-2 py-1 bg-muted hover:bg-muted/80 text-foreground text-xs rounded-md whitespace-nowrap transition-colors border border-border shadow-sm"
+                          >
+                            {category.icon}
+                            <span>{category.category}</span>
+                            <ChevronDown className="w-3 h-3" />
+                          </button>
+                          
+                          {/* Dropdown menu */}
+                          {activeDropdown === category.category && (
+                            <div className="absolute bottom-full mb-2 left-0 bg-background border border-border rounded-lg shadow-lg z-50 min-w-[200px] max-h-48 overflow-y-auto">
+                              <div className="p-2 space-y-1">
+                                {category.chips.map((chip) => (
+                                  <button
+                                    key={chip.text}
+                                    onClick={() => handleChipClick(chip.text)}
+                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-md text-sm text-left transition-colors"
+                                  >
+                                    {chip.icon}
+                                    <span>{chip.text}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    
                     <input
                       id="image-upload"
                       type="file"
@@ -204,30 +247,6 @@ const Home = () => {
                   <Button className="px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-semibold text-lg h-fit sm:self-end">
                     Generate
                   </Button>
-                </div>
-
-                {/* Quick Reply Chips */}
-                <div className="space-y-4 border-t border-border pt-4">
-                  {quickReplies.map((category) => (
-                    <div key={category.category} className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                        {category.icon}
-                        <span>{category.category}</span>
-                      </div>
-                      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                        {category.chips.map((chip) => (
-                          <button
-                            key={chip.text}
-                            onClick={() => handleChipClick(chip.text)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 active:bg-muted/60 text-foreground text-sm rounded-full whitespace-nowrap transition-colors duration-200 shadow-sm hover:shadow-md"
-                          >
-                            {chip.icon}
-                            <span>{chip.text}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
