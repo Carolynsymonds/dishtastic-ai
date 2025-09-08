@@ -221,8 +221,8 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
-          <div className="space-y-6 mt-24">
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center justify-center min-h-[80vh]">
+          <div className="space-y-6">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
               Make A Food Dish Image or Video in Seconds
             </h1>
