@@ -1,53 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-// Remove unused imports since we're redirecting
-import { Loader2, ArrowLeft, RotateCcw } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-interface GenerationResult {
-  type: 'image' | 'video';
-  content: string;
-  format: string;
-  parameters: any;
-  prompt: string;
-  duration?: number;
-  taskId?: string;
-}
-
 const GenerateVideo = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const hasStartedGeneration = useRef(false);
 
   // Get parameters from URL
   const prompt = searchParams.get('prompt');
   const parametersString = searchParams.get('parameters');
-  const parameters = parametersString ? JSON.parse(decodeURIComponent(parametersString)) : null;
 
   useEffect(() => {
-    if (!prompt || !parameters) {
+    if (!prompt || !parametersString) {
       toast.error("Invalid generation parameters");
       navigate('/');
       return;
     }
 
-    // Start generation when component mounts
-    handleGenerate();
-  }, [prompt, parameters]);
+    // Prevent multiple generations
+    if (hasStartedGeneration.current) {
+      return;
+    }
 
-  const handleGenerate = async () => {
-    if (!prompt || !parameters) return;
+    try {
+      const parameters = JSON.parse(decodeURIComponent(parametersString));
+      hasStartedGeneration.current = true;
+      handleGenerate(prompt, parameters);
+    } catch (error) {
+      toast.error("Invalid parameters format");
+      navigate('/');
+    }
+  }, [prompt, parametersString, navigate]);
 
+  const handleGenerate = async (prompt: string, parameters: any) => {
     setIsGenerating(true);
     setGenerationError(null);
-    setGenerationResult(null);
 
     try {
       const isVideo = parameters.Format === 'Video';
@@ -64,7 +60,6 @@ const GenerateVideo = () => {
         throw error;
       }
 
-      setGenerationResult(data);
       toast.success(`${isVideo ? 'Video' : 'Image'} generated successfully!`);
       
       // Redirect to video display page after successful generation
@@ -84,13 +79,10 @@ const GenerateVideo = () => {
       console.error('Generation error:', error);
       setGenerationError(error.message || 'Failed to generate content');
       toast.error(error.message || 'Failed to generate content');
+      hasStartedGeneration.current = false; // Allow retry
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const handleRegenerate = () => {
-    handleGenerate();
   };
 
   const goBack = () => {
@@ -113,21 +105,6 @@ const GenerateVideo = () => {
               <ArrowLeft className="w-4 h-4" />
               Back to Home
             </Button>
-            
-            {generationResult && (
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleRegenerate}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                  disabled={isGenerating}
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Regenerate
-                </Button>
-              </div>
-            )}
           </div>
 
           {/* Generation Content */}
@@ -137,13 +114,10 @@ const GenerateVideo = () => {
                 <div className="text-center py-16">
                   <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
                   <h2 className="text-2xl font-semibold mb-2">
-                    {parameters?.Format === 'Video' ? 'Generating Video...' : 'Generating Image...'}
+                    Generating Content...
                   </h2>
                   <p className="text-muted-foreground mb-4">
-                    {parameters?.Format === 'Video' 
-                      ? 'This may take up to 2 minutes. Please be patient while we create your video.'
-                      : 'Creating your image now...'
-                    }
+                    This may take up to 2 minutes. Please be patient while we create your content.
                   </p>
                   <div className="bg-primary/10 rounded-lg p-4 max-w-md mx-auto">
                     <p className="text-sm font-medium">Prompt:</p>
@@ -158,19 +132,9 @@ const GenerateVideo = () => {
                     <h3 className="font-semibold mb-2">Generation Failed</h3>
                     <p className="text-sm">{generationError}</p>
                   </div>
-                  <Button onClick={handleRegenerate} className="flex items-center gap-2">
-                    <RotateCcw className="w-4 h-4" />
-                    Try Again
+                  <Button onClick={goBack} variant="outline">
+                    Go Back
                   </Button>
-                </div>
-              )}
-
-              {generationResult && !isGenerating && (
-                <div className="text-center py-16">
-                  <div className="bg-primary/10 text-primary p-6 rounded-lg mb-4 max-w-md mx-auto">
-                    <h3 className="font-semibold mb-2">Generation Complete!</h3>
-                    <p className="text-sm">Redirecting to view your {generationResult.type}...</p>
-                  </div>
                 </div>
               )}
             </CardContent>
