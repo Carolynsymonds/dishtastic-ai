@@ -83,7 +83,60 @@ async function generateImage(prompt: string, parameters: any) {
   console.log('generateImage: dimensions/scale/bg', { dimensions, scale: parameters.Scale || '1:1', background: parameters.Background || 'none' });
   // Enhance prompt for food photography
   const enhancedPrompt = `Professional food photography: ${prompt}. ${parameters.Background ? `Background: ${parameters.Background}.` : ''} Studio lighting, high resolution, appetizing presentation, commercial quality.`;
-  console.log('generateImage: calling OpenAI images', { model: 'gpt-image-1', size: `${dimensions.width}x${dimensions.height}` });
+  
+  // Try gpt-image-1 first, fallback to dall-e-3 if org verification fails
+  console.log('generateImage: trying gpt-image-1 first');
+  try {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-image-1',
+        prompt: enhancedPrompt,
+        n: 1,
+        size: `${dimensions.width}x${dimensions.height}`,
+        quality: 'high',
+        output_format: 'png',
+      }),
+    });
+    console.log('generateImage: gpt-image-1 response', { status: response.status, statusText: response.statusText });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('generateImage: gpt-image-1 success');
+      return {
+        type: 'image',
+        content: data.data[0].b64_json,
+        format: 'png',
+        parameters,
+        prompt: enhancedPrompt
+      };
+    } else {
+      const errorData = await response.json();
+      console.log('generateImage: gpt-image-1 failed, checking if org verification issue');
+      
+      // Check if it's an organization verification error
+      if (errorData.error?.message?.includes('organization must be verified')) {
+        console.log('generateImage: org verification issue detected, falling back to dall-e-3');
+        // Fall back to dall-e-3
+        return await generateImageFallback(enhancedPrompt, dimensions, parameters);
+      } else {
+        console.error('generateImage: gpt-image-1 failed with other error:', errorData);
+        throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+      }
+    }
+  } catch (error) {
+    console.error('generateImage: gpt-image-1 request failed:', error);
+    console.log('generateImage: falling back to dall-e-3');
+    return await generateImageFallback(enhancedPrompt, dimensions, parameters);
+  }
+}
+
+async function generateImageFallback(prompt: string, dimensions: any, parameters: any) {
+  console.log('generateImageFallback: using dall-e-3');
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -91,30 +144,31 @@ async function generateImage(prompt: string, parameters: any) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-image-1',
-      prompt: enhancedPrompt,
+      model: 'dall-e-3',
+      prompt: prompt,
       n: 1,
       size: `${dimensions.width}x${dimensions.height}`,
-      quality: 'high',
-      output_format: 'png',
+      quality: 'hd',
+      response_format: 'b64_json',
     }),
   });
-  console.log('generateImage: OpenAI response', { status: response.status, statusText: response.statusText });
+  
+  console.log('generateImageFallback: dall-e-3 response', { status: response.status, statusText: response.statusText });
   if (!response.ok) {
     const errorData = await response.json();
-    console.error('OpenAI API error payload:', errorData);
-    throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    console.error('generateImageFallback: dall-e-3 failed:', errorData);
+    throw new Error(`DALL-E-3 API error: ${errorData.error?.message || 'Unknown error'}`);
   }
 
   const data = await response.json();
-  console.log('OpenAI response received');
+  console.log('generateImageFallback: dall-e-3 success');
 
   return {
     type: 'image',
     content: data.data[0].b64_json,
     format: 'png',
     parameters,
-    prompt: enhancedPrompt
+    prompt: prompt
   };
 }
 
