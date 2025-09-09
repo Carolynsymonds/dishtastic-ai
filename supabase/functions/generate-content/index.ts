@@ -290,7 +290,7 @@ async function generateVideo(prompt: string, parameters: any) {
   console.log('Generating video with Runway:', { duration, aspectRatio, prompt: enhancedPrompt });
 
   // Create video generation task
-  const createResponse = await fetch('https://api.runwayml.com/v1/image_to_video', {
+  const createResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${runwayApiKey}`,
@@ -322,7 +322,7 @@ async function generateVideo(prompt: string, parameters: any) {
   while (attempts < maxAttempts) {
     await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
     
-    const statusResponse = await fetch(`https://api.runwayml.com/v1/tasks/${taskId}`, {
+    const statusResponse = await fetch(`https://api.dev.runwayml.com/v1/tasks/${taskId}`, {
       headers: {
         'Authorization': `Bearer ${runwayApiKey}`,
       },
