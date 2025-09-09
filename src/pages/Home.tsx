@@ -39,6 +39,10 @@ const DynamicSvgIcon = ({
 const Home = () => {
   const navigate = useNavigate();
   const { navigateWithUtm } = useUtmTracking();
+  
+  // Debug log to force rebuild
+  console.log('Home component loaded - cache cleared');
+  
   const [textareaValue, setTextareaValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [generationParameters, setGenerationParameters] = useState<GenerationParameters>({
