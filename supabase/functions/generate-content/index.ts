@@ -295,6 +295,7 @@ async function generateVideo(prompt: string, parameters: any) {
     headers: {
       'Authorization': `Bearer ${runwayApiKey}`,
       'Content-Type': 'application/json',
+      'X-Runway-Version': '2024-11-06',
     },
     body: JSON.stringify({
       promptText: enhancedPrompt,
@@ -325,6 +326,7 @@ async function generateVideo(prompt: string, parameters: any) {
     const statusResponse = await fetch(`https://api.dev.runwayml.com/v1/tasks/${taskId}`, {
       headers: {
         'Authorization': `Bearer ${runwayApiKey}`,
+        'X-Runway-Version': '2024-11-06',
       },
     });
 
