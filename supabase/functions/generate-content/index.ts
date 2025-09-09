@@ -339,13 +339,18 @@ async function generateVideo(prompt: string, parameters: any) {
     }
   };
 
-  // Map scale to aspect ratio
+  // Map scale to aspect ratio (must match Runway allowed values)
   const getAspectRatio = (scale: string) => {
     switch (scale) {
-      case '2:3': return '768:1344';
-      case '16:9': return '1408:768';
-      case '1:1':
-      default: return '1024:1024';
+      case '16:9': return '16:9';
+      case '9:16': return '9:16';
+      case '1:1': return '1:1';
+      case '4:3': return '4:3';
+      case '3:4': return '3:4';
+      case '2:3': return '3:4'; // closest supported
+      case '3:2': return '4:3'; // closest supported
+      case '21:9': return '21:9';
+      default: return '1:1';
     }
   };
 
@@ -362,72 +367,89 @@ async function generateVideo(prompt: string, parameters: any) {
 
   console.log('Generating video with Runway:', { duration, aspectRatio, promptUsed: enhancedPrompt ? 'enhanced' : 'basic' });
 
-  // Create video generation task
-  const createResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${runwayApiKey}`,
-      'Content-Type': 'application/json',
-      'X-Runway-Version': '2024-11-06',
-    },
-    body: JSON.stringify({
-      promptImage,
-      model: 'gen3a_turbo',
-      duration: duration,
-      ratio: aspectRatio,
-      seed: Math.floor(Math.random() * 1000000),
-    }),
-  });
-  console.log('Runway create task response', { status: createResponse.status, statusText: createResponse.statusText });
-
-  if (!createResponse.ok) {
-    const errorData = await createResponse.json();
-    console.error('Runway API error (create) payload:', errorData);
-    throw new Error(`Runway API error: ${errorData.message || 'Unknown error'}`);
-  }
-
-  const createData = await createResponse.json();
-  const taskId = createData.id;
-  console.log('Runway task created:', taskId);
-
-  // Poll for completion
-  let attempts = 0;
-  const maxAttempts = 60; // 5 minutes max wait time
-  
-  while (attempts < maxAttempts) {
-    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-    
-    const statusResponse = await fetch(`https://api.dev.runwayml.com/v1/tasks/${taskId}`, {
+  try {
+    // Create video generation task
+    const createResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${runwayApiKey}`,
+        'Content-Type': 'application/json',
         'X-Runway-Version': '2024-11-06',
       },
+      body: JSON.stringify({
+        promptImage,
+        model: 'gen3a_turbo',
+        duration: duration,
+        ratio: aspectRatio,
+        seed: Math.floor(Math.random() * 1000000),
+      }),
     });
+    console.log('Runway create task response', { status: createResponse.status, statusText: createResponse.statusText, triedRatio: aspectRatio });
 
-    if (!statusResponse.ok) {
-      console.error('Failed to check task status');
+    if (!createResponse.ok) {
+      let errorPayload: any = null;
+      try { errorPayload = await createResponse.json(); } catch (_) { errorPayload = { raw: await createResponse.text() }; }
+      console.error('Runway API error (create) payload:', errorPayload);
+      throw new Error(`Runway API error: ${errorPayload?.message || errorPayload?.error || 'Unknown error'}`);
+    }
+
+    const createData = await createResponse.json();
+    const taskId = createData.id;
+    console.log('Runway task created:', taskId);
+
+    // Poll for completion
+    let attempts = 0;
+    const maxAttempts = 60; // 5 minutes max wait time
+    
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+      
+      const statusResponse = await fetch(`https://api.dev.runwayml.com/v1/tasks/${taskId}`, {
+        headers: {
+          'Authorization': `Bearer ${runwayApiKey}`,
+          'X-Runway-Version': '2024-11-06',
+        },
+      });
+
+      if (!statusResponse.ok) {
+        console.error('Failed to check task status', { attempt: attempts + 1 });
+        attempts++;
+        continue;
+      }
+
+      const statusData = await statusResponse.json();
+      console.log(`Task status (attempt ${attempts + 1}):`, statusData.status, statusData.failure_reason ? `reason: ${statusData.failure_reason}` : '');
+      if (statusData.status === 'SUCCEEDED') {
+        return {
+          type: 'video',
+          content: statusData.output?.[0],
+          format: 'mp4',
+          parameters,
+          prompt: enhancedPrompt,
+          duration,
+          taskId
+        };
+      } else if (statusData.status === 'FAILED') {
+        throw new Error(`Video generation failed: ${statusData.failure_reason || 'Unknown error'}`);
+      }
+
       attempts++;
-      continue;
     }
 
-    const statusData = await statusResponse.json();
-    console.log(`Task status (attempt ${attempts + 1}):`, statusData.status, statusData.failure_reason ? `reason: ${statusData.failure_reason}` : '');
-    if (statusData.status === 'SUCCEEDED') {
-      return {
-        type: 'video',
-        content: statusData.output?.[0],
-        format: 'mp4',
-        parameters,
-        prompt: enhancedPrompt,
-        duration,
-        taskId
-      };
-    } else if (statusData.status === 'FAILED') {
-      throw new Error(`Video generation failed: ${statusData.failure_reason || 'Unknown error'}`);
-    }
-
-    attempts++;
+    throw new Error('Video generation timed out');
+  } catch (err) {
+    console.error('[generate-content] Runway video generation failed, falling back to starter image', { error: (err as any)?.message || String(err), triedRatio: aspectRatio, duration });
+    // Graceful fallback: return the starter image so the UI can still render
+    return {
+      type: 'image',
+      content: starterImage.content,
+      format: starterImage.format || 'png',
+      parameters,
+      prompt: enhancedPrompt,
+      // @ts-ignore - extra metadata for debugging
+      fallback: true,
+      // @ts-ignore
+      fallback_reason: 'runway_error'
+    };
   }
-
-  throw new Error('Video generation timed out');
 }
