@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeroBanner from "@/components/HeroBanner";
 import { Badge } from "@/components/ui/badge";
-import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown, ArrowUp } from "lucide-react";
+import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown, ArrowUp, Loader2, Download, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -13,6 +13,9 @@ import FeatureIntroSection from "@/components/FeatureIntroSection";
 import SplitScreenSection from "@/components/SplitScreenSection";
 import { siteContent } from "@/config/site-content";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { GenerationParameters, GenerationResult } from "@/types/generation";
 const DynamicSvgIcon = ({
   url,
   className = '',
@@ -40,7 +43,60 @@ const Home = () => {
   } = useUtmTracking();
   const [textareaValue, setTextareaValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [generationParameters, setGenerationParameters] = useState<Record<string, string>>({});
+  const [generationParameters, setGenerationParameters] = useState<GenerationParameters>({});
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationResult, setGenerationResult] = useState<GenerationResult | null>(null);
+  const [generationError, setGenerationError] = useState<string | null>(null);
+
+  const handleGenerate = async () => {
+    if (!textareaValue.trim()) {
+      toast.error("Please enter a description for your food dish");
+      return;
+    }
+
+    setIsGenerating(true);
+    setGenerationError(null);
+    setGenerationResult(null);
+
+    try {
+      const isVideo = generationParameters.Format === 'Video';
+      toast.info(isVideo ? "Generating video... This may take up to 2 minutes" : "Generating image...");
+      
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: {
+          prompt: textareaValue,
+          parameters: generationParameters
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setGenerationResult(data);
+      toast.success(`${isVideo ? 'Video' : 'Image'} generated successfully!`);
+    } catch (error: any) {
+      console.error('Generation error:', error);
+      setGenerationError(error.message || 'Failed to generate content');
+      toast.error(error.message || 'Failed to generate content');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const downloadContent = () => {
+    if (!generationResult) return;
+
+    const link = document.createElement('a');
+    if (generationResult.type === 'image') {
+      link.href = `data:image/${generationResult.format};base64,${generationResult.content}`;
+      link.download = `generated-dish.${generationResult.format}`;
+    } else {
+      link.href = generationResult.content;
+      link.download = `generated-video.${generationResult.format}`;
+    }
+    link.click();
+  };
   const handleSignupClick = () => {
     try {
       // GA4 recommended event
@@ -254,16 +310,16 @@ const Home = () => {
                   
                   {/* Send button */}
                   <button
-                    onClick={() => {
-                      console.log('Generate clicked with:', {
-                        text: textareaValue,
-                        parameters: generationParameters
-                      });
-                    }}
-                    className="absolute bottom-8 right-4 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
+                    onClick={handleGenerate}
+                    disabled={isGenerating || !textareaValue.trim()}
+                    className="absolute bottom-8 right-4 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Generate"
                   >
-                    <ArrowUp className="w-5 h-5" />
+                    {isGenerating ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <ArrowUp className="w-5 h-5" />
+                    )}
                   </button>
                   
                   {/* Quick Reply Chips inside textarea */}
@@ -322,6 +378,96 @@ const Home = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Generation Results Display */}
+            {(isGenerating || generationResult || generationError) && (
+              <div className="max-w-5xl mx-auto mt-8">
+                <div className="space-y-4 p-6 bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-lg">
+                  {isGenerating && (
+                    <div className="text-center py-8">
+                      <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+                      <p className="text-muted-foreground">
+                        {generationParameters.Format === 'Video' 
+                          ? 'Generating your video... This may take up to 2 minutes' 
+                          : 'Generating your image...'}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {generationError && (
+                    <div className="text-center py-8">
+                      <p className="text-destructive mb-4">{generationError}</p>
+                      <Button
+                        onClick={handleGenerate}
+                        variant="outline"
+                        className="gap-2"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        Try Again
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {generationResult && !isGenerating && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Generated Content</h3>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={downloadContent}
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download
+                          </Button>
+                          <Button
+                            onClick={handleGenerate}
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                            Regenerate
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-muted rounded-lg overflow-hidden">
+                        {generationResult.type === 'image' ? (
+                          <img
+                            src={`data:image/${generationResult.format};base64,${generationResult.content}`}
+                            alt="Generated food dish"
+                            className="w-full h-auto max-h-96 object-contain"
+                          />
+                        ) : (
+                          <video
+                            src={generationResult.content}
+                            controls
+                            className="w-full h-auto max-h-96"
+                            poster=""
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        )}
+                      </div>
+                      
+                      <div className="text-sm text-muted-foreground space-y-1">
+                        <p><strong>Prompt:</strong> {generationResult.prompt}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(generationResult.parameters).map(([key, value]) => (
+                            <span key={key} className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
+                              {key}: {String(value)}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             
           </div>
 
