@@ -287,7 +287,11 @@ async function generateVideo(prompt: string, parameters: any) {
   // Enhance prompt using OpenAI
   const enhancedPrompt = await enhancePromptWithAI(prompt, parameters);
 
-  console.log('Generating video with Runway:', { duration, aspectRatio, prompt: enhancedPrompt });
+  // Generate a starter image to satisfy Runway's promptImage requirement
+  const starterImage = await generateImage(prompt, parameters);
+  const promptImage = `data:image/${starterImage.format || 'png'};base64,${starterImage.content}`;
+
+  console.log('Generating video with Runway:', { duration, aspectRatio, promptUsed: enhancedPrompt ? 'enhanced' : 'basic' });
 
   // Create video generation task
   const createResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
@@ -298,7 +302,7 @@ async function generateVideo(prompt: string, parameters: any) {
       'X-Runway-Version': '2024-11-06',
     },
     body: JSON.stringify({
-      promptText: enhancedPrompt,
+      promptImage,
       model: 'gen3a_turbo',
       duration: duration,
       ratio: aspectRatio,
