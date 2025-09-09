@@ -122,7 +122,7 @@ async function generateImage(prompt: string, parameters: any) {
       if (errorData.error?.message?.includes('organization must be verified')) {
         console.log('generateImage: org verification issue detected, falling back to dall-e-3');
         // Fall back to dall-e-3
-        return await generateImageFallback(enhancedPrompt, dimensions, parameters);
+        return await generateImageFallback(enhancedPrompt, parameters);
       } else {
         console.error('generateImage: gpt-image-1 failed with other error:', errorData);
         throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
@@ -131,12 +131,18 @@ async function generateImage(prompt: string, parameters: any) {
   } catch (error) {
     console.error('generateImage: gpt-image-1 request failed:', error);
     console.log('generateImage: falling back to dall-e-3');
-    return await generateImageFallback(enhancedPrompt, dimensions, parameters);
+    return await generateImageFallback(enhancedPrompt, parameters);
   }
 }
 
-async function generateImageFallback(prompt: string, dimensions: any, parameters: any) {
+async function generateImageFallback(prompt: string, parameters: any) {
   console.log('generateImageFallback: using dall-e-3');
+
+  // DALL-E-3 only supports 1024x1024, 1792x1024, 1024x1792
+  const scale = parameters.Scale || '1:1';
+  const size = scale === '2:3' ? '1024x1792' : scale === '16:9' ? '1792x1024' : '1024x1024';
+  console.log('generateImageFallback: resolved size for dall-e-3', { scale, size });
+
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -147,7 +153,7 @@ async function generateImageFallback(prompt: string, dimensions: any, parameters
       model: 'dall-e-3',
       prompt: prompt,
       n: 1,
-      size: `${dimensions.width}x${dimensions.height}`,
+      size,
       quality: 'hd',
       response_format: 'b64_json',
     }),
