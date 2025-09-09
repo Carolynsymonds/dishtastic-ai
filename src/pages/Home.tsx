@@ -40,6 +40,7 @@ const Home = () => {
   } = useUtmTracking();
   const [textareaValue, setTextareaValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [generationParameters, setGenerationParameters] = useState<Record<string, string>>({});
   const handleSignupClick = () => {
     try {
       // GA4 recommended event
@@ -57,9 +58,24 @@ const Home = () => {
     navigateWithUtm('/signup');
   };
 
-  const handleChipClick = (chipText: string) => {
-    setTextareaValue(prev => prev ? `${prev} ${chipText}` : chipText);
+  const handleChipClick = (chipText: string, category: string) => {
+    setGenerationParameters(prev => ({
+      ...prev,
+      [category]: chipText
+    }));
     setActiveDropdown(null); // Close dropdown after selection
+  };
+
+  const removeParameter = (category: string) => {
+    setGenerationParameters(prev => {
+      const newParams = { ...prev };
+      delete newParams[category];
+      return newParams;
+    });
+  };
+
+  const clearAllParameters = () => {
+    setGenerationParameters({});
   };
 
   const toggleDropdown = (category: string) => {
@@ -250,7 +266,12 @@ const Home = () => {
                   
                   {/* Send button */}
                   <button
-                    onClick={() => console.log('Generate clicked')}
+                    onClick={() => {
+                      console.log('Generate clicked with:', {
+                        text: textareaValue,
+                        parameters: generationParameters
+                      });
+                    }}
                     className="absolute bottom-8 right-4 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
                     title="Generate"
                   >
@@ -263,10 +284,14 @@ const Home = () => {
                         <div key={category.category} className="relative">
                           <button
                             onClick={() => toggleDropdown(category.category)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 text-foreground text-xs rounded-md whitespace-nowrap transition-colors border border-border shadow-sm"
+                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md whitespace-nowrap transition-colors border shadow-sm ${
+                              generationParameters[category.category] 
+                                ? 'bg-primary text-primary-foreground border-primary' 
+                                : 'bg-muted hover:bg-muted/80 text-foreground border-border'
+                            }`}
                           >
                             {category.icon}
-                            <span>{category.category}</span>
+                            <span>{generationParameters[category.category] || category.category}</span>
                             <ChevronDown className="w-3 h-3" />
                           </button>
                           
@@ -277,8 +302,12 @@ const Home = () => {
                                 {category.chips.map((chip) => (
                                   <button
                                     key={chip.text}
-                                    onClick={() => handleChipClick(chip.text)}
-                                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-md text-sm text-left transition-colors"
+                                    onClick={() => handleChipClick(chip.text, category.category)}
+                                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-left transition-colors ${
+                                      generationParameters[category.category] === chip.text
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'hover:bg-muted'
+                                    }`}
                                   >
                                     {chip.icon}
                                     <span>{chip.text}</span>
@@ -303,6 +332,36 @@ const Home = () => {
                       }}
                     />
                 </div>
+                
+                {/* Selected Parameters Display */}
+                {Object.keys(generationParameters).length > 0 && (
+                  <div className="p-4 border-t border-border">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-foreground">Generation Settings:</span>
+                      <button
+                        onClick={clearAllParameters}
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(generationParameters).map(([category, value]) => (
+                        <div key={category} className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary text-xs rounded-md border border-primary/20">
+                          <span className="font-medium">{category}:</span>
+                          <span>{value}</span>
+                          <button
+                            onClick={() => removeParameter(category)}
+                            className="ml-1 hover:text-primary/70 transition-colors"
+                            title={`Remove ${category}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
