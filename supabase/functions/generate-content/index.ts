@@ -274,38 +274,29 @@ async function generateVideo(prompt: string, parameters: any) {
   // Map scale to aspect ratio
   const getAspectRatio = (scale: string) => {
     switch (scale) {
-      case '2:3': return '720:1280';
-      case '16:9': return '1280:720';
+      case '2:3': return '768:1344';
+      case '16:9': return '1408:768';
       case '1:1':
-      default: return '960:960';
+      default: return '1024:1024';
     }
   };
 
   const duration = getDuration(parameters.Length || '5s');
   const aspectRatio = getAspectRatio(parameters.Scale || '1:1');
   
-  // Step 1: Generate an image first using OpenAI
-  console.log('Step 1: Generating image for video with OpenAI');
-  const imageResult = await generateImage(prompt, { ...parameters, Format: 'Image' });
-  
-  // Convert base64 to data URI for Runway
-  const imageDataUri = `data:image/${imageResult.format};base64,${imageResult.content}`;
-  
   // Enhance prompt using OpenAI
   const enhancedPrompt = await enhancePromptWithAI(prompt, parameters);
 
-  console.log('Step 2: Generating video with Runway using generated image');
+  console.log('Generating video with Runway:', { duration, aspectRatio, prompt: enhancedPrompt });
 
-  // Step 2: Create video generation task using the generated image
+  // Create video generation task
   const createResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${runwayApiKey}`,
       'Content-Type': 'application/json',
-      'X-Runway-Version': '2024-11-06',
     },
     body: JSON.stringify({
-      promptImage: imageDataUri,
       promptText: enhancedPrompt,
       model: 'gen3a_turbo',
       duration: duration,
