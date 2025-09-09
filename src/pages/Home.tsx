@@ -139,9 +139,9 @@ const Home = () => {
       category: "Scale", 
       icon: <Maximize2 className="w-4 h-4" />,
       chips: [
-        { text: "2:3", icon: <Maximize2 className="w-3 h-3" /> },
-        { text: "1:1", icon: <Maximize2 className="w-3 h-3" /> },
-        { text: "16:9", icon: <Maximize2 className="w-3 h-3" /> }
+        { text: "Portrait", icon: <Maximize2 className="w-3 h-3" /> },
+        { text: "Square", icon: <Maximize2 className="w-3 h-3" /> },
+        { text: "Landscape", icon: <Maximize2 className="w-3 h-3" /> }
       ]
     },
     {

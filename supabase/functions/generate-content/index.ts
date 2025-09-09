@@ -339,18 +339,20 @@ async function generateVideo(prompt: string, parameters: any) {
     }
   };
 
-  // Map scale to aspect ratio (must match Runway allowed values)
+  // Map scale to aspect ratio (must match Runway exact requirements: 768:1280 or 1280:768 only)
   const getAspectRatio = (scale: string) => {
     switch (scale) {
-      case '16:9': return '16:9';
-      case '9:16': return '9:16';
-      case '1:1': return '1:1';
-      case '4:3': return '4:3';
-      case '3:4': return '3:4';
-      case '2:3': return '3:4'; // closest supported
-      case '3:2': return '4:3'; // closest supported
-      case '21:9': return '21:9';
-      default: return '1:1';
+      case 'Portrait':
+      case '2:3': 
+      case '9:16': 
+        return '768:1280'; // Portrait
+      case 'Landscape':
+      case '16:9': 
+        return '1280:768'; // Landscape
+      case 'Square':
+      case '1:1': 
+      default: 
+        return '768:1280'; // Default to portrait since 1:1 not supported
     }
   };
 
