@@ -111,6 +111,63 @@ async function generateImage(prompt: string, parameters: any) {
   };
 }
 
+async function enhancePromptWithAI(prompt: string, parameters: any): Promise<string> {
+  if (!openAIApiKey) {
+    console.log('OpenAI API key not available, using basic enhancement');
+    return `${prompt}. ${parameters['Video Style'] ? `Style: ${parameters['Video Style']}.` : ''} ${parameters.Background ? `Background: ${parameters.Background}.` : ''} High quality food cinematography, smooth motion, professional lighting.`;
+  }
+
+  try {
+    const systemPrompt = `You are a professional food cinematographer. Transform user prompts into detailed, cinematic video descriptions for AI video generation. 
+
+Guidelines:
+- Focus on visual storytelling and camera work
+- Include specific details about lighting, composition, and movement
+- Incorporate food styling and presentation elements
+- Keep descriptions concise but vivid (max 200 words)
+- Consider the video style and background provided
+- Emphasize smooth, professional camera movements
+- Include sensory details that translate to visuals
+
+Video Style: ${parameters['Video Style'] || 'Standard'}
+Background: ${parameters.Background || 'Neutral'}
+Duration: ${parameters.Length || '5s'}
+
+Transform the user's prompt into a professional cinematographic description.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-5-mini-2025-08-07',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
+        ],
+        max_completion_tokens: 150,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('OpenAI API error, falling back to basic enhancement');
+      throw new Error('OpenAI API error');
+    }
+
+    const data = await response.json();
+    const enhancedPrompt = data.choices[0].message.content;
+    console.log('Original prompt:', prompt);
+    console.log('Enhanced prompt:', enhancedPrompt);
+    return enhancedPrompt;
+  } catch (error) {
+    console.error('Error enhancing prompt with AI:', error);
+    // Fallback to basic enhancement
+    return `${prompt}. ${parameters['Video Style'] ? `Style: ${parameters['Video Style']}.` : ''} ${parameters.Background ? `Background: ${parameters.Background}.` : ''} High quality food cinematography, smooth motion, professional lighting.`;
+  }
+}
+
 async function generateVideo(prompt: string, parameters: any) {
   if (!runwayApiKey) {
     throw new Error('Runway API key not configured');
@@ -141,8 +198,8 @@ async function generateVideo(prompt: string, parameters: any) {
   const duration = getDuration(parameters.Length || '5s');
   const aspectRatio = getAspectRatio(parameters.Scale || '1:1');
   
-  // Enhance prompt for food video
-  const enhancedPrompt = `${prompt}. ${parameters['Video Style'] ? `Style: ${parameters['Video Style']}.` : ''} ${parameters.Background ? `Background: ${parameters.Background}.` : ''} High quality food cinematography, smooth motion, professional lighting.`;
+  // Enhance prompt using OpenAI
+  const enhancedPrompt = await enhancePromptWithAI(prompt, parameters);
 
   console.log('Generating video with Runway:', { duration, aspectRatio, prompt: enhancedPrompt });
 
