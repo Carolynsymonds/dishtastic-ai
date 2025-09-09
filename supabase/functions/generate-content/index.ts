@@ -185,7 +185,7 @@ async function enhancePromptWithAI(prompt: string, parameters: any): Promise<str
   }
 
   try {
-    const systemPrompt = `You are a food-film director and prompt composer. Convert the user's description and chip selections into a JSON creative brief for a photoreal, mouth-watering food image or video.
+    const systemPrompt = `You are a professional food content creator specializing in realistic, appetizing culinary visuals. Convert the user's description and parameters into a JSON creative brief for photoreal, mouth-watering food imagery that focuses on authentic cooking processes and natural food behavior.
 
 Rules:
 - Return **valid JSON only**, no explanations.
@@ -201,7 +201,7 @@ Rules:
     "textures": ["string"]
   },
   "visual_direction": {
-    "camera_move": "Push-In Close | Pull-Back Reveal | Overhead Top-Down | 360° Dish Orbit | Table Slide | Tilt-Down Reveal | Tilt-Up Reveal | Rack Focus Shift | Slow-Mo Pour | Ingredient Drop | Handheld Lifestyle | Whip Pan | Speed Ramp | Drone Establishing | Chef POV | none",
+    "motion_style": "Ingredient Cascade | Steam Rising | Liquid Flow | Cheese Stretch | Sizzle Effect | Natural Motion | Falling Elements | Texture Reveal | Color Enhancement | Aromatic Steam | none",
     "framing": "macro close-up | three-quarter | overhead | side-on",
     "angle": "eye-level | top-down | 45-degree"
   },
@@ -246,13 +246,13 @@ Rules:
 Heuristics:
 - If Format = "Video", set "mode": "video" and use Length (in seconds) as "duration_seconds".  
 - If Format = "Image", set "mode": "image" and "duration_seconds": null.  
-- Use Video Style for "camera_move". If none, set "camera_move": "none".  
+- Map Video Style to "motion_style" focusing on food behavior, not filming techniques.  
 - Use Background for "setting.background".  
 - Infer plateware & tabletop style from cuisine, dish_type, and background.  
-- Add one clear action for videos (steam, toss, garnish sprinkle, cheese pull, etc.).  
-- Always include tabletop details.  
-- Negative prompts: distorted proportions, plastic look, cartoonish, messy background, over-saturation.  
-- runway_prompt must be a **single paragraph** weaving together dish, servingware, tabletop, props, textures, camera, lighting, and mood.`;
+- Focus on realistic food physics: steam rising naturally, ingredients falling gracefully, liquids flowing smoothly, cheese stretching authentically.  
+- Always include tabletop details that enhance food presentation.  
+- Negative prompts: artificial look, plastic appearance, unrealistic proportions, equipment visible, technical gear.  
+- runway_prompt must describe **realistic food behavior and cooking processes** - steam patterns, ingredient interactions, natural textures, authentic colors, and appetizing motion without mentioning filming equipment.`;
 
     const userPrompt = `User description: ${prompt}
 Format: ${parameters.Format || 'Image'}
@@ -326,47 +326,47 @@ function createMotionPrompt(prompt: string, parameters: any): string {
   const videoStyle = parameters['Video Style'];
   const background = parameters.Background;
   
-  // Motion-specific instructions for each video style
+  // Realistic food behavior instructions for each video style
   const motionInstructions = {
-    'Ingredient Drop': 'ingredients actively falling and splashing into the dish with visible motion and splash effects',
-    'Slow-Mo Pour': 'sauce or liquid slowly pouring in dramatic slow motion with smooth flow and ripple effects',
-    'Steam Rising': 'hot steam actively rising and swirling upward from the food with dynamic movement',
-    'Cheese Pull': 'melted cheese stretching and pulling as the food is lifted, showing the elastic cheese strands',
-    'Sizzle Effect': 'food actively sizzling and bubbling with steam and small bubbles popping',
-    'Garnish Drop': 'fresh herbs or seasoning slowly falling and landing on the dish',
-    'Liquid Drizzle': 'oil, sauce, or honey slowly drizzling down with visible flow patterns',
-    'Whisk Action': 'ingredients being actively mixed or whisked with dynamic circular motion'
+    'Ingredient Drop': 'Fresh ingredients gracefully cascading through the air with natural physics, landing softly into the dish creating beautiful splashes and gentle movements as they settle into place',
+    'Slow-Mo Pour': 'Liquid flowing in elegant slow motion with smooth, natural curves and realistic viscosity, creating mesmerizing patterns as it streams into the dish with authentic splash dynamics',
+    'Steam Rising': 'Delicate steam naturally rising from hot food in organic, wispy patterns, dancing upward with realistic heat convection, creating an appetizing visual of freshly prepared warmth',
+    'Cheese Pull': 'Melted cheese stretching authentically with golden, elastic strands that flow naturally with realistic texture, showing the perfect melt and appetizing stretch without any artificial tension',
+    'Sizzle Effect': 'Food naturally sizzling with authentic bubbling, gentle steam wisps, and realistic heat effects that create an appetizing sensory experience of active cooking',
+    'Garnish Drop': 'Fresh herbs or seasonings gently falling through the air with natural grace, landing delicately on the dish surface with realistic scatter patterns',
+    'Liquid Drizzle': 'Sauce, oil, or honey flowing in smooth streams with natural viscosity and authentic dripping patterns that enhance the dish\'s appetizing appearance',
+    'Whisk Action': 'Ingredients naturally swirling and blending with realistic fluid dynamics, creating appetizing textures and natural mixing patterns'
   };
   
-  const motionInstruction = motionInstructions[videoStyle as keyof typeof motionInstructions] || 'smooth camera movement revealing the dish with professional cinematography';
+  const motionInstruction = motionInstructions[videoStyle as keyof typeof motionInstructions] || 'natural, appetizing food motion with realistic cooking behavior and authentic culinary physics';
   
   // Background-specific enhancements
-  const backgroundEnhancement = background ? `Set in ${background} environment.` : '';
+  const backgroundEnhancement = background ? `Set in a beautiful ${background} environment that complements the food presentation.` : '';
   
-  // Create dynamic motion prompt
-  return `Professional food cinematography: ${prompt}. ${backgroundEnhancement} Dynamic action: ${motionInstruction}. Camera captures the motion with smooth tracking. Professional studio lighting, high contrast, appetizing colors, commercial quality food videography. The movement should be clear and engaging, showing the food in action.`;
+  // Create realistic food behavior prompt
+  return `Stunning food videography showcasing: ${prompt}. ${backgroundEnhancement} The scene features ${motionInstruction}. Professional lighting highlights natural textures, vibrant colors, and appetizing details. The focus is on authentic cooking processes and realistic food physics that make the dish look incredibly fresh and delicious.`;
 }
 
 function createMotionImagePrompt(prompt: string, parameters: any): string {
   const videoStyle = parameters['Video Style'];
   const background = parameters.Background;
   
-  // Create image prompts that suggest motion for better video generation
+  // Create image prompts optimized for realistic motion generation
   const motionSetups = {
-    'Ingredient Drop': 'ingredients positioned mid-air above the dish, captured at the moment of falling',
-    'Slow-Mo Pour': 'sauce or liquid captured mid-pour with visible stream and splash patterns',
-    'Steam Rising': 'hot food with visible steam wisps and vapor clouds rising upward',
-    'Cheese Pull': 'melted cheese partially stretched showing elastic strands ready to pull',
-    'Sizzle Effect': 'food in a hot pan with oil bubbles and steam wisps visible',
-    'Garnish Drop': 'herbs or seasonings positioned above the dish ready to fall',
-    'Liquid Drizzle': 'honey or sauce mid-drizzle with visible droplets in motion',
-    'Whisk Action': 'ingredients in a bowl with whisk positioned to show mixing motion'
+    'Ingredient Drop': 'Fresh ingredients naturally positioned above the dish with perfect spacing for graceful falling motion, arranged to showcase natural physics and authentic ingredient behavior',
+    'Slow-Mo Pour': 'Liquid captured at the perfect pouring moment with realistic trajectory, positioned for smooth, natural flowing motion with authentic viscosity and stream patterns',
+    'Steam Rising': 'Freshly prepared hot dish with natural steam patterns beginning to rise, positioned to show authentic heat emanation and organic vapor movement',
+    'Cheese Pull': 'Perfectly melted cheese in natural stretch position with golden, elastic texture, arranged for authentic cheese-pulling motion that showcases realistic dairy physics',
+    'Sizzle Effect': 'Food positioned in hot cooking environment with natural heat effects and authentic bubbling patterns that suggest realistic cooking processes',
+    'Garnish Drop': 'Fresh herbs or seasonings naturally positioned above the dish with perfect spacing for graceful falling motion and authentic scatter patterns',
+    'Liquid Drizzle': 'Sauce, honey, or oil positioned for natural drizzling motion with realistic viscosity patterns and authentic flow behavior',
+    'Whisk Action': 'Ingredients arranged in natural mixing position with authentic textures that suggest realistic blending and fluid dynamics'
   };
   
-  const motionSetup = motionSetups[videoStyle as keyof typeof motionSetups] || 'beautifully plated dish with dynamic composition';
-  const backgroundEnhancement = background ? `Background: ${background}.` : '';
+  const motionSetup = motionSetups[videoStyle as keyof typeof motionSetups] || 'Food beautifully arranged for natural, appetizing motion and authentic culinary behavior';
+  const backgroundEnhancement = background ? `Set in a stunning ${background} environment that enhances the food presentation.` : '';
   
-  return `Professional food photography: ${prompt}. ${backgroundEnhancement} Composition: ${motionSetup}. Studio lighting, high resolution, dynamic positioning that suggests movement, commercial quality.`;
+  return `Professional food photography: ${prompt}. ${backgroundEnhancement} ${motionSetup}. The composition emphasizes realistic food physics and natural culinary processes with perfect lighting that showcases authentic textures, vibrant colors, and appetizing details optimized for the most realistic motion generation.`;
 }
 
 async function generateImageWithPrompt(customPrompt: string, parameters: any) {
