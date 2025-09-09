@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, ArrowLeft, Download, Share2, RotateCcw } from "lucide-react";
+// Remove unused imports since we're redirecting
+import { Loader2, ArrowLeft, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -65,51 +66,26 @@ const GenerateVideo = () => {
 
       setGenerationResult(data);
       toast.success(`${isVideo ? 'Video' : 'Image'} generated successfully!`);
+      
+      // Redirect to video display page after successful generation
+      const redirectParams = new URLSearchParams({
+        url: data.type === 'video' ? data.content : `data:image/${data.format};base64,${data.content}`,
+        prompt: data.prompt,
+        type: data.type,
+        format: data.format,
+        parameters: JSON.stringify(data.parameters)
+      });
+      
+      // Small delay to show success message
+      setTimeout(() => {
+        navigate(`/video?${redirectParams.toString()}`);
+      }, 1500);
     } catch (error: any) {
       console.error('Generation error:', error);
       setGenerationError(error.message || 'Failed to generate content');
       toast.error(error.message || 'Failed to generate content');
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const downloadContent = () => {
-    if (!generationResult) return;
-
-    const link = document.createElement('a');
-    if (generationResult.type === 'image') {
-      link.href = `data:image/${generationResult.format};base64,${generationResult.content}`;
-      link.download = `generated-dish.${generationResult.format}`;
-    } else {
-      link.href = generationResult.content;
-      link.download = `generated-video.${generationResult.format}`;
-    }
-    link.click();
-  };
-
-  const handleShare = async () => {
-    if (!generationResult) return;
-
-    const shareData = {
-      title: 'Generated Food Content',
-      text: `Check out this ${generationResult.type} I generated: ${prompt}`,
-      url: window.location.href
-    };
-
-    if (navigator.share && navigator.canShare?.(shareData)) {
-      try {
-        await navigator.share(shareData);
-      } catch (error) {
-        console.error('Error sharing:', error);
-        // Fallback to clipboard
-        navigator.clipboard.writeText(window.location.href);
-        toast.success('Link copied to clipboard!');
-      }
-    } else {
-      // Fallback to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard!');
     }
   };
 
@@ -140,24 +116,6 @@ const GenerateVideo = () => {
             
             {generationResult && (
               <div className="flex gap-2">
-                <Button
-                  onClick={handleShare}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Share
-                </Button>
-                <Button
-                  onClick={downloadContent}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Download
-                </Button>
                 <Button
                   onClick={handleRegenerate}
                   variant="outline"
@@ -208,54 +166,10 @@ const GenerateVideo = () => {
               )}
 
               {generationResult && !isGenerating && (
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-semibold mb-2">
-                      {generationResult.type === 'video' ? 'Video Generated!' : 'Image Generated!'}
-                    </h2>
-                    <p className="text-muted-foreground">
-                      Your {generationResult.type} has been successfully created.
-                    </p>
-                  </div>
-
-                  {/* Display content */}
-                  <div className="flex justify-center">
-                    {generationResult.type === 'image' ? (
-                      <img
-                        src={`data:image/${generationResult.format};base64,${generationResult.content}`}
-                        alt="Generated food dish"
-                        className="max-w-full h-auto rounded-lg shadow-lg"
-                        style={{ maxHeight: '70vh' }}
-                      />
-                    ) : (
-                      <video
-                        src={generationResult.content}
-                        controls
-                        autoPlay
-                        loop
-                        className="max-w-full h-auto rounded-lg shadow-lg"
-                        style={{ maxHeight: '70vh' }}
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    )}
-                  </div>
-                  
-                  {/* Generation details */}
-                  <div className="text-center space-y-4">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm font-medium mb-2">Generation Details</p>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        <strong>Prompt:</strong> {generationResult.prompt}
-                      </p>
-                      <div className="flex flex-wrap justify-center gap-2">
-                        {Object.entries(generationResult.parameters).map(([key, value]) => (
-                          <span key={key} className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
-                            {key}: {String(value)}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                <div className="text-center py-16">
+                  <div className="bg-primary/10 text-primary p-6 rounded-lg mb-4 max-w-md mx-auto">
+                    <h3 className="font-semibold mb-2">Generation Complete!</h3>
+                    <p className="text-sm">Redirecting to view your {generationResult.type}...</p>
                   </div>
                 </div>
               )}

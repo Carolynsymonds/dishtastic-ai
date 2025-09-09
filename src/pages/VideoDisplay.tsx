@@ -10,13 +10,20 @@ const VideoDisplay = () => {
   
   const videoUrl = searchParams.get('url');
   const prompt = searchParams.get('prompt');
-  const scale = searchParams.get('scale');
+  const type = searchParams.get('type');
+  const format = searchParams.get('format');
+  const parametersString = searchParams.get('parameters');
+  const parameters = parametersString ? JSON.parse(decodeURIComponent(parametersString)) : null;
   
   const handleDownload = () => {
     if (videoUrl) {
       const a = document.createElement('a');
       a.href = videoUrl;
-      a.download = 'generated-video.mp4';
+      if (type === 'video') {
+        a.download = `generated-video.${format || 'mp4'}`;
+      } else {
+        a.download = `generated-image.${format || 'jpg'}`;
+      }
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -27,18 +34,18 @@ const VideoDisplay = () => {
     if (navigator.share && videoUrl) {
       try {
         await navigator.share({
-          title: 'Generated Video',
-          text: prompt || 'Check out this AI-generated video!',
+          title: `Generated ${type === 'video' ? 'Video' : 'Image'}`,
+          text: prompt || `Check out this AI-generated ${type}!`,
           url: window.location.href
         });
       } catch (error) {
         // Fallback to copying URL
         navigator.clipboard.writeText(window.location.href);
-        toast.success("Video link copied to clipboard!");
+        toast.success(`${type === 'video' ? 'Video' : 'Content'} link copied to clipboard!`);
       }
     } else if (videoUrl) {
       navigator.clipboard.writeText(window.location.href);
-      toast.success("Video link copied to clipboard!");
+      toast.success(`${type === 'video' ? 'Video' : 'Content'} link copied to clipboard!`);
     }
   };
 
@@ -46,9 +53,9 @@ const VideoDisplay = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="p-8 text-center max-w-md">
-          <h1 className="text-2xl font-bold mb-4">Video Not Found</h1>
+          <h1 className="text-2xl font-bold mb-4">Content Not Found</h1>
           <p className="text-muted-foreground mb-6">
-            The requested video could not be found or the URL is invalid.
+            The requested content could not be found or the URL is invalid.
           </p>
           <Button onClick={() => navigate('/')} className="w-full">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -91,33 +98,49 @@ const VideoDisplay = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Video Player */}
+          {/* Content Display */}
           <Card className="overflow-hidden">
-            <video 
-              src={videoUrl} 
-              controls 
-              className="w-full h-auto max-h-[70vh] bg-black"
-              poster="/placeholder.svg"
-            >
-              Your browser does not support the video tag.
-            </video>
+            {type === 'video' ? (
+              <video 
+                src={videoUrl} 
+                controls 
+                autoPlay
+                loop
+                className="w-full h-auto max-h-[70vh] bg-black"
+                poster="/placeholder.svg"
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <img
+                src={videoUrl}
+                alt="Generated content"
+                className="w-full h-auto max-h-[70vh] object-contain bg-black"
+              />
+            )}
           </Card>
 
-          {/* Video Details */}
-          {(prompt || scale) && (
+          {/* Generation Details */}
+          {(prompt || parameters) && (
             <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Video Details</h2>
-              <div className="space-y-3">
+              <h2 className="text-lg font-semibold mb-4">Generation Details</h2>
+              <div className="space-y-4">
                 {prompt && (
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Prompt</label>
                     <p className="mt-1 text-sm bg-muted p-3 rounded-md">{prompt}</p>
                   </div>
                 )}
-                {scale && (
+                {parameters && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Scale</label>
-                    <p className="mt-1 text-sm">{scale}</p>
+                    <label className="text-sm font-medium text-muted-foreground">Parameters</label>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {Object.entries(parameters).map(([key, value]) => (
+                        <span key={key} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
+                          {key}: {String(value)}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
