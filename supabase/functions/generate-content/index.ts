@@ -27,29 +27,36 @@ serve(async (req) => {
   }
 
   try {
+    const requestId = crypto.randomUUID();
+    const startedAt = Date.now();
     const { prompt, parameters }: GenerationRequest = await req.json();
-    console.log('Generation request:', { prompt, parameters });
+    console.log('[generate-content]', { requestId, event: 'request_received', hasOPENAI: !!openAIApiKey, hasRUNWAY: !!runwayApiKey, parameters, promptPreview: (prompt || '').slice(0, 120) });
 
     const isVideoGeneration = parameters.Format === 'Video';
 
     if (isVideoGeneration) {
       // Generate video using Runway ML
+      const videoStart = Date.now();
       const videoResult = await generateVideo(prompt, parameters);
+      console.log('[generate-content]', { requestId, event: 'video_generated', ms: Date.now() - videoStart });
       return new Response(JSON.stringify(videoResult), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'x-request-id': requestId },
       });
     } else {
       // Generate image using OpenAI
+      const imageStart = Date.now();
       const imageResult = await generateImage(prompt, parameters);
+      console.log('[generate-content]', { requestId, event: 'image_generated', ms: Date.now() - imageStart });
       return new Response(JSON.stringify(imageResult), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json', 'x-request-id': requestId },
       });
     }
   } catch (error) {
-    console.error('Error in generate-content function:', error);
+    const err = error as any;
+    console.error('[generate-content]', { event: 'error', message: err?.message, stack: err?.stack });
     return new Response(JSON.stringify({ 
       error: 'Generation failed', 
-      details: error.message 
+      details: err?.message || 'Unknown error' 
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -73,10 +80,10 @@ async function generateImage(prompt: string, parameters: any) {
   };
 
   const dimensions = getDimensions(parameters.Scale || '1:1');
-  
+  console.log('generateImage: dimensions/scale/bg', { dimensions, scale: parameters.Scale || '1:1', background: parameters.Background || 'none' });
   // Enhance prompt for food photography
   const enhancedPrompt = `Professional food photography: ${prompt}. ${parameters.Background ? `Background: ${parameters.Background}.` : ''} Studio lighting, high resolution, appetizing presentation, commercial quality.`;
-
+  console.log('generateImage: calling OpenAI images', { model: 'gpt-image-1', size: `${dimensions.width}x${dimensions.height}` });
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -92,10 +99,10 @@ async function generateImage(prompt: string, parameters: any) {
       output_format: 'png',
     }),
   });
-
+  console.log('generateImage: OpenAI response', { status: response.status, statusText: response.statusText });
   if (!response.ok) {
     const errorData = await response.json();
-    console.error('OpenAI API error:', errorData);
+    console.error('OpenAI API error payload:', errorData);
     throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
   }
 
@@ -211,6 +218,7 @@ Background: ${parameters.Background || 'Plain'}`;
         max_completion_tokens: 800,
       }),
     });
+    console.log('enhancePromptWithAI: OpenAI chat response', { status: response.status, statusText: response.statusText });
 
     if (!response.ok) {
       console.error('OpenAI API error, falling back to basic enhancement');
@@ -283,6 +291,7 @@ async function generateVideo(prompt: string, parameters: any) {
 
   const duration = getDuration(parameters.Length || '5s');
   const aspectRatio = getAspectRatio(parameters.Scale || '1:1');
+  console.log('generateVideo: config', { duration, aspectRatio, length: parameters.Length || '5s', scale: parameters.Scale || '1:1' });
   
   // Enhance prompt using OpenAI
   const enhancedPrompt = await enhancePromptWithAI(prompt, parameters);
@@ -309,10 +318,11 @@ async function generateVideo(prompt: string, parameters: any) {
       seed: Math.floor(Math.random() * 1000000),
     }),
   });
+  console.log('Runway create task response', { status: createResponse.status, statusText: createResponse.statusText });
 
   if (!createResponse.ok) {
     const errorData = await createResponse.json();
-    console.error('Runway API error (create):', errorData);
+    console.error('Runway API error (create) payload:', errorData);
     throw new Error(`Runway API error: ${errorData.message || 'Unknown error'}`);
   }
 
@@ -341,8 +351,7 @@ async function generateVideo(prompt: string, parameters: any) {
     }
 
     const statusData = await statusResponse.json();
-    console.log(`Task status (attempt ${attempts + 1}):`, statusData.status);
-
+    console.log(`Task status (attempt ${attempts + 1}):`, statusData.status, statusData.failure_reason ? `reason: ${statusData.failure_reason}` : '');
     if (statusData.status === 'SUCCEEDED') {
       return {
         type: 'video',
