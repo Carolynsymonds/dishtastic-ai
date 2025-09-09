@@ -118,22 +118,83 @@ async function enhancePromptWithAI(prompt: string, parameters: any): Promise<str
   }
 
   try {
-    const systemPrompt = `You are a professional food cinematographer. Transform user prompts into detailed, cinematic video descriptions for AI video generation. 
+    const systemPrompt = `You are a food-film director and prompt composer. Convert the user's description and chip selections into a JSON creative brief for a photoreal, mouth-watering food image or video.
 
-Guidelines:
-- Focus on visual storytelling and camera work
-- Include specific details about lighting, composition, and movement
-- Incorporate food styling and presentation elements
-- Keep descriptions concise but vivid (max 200 words)
-- Consider the video style and background provided
-- Emphasize smooth, professional camera movements
-- Include sensory details that translate to visuals
+Rules:
+- Return **valid JSON only**, no explanations.
+- Follow this schema exactly:
 
-Video Style: ${parameters['Video Style'] || 'Standard'}
-Background: ${parameters.Background || 'Neutral'}
-Duration: ${parameters.Length || '5s'}
+{
+  "mode": "video | image",
+  "dish": {
+    "name": "string",
+    "cuisine": "string | null",
+    "dish_type": "pasta | soup | noodles | steak | dessert | pastry | salad | pizza | bowl | sandwich | rice | fries | seafood | tacos | bbq | curry | other",
+    "key_ingredients": ["string"],
+    "textures": ["string"]
+  },
+  "visual_direction": {
+    "camera_move": "Push-In Close | Pull-Back Reveal | Overhead Top-Down | 360° Dish Orbit | Table Slide | Tilt-Down Reveal | Tilt-Up Reveal | Rack Focus Shift | Slow-Mo Pour | Ingredient Drop | Handheld Lifestyle | Whip Pan | Speed Ramp | Drone Establishing | Chef POV | none",
+    "framing": "macro close-up | three-quarter | overhead | side-on",
+    "angle": "eye-level | top-down | 45-degree"
+  },
+  "setting": {
+    "background": "Plain | Home Kitchen | Chef's Pass | Fine Dining | Farm Table | Coffee Shop | Garden Picnic | Rooftop Bar | Market Stand | Fastfood Venue | Hotel Buffet | Food Truck | Casual Diner | Family Dinner",
+    "servingware": "string",
+    "props": ["string"],
+    "lighting": "string",
+    "mood": "string"
+  },
+  "tabletop": {
+    "surface_material": "marble | rustic wood | lacquered wood | slate | stainless steel | terrazzo | linen-covered | laminate | bamboo",
+    "surface_color": "string",
+    "linens": "none | natural linen napkin | crisp white tablecloth | paper liner",
+    "cutlery": "polished stainless | brushed brass | black matte | stainless chopsticks & spoon | none",
+    "glassware": "none | water tumbler | wine glass | beer glass | tea cup",
+    "plate_style": "classic white rimmed | rustic stoneware | modern coupe | bamboo tray | cast-iron skillet | diner china | lacquered tray",
+    "garnish_style": "minimalist | abundant | rustic scatter | fine-dining microgreens",
+    "color_palette": ["string"]
+  },
+  "people": {
+    "presence": "none | chef hands | diners",
+    "action": "string | null"
+  },
+  "tech": {
+    "aspect_ratio": "16:9 | 3:2 | 1:1 | 2:3 | 9:16",
+    "duration_seconds": "number | null",
+    "fps": "number | null",
+    "style_strength": "realistic | cinematic | stylized",
+    "lens": "string",
+    "depth_of_field": "shallow | medium | deep",
+    "negative_prompts": ["string"]
+  },
+  "runway_prompt": "string",
+  "runway_params": {
+    "aspect_ratio": "16:9 | 3:2 | 1:1 | 2:3 | 9:16",
+    "seconds": "number | null",
+    "seed": "number"
+  }
+}
 
-Transform the user's prompt into a professional cinematographic description.`;
+Heuristics:
+- If Format = "Video", set "mode": "video" and use Length (in seconds) as "duration_seconds".  
+- If Format = "Image", set "mode": "image" and "duration_seconds": null.  
+- Use Video Style for "camera_move". If none, set "camera_move": "none".  
+- Use Background for "setting.background".  
+- Infer plateware & tabletop style from cuisine, dish_type, and background.  
+- Add one clear action for videos (steam, toss, garnish sprinkle, cheese pull, etc.).  
+- Always include tabletop details.  
+- Negative prompts: distorted proportions, plastic look, cartoonish, messy background, over-saturation.  
+- runway_prompt must be a **single paragraph** weaving together dish, servingware, tabletop, props, textures, camera, lighting, and mood.`;
+
+    const userPrompt = `User description: ${prompt}
+Format: ${parameters.Format || 'Image'}
+Scale: ${parameters.Scale || '1:1'}
+Length: ${parameters.Length || '5s'}
+Video Style: ${parameters['Video Style'] || 'none'}
+Background: ${parameters.Background || 'Plain'}`;
+
+    console.log('Sending enhanced prompt request to OpenAI');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -145,9 +206,9 @@ Transform the user's prompt into a professional cinematographic description.`;
         model: 'gpt-5-mini-2025-08-07',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: prompt }
+          { role: 'user', content: userPrompt }
         ],
-        max_completion_tokens: 150,
+        max_completion_tokens: 800,
       }),
     });
 
@@ -157,10 +218,35 @@ Transform the user's prompt into a professional cinematographic description.`;
     }
 
     const data = await response.json();
-    const enhancedPrompt = data.choices[0].message.content;
-    console.log('Original prompt:', prompt);
-    console.log('Enhanced prompt:', enhancedPrompt);
-    return enhancedPrompt;
+    let jsonResponse = data.choices[0].message.content;
+
+    console.log('Raw OpenAI response:', jsonResponse);
+
+    // Clean up the response in case it has markdown formatting
+    jsonResponse = jsonResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    try {
+      const parsedJson = JSON.parse(jsonResponse);
+      console.log('Successfully parsed JSON response:', parsedJson);
+      
+      // Extract the runway_prompt from the JSON
+      const runwayPrompt = parsedJson.runway_prompt;
+      
+      if (!runwayPrompt) {
+        console.warn('No runway_prompt found in JSON, falling back');
+        throw new Error('Missing runway_prompt in JSON response');
+      }
+
+      console.log('Using runway_prompt:', runwayPrompt);
+      return runwayPrompt;
+      
+    } catch (parseError) {
+      console.error('Failed to parse JSON response:', parseError);
+      console.error('Raw response was:', jsonResponse);
+      // Fallback to basic enhancement
+      throw parseError;
+    }
+
   } catch (error) {
     console.error('Error enhancing prompt with AI:', error);
     // Fallback to basic enhancement
