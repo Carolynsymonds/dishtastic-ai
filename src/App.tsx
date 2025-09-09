@@ -18,6 +18,7 @@ import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import VideoDisplay from "./pages/VideoDisplay";
+import GenerateVideo from "./pages/GenerateVideo";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
@@ -53,25 +54,26 @@ const App = () => (
           <ConditionalTopBanner />
           <UtmTracker />
           <ScrollToTop />
-          <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/free-plan" element={<Index />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/app" element={<Application />} />
-          <Route path="/app/purchases" element={<PurchasesBySupplier />} />
-          <Route path="/app/inventory" element={<Inventory />} />
-           <Route path="/app/inventory/analytics" element={<InventoryAnalytics />} />
-           <Route path="/video" element={<VideoDisplay />} />
-           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-           <Route path="/terms-conditions" element={<TermsConditions />} />
-           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-          </Routes>
+            <Routes>
+           <Route path="/" element={<Home />} />
+           <Route path="/free-plan" element={<Index />} />
+           <Route path="/pricing" element={<Pricing />} />
+           <Route path="/features" element={<Features />} />
+           <Route path="/contact" element={<Contact />} />
+           <Route path="/login" element={<Login />} />
+           <Route path="/signup" element={<Signup />} />
+           <Route path="/auth/callback" element={<AuthCallback />} />
+           <Route path="/app" element={<Application />} />
+           <Route path="/app/purchases" element={<PurchasesBySupplier />} />
+           <Route path="/app/inventory" element={<Inventory />} />
+            <Route path="/app/inventory/analytics" element={<InventoryAnalytics />} />
+            <Route path="/video" element={<VideoDisplay />} />
+            <Route path="/generate" element={<GenerateVideo />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-conditions" element={<TermsConditions />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+           <Route path="*" element={<NotFound />} />
+           </Routes>
           <CookieConsent />
         </div>
       </BrowserRouter>
