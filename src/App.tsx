@@ -17,6 +17,7 @@ import Features from "./pages/Features";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
+import VideoDisplay from "./pages/VideoDisplay";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
@@ -64,10 +65,11 @@ const App = () => (
           <Route path="/app" element={<Application />} />
           <Route path="/app/purchases" element={<PurchasesBySupplier />} />
           <Route path="/app/inventory" element={<Inventory />} />
-          <Route path="/app/inventory/analytics" element={<InventoryAnalytics />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-conditions" element={<TermsConditions />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+           <Route path="/app/inventory/analytics" element={<InventoryAnalytics />} />
+           <Route path="/video" element={<VideoDisplay />} />
+           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+           <Route path="/terms-conditions" element={<TermsConditions />} />
+           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           </Routes>
           <CookieConsent />
