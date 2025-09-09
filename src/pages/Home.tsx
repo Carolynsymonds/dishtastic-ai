@@ -171,9 +171,9 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative min-h-[140vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5 overflow-visible">
         {/* Background Images - Two Rows */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-1 pt-20">
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-0 pt-20">
           {/* First Row */}
-          <div className="flex gap-1 w-full max-w-full px-4 opacity-60">
+          <div className="flex gap-0 w-full max-w-full px-4 opacity-60">
             <img 
               src="/lovable-uploads/ac8c5174-2398-43ea-8ede-9298108eb6cc.png" 
               alt="Wood-fired pizza showcase" 
@@ -197,7 +197,7 @@ const Home = () => {
           </div>
           
           {/* Second Row */}
-          <div className="flex gap-1 w-full max-w-full px-4 opacity-60">
+          <div className="flex gap-0 w-full max-w-full px-4 opacity-60">
             <img 
               src="/lovable-uploads/006ae285-acc6-42fb-a3e2-b2415ed1da30.png" 
               alt="Fine dining steak showcase" 
