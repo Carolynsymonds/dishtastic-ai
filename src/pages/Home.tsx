@@ -279,7 +279,7 @@ const Home = () => {
                   </button>
                   
                   {/* Quick Reply Chips inside textarea */}
-                  <div className="absolute bottom-2 left-3 right-3 flex flex-wrap gap-2">
+                  <div className="absolute bottom-6 left-3 right-3 flex flex-wrap gap-2">
                       {quickReplies.map((category) => (
                         <div key={category.category} className="relative">
                           <button
