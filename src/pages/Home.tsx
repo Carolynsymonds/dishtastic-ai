@@ -66,18 +66,6 @@ const Home = () => {
     setActiveDropdown(null); // Close dropdown after selection
   };
 
-  const removeParameter = (category: string) => {
-    setGenerationParameters(prev => {
-      const newParams = { ...prev };
-      delete newParams[category];
-      return newParams;
-    });
-  };
-
-  const clearAllParameters = () => {
-    setGenerationParameters({});
-  };
-
   const toggleDropdown = (category: string) => {
     setActiveDropdown(activeDropdown === category ? null : category);
   };
@@ -332,36 +320,6 @@ const Home = () => {
                       }}
                     />
                 </div>
-                
-                {/* Selected Parameters Display */}
-                {Object.keys(generationParameters).length > 0 && (
-                  <div className="p-4 border-t border-border">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-foreground">Generation Settings:</span>
-                      <button
-                        onClick={clearAllParameters}
-                        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        Clear all
-                      </button>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(generationParameters).map(([category, value]) => (
-                        <div key={category} className="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary text-xs rounded-md border border-primary/20">
-                          <span className="font-medium">{category}:</span>
-                          <span>{value}</span>
-                          <button
-                            onClick={() => removeParameter(category)}
-                            className="ml-1 hover:text-primary/70 transition-colors"
-                            title={`Remove ${category}`}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
             
