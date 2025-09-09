@@ -7,13 +7,114 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
   }
   public: {
     Tables: {
+      contact_submissions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          landing_page_id: string | null
+          message: string | null
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          landing_page_id?: string | null
+          message?: string | null
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          landing_page_id?: string | null
+          message?: string | null
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_submissions_landing_page_id_fkey"
+            columns: ["landing_page_id"]
+            isOneToOne: false
+            referencedRelation: "landing_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dish_analyses: {
+        Row: {
+          analysis_result: Json
+          created_at: string
+          dish_name: string
+          id: string
+          profit_margin: number | null
+          suggestions: Json
+          updated_at: string
+        }
+        Insert: {
+          analysis_result: Json
+          created_at?: string
+          dish_name: string
+          id?: string
+          profit_margin?: number | null
+          suggestions?: Json
+          updated_at?: string
+        }
+        Update: {
+          analysis_result?: Json
+          created_at?: string
+          dish_name?: string
+          id?: string
+          profit_margin?: number | null
+          suggestions?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      dish_analysis_verifications: {
+        Row: {
+          created_at: string
+          dishes_data: Json
+          email: string
+          expires_at: string
+          id: string
+          updated_at: string
+          verification_token: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          dishes_data: Json
+          email: string
+          expires_at?: string
+          id?: string
+          updated_at?: string
+          verification_token: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          dishes_data?: Json
+          email?: string
+          expires_at?: string
+          id?: string
+          updated_at?: string
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       landing_pages: {
         Row: {
           created_at: string
@@ -48,7 +149,6 @@ export type Database = {
           utm_medium: string | null
           utm_source: string | null
           utm_term: string | null
-          visitor_id: string | null
         }
         Insert: {
           created_at?: string
@@ -65,7 +165,6 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
-          visitor_id?: string | null
         }
         Update: {
           created_at?: string
@@ -82,7 +181,6 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
-          visitor_id?: string | null
         }
         Relationships: [
           {
@@ -100,6 +198,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      static_content: {
+        Row: {
+          content_type: string
+          created_at: string
+          id: string
+          last_updated: string | null
+          sections: Json
+          site_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string
+          id?: string
+          last_updated?: string | null
+          sections?: Json
+          site_id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          id?: string
+          last_updated?: string | null
+          sections?: Json
+          site_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_onboarding_drafts: {
         Row: {
@@ -188,30 +319,30 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           email: string
-          first_touch_page_id: string | null
           id: string
+          landing_page_id: string | null
           status: string
         }
         Insert: {
           created_at?: string
           deleted_at?: string | null
           email: string
-          first_touch_page_id?: string | null
           id?: string
+          landing_page_id?: string | null
           status?: string
         }
         Update: {
           created_at?: string
           deleted_at?: string | null
           email?: string
-          first_touch_page_id?: string | null
           id?: string
+          landing_page_id?: string | null
           status?: string
         }
         Relationships: [
           {
             foreignKeyName: "users_first_touch_page_id_fkey"
-            columns: ["first_touch_page_id"]
+            columns: ["landing_page_id"]
             isOneToOne: false
             referencedRelation: "landing_pages"
             referencedColumns: ["id"]
@@ -246,6 +377,21 @@ export type Database = {
       citextsend: {
         Args: { "": string }
         Returns: string
+      }
+      get_landing_page_analytics: {
+        Args: { days_back?: number; min_leads?: number }
+        Returns: {
+          first_lead_at: string
+          landing_page_id: string
+          landing_page_slug: string
+          last_lead_at: string
+          lead_to_onboard_pct: number
+          lead_to_signup_pct: number
+          leads: number
+          onboarded: number
+          signup_to_onboard_pct: number
+          signups: number
+        }[]
       }
     }
     Enums: {
