@@ -173,50 +173,50 @@ const Home = () => {
         {/* Background Images - Two Rows */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pt-20" style={{ gap: '0px' }}>
           {/* First Row */}
-          <div className="flex gap-0 w-full max-w-full px-4 opacity-60">
+          <div className="flex gap-px w-full max-w-full px-4 opacity-60">
             <img 
               src="/lovable-uploads/ac8c5174-2398-43ea-8ede-9298108eb6cc.png" 
               alt="Wood-fired pizza showcase" 
-              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
             />
             <img 
               src="/lovable-uploads/414772d4-1bcb-4d32-a2a1-79efdc45cdca.png" 
               alt="Lobster roll showcase" 
-              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
             />
             <img 
               src="/lovable-uploads/3019963f-d795-4f70-a8a6-9e8a0f85c0ef.png" 
               alt="Ramen preparation showcase" 
-              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
             />
             <img 
               src="/lovable-uploads/9b776cf4-fad8-4955-a4a2-ccbbd1ce7a96.png" 
               alt="Poke bowl preparation showcase" 
-              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
             />
           </div>
           
           {/* Second Row */}
-          <div className="flex gap-0 w-full max-w-full px-4 opacity-60">
+          <div className="flex gap-px w-full max-w-full px-4 opacity-60">
             <img 
               src="/lovable-uploads/006ae285-acc6-42fb-a3e2-b2415ed1da30.png" 
               alt="Fine dining steak showcase" 
-              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
             />
             <img 
               src="/lovable-uploads/a8ad989d-7ec6-494d-83c6-f74aab6a0170.png" 
               alt="Artisan cookies bakery showcase" 
-              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
             />
             <img 
               src="/lovable-uploads/26136666-4fcb-49fd-b5a9-13b1af964c5d.png" 
               alt="Glazed chicken wings showcase" 
-              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
             />
             <img 
               src="/lovable-uploads/cba94c88-cf1f-4568-bbdf-43bec434925e.png" 
               alt="Street taco showcase" 
-              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover rounded-lg"
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
             />
           </div>
         </div>
