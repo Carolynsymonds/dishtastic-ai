@@ -180,8 +180,8 @@ async function generateImageFallback(prompt: string, parameters: any) {
 
 async function enhancePromptWithAI(prompt: string, parameters: any): Promise<string> {
   if (!openAIApiKey) {
-    console.log('OpenAI API key not available, using basic enhancement');
-    return `${prompt}. ${parameters['Video Style'] ? `Style: ${parameters['Video Style']}.` : ''} ${parameters.Background ? `Background: ${parameters.Background}.` : ''} High quality food cinematography, smooth motion, professional lighting.`;
+    console.log('OpenAI API key not available, using enhanced fallback');
+    return createMotionPrompt(prompt, parameters);
   }
 
   try {
@@ -317,8 +317,108 @@ Background: ${parameters.Background || 'Plain'}`;
 
   } catch (error) {
     console.error('Error enhancing prompt with AI:', error);
-    // Fallback to basic enhancement
-    return `${prompt}. ${parameters['Video Style'] ? `Style: ${parameters['Video Style']}.` : ''} ${parameters.Background ? `Background: ${parameters.Background}.` : ''} High quality food cinematography, smooth motion, professional lighting.`;
+    // Fallback to enhanced motion-specific prompt
+    return createMotionPrompt(prompt, parameters);
+  }
+}
+
+function createMotionPrompt(prompt: string, parameters: any): string {
+  const videoStyle = parameters['Video Style'];
+  const background = parameters.Background;
+  
+  // Motion-specific instructions for each video style
+  const motionInstructions = {
+    'Ingredient Drop': 'ingredients actively falling and splashing into the dish with visible motion and splash effects',
+    'Slow-Mo Pour': 'sauce or liquid slowly pouring in dramatic slow motion with smooth flow and ripple effects',
+    'Steam Rising': 'hot steam actively rising and swirling upward from the food with dynamic movement',
+    'Cheese Pull': 'melted cheese stretching and pulling as the food is lifted, showing the elastic cheese strands',
+    'Sizzle Effect': 'food actively sizzling and bubbling with steam and small bubbles popping',
+    'Garnish Drop': 'fresh herbs or seasoning slowly falling and landing on the dish',
+    'Liquid Drizzle': 'oil, sauce, or honey slowly drizzling down with visible flow patterns',
+    'Whisk Action': 'ingredients being actively mixed or whisked with dynamic circular motion'
+  };
+  
+  const motionInstruction = motionInstructions[videoStyle as keyof typeof motionInstructions] || 'smooth camera movement revealing the dish with professional cinematography';
+  
+  // Background-specific enhancements
+  const backgroundEnhancement = background ? `Set in ${background} environment.` : '';
+  
+  // Create dynamic motion prompt
+  return `Professional food cinematography: ${prompt}. ${backgroundEnhancement} Dynamic action: ${motionInstruction}. Camera captures the motion with smooth tracking. Professional studio lighting, high contrast, appetizing colors, commercial quality food videography. The movement should be clear and engaging, showing the food in action.`;
+}
+
+function createMotionImagePrompt(prompt: string, parameters: any): string {
+  const videoStyle = parameters['Video Style'];
+  const background = parameters.Background;
+  
+  // Create image prompts that suggest motion for better video generation
+  const motionSetups = {
+    'Ingredient Drop': 'ingredients positioned mid-air above the dish, captured at the moment of falling',
+    'Slow-Mo Pour': 'sauce or liquid captured mid-pour with visible stream and splash patterns',
+    'Steam Rising': 'hot food with visible steam wisps and vapor clouds rising upward',
+    'Cheese Pull': 'melted cheese partially stretched showing elastic strands ready to pull',
+    'Sizzle Effect': 'food in a hot pan with oil bubbles and steam wisps visible',
+    'Garnish Drop': 'herbs or seasonings positioned above the dish ready to fall',
+    'Liquid Drizzle': 'honey or sauce mid-drizzle with visible droplets in motion',
+    'Whisk Action': 'ingredients in a bowl with whisk positioned to show mixing motion'
+  };
+  
+  const motionSetup = motionSetups[videoStyle as keyof typeof motionSetups] || 'beautifully plated dish with dynamic composition';
+  const backgroundEnhancement = background ? `Background: ${background}.` : '';
+  
+  return `Professional food photography: ${prompt}. ${backgroundEnhancement} Composition: ${motionSetup}. Studio lighting, high resolution, dynamic positioning that suggests movement, commercial quality.`;
+}
+
+async function generateImageWithPrompt(customPrompt: string, parameters: any) {
+  if (!openAIApiKey) {
+    throw new Error('OpenAI API key not configured');
+  }
+
+  // Map scale to image dimensions
+  const getDimensions = (scale: string) => {
+    switch (scale) {
+      case '2:3': return { width: 1024, height: 1536 };
+      case '16:9': return { width: 1792, height: 1024 };
+      case '1:1':
+      default: return { width: 1024, height: 1024 };
+    }
+  };
+
+  const dimensions = getDimensions(parameters.Scale || '1:1');
+  
+  // Try gpt-image-1 first, fallback to dall-e-3 if org verification fails
+  try {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-image-1',
+        prompt: customPrompt,
+        n: 1,
+        size: `${dimensions.width}x${dimensions.height}`,
+        quality: 'high',
+        output_format: 'png',
+      }),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        type: 'image',
+        content: data.data[0].b64_json,
+        format: 'png',
+        parameters,
+        prompt: customPrompt
+      };
+    } else {
+      // Fall back to dall-e-3
+      return await generateImageFallback(customPrompt, parameters);
+    }
+  } catch (error) {
+    return await generateImageFallback(customPrompt, parameters);
   }
 }
 
@@ -360,11 +460,12 @@ async function generateVideo(prompt: string, parameters: any) {
   const aspectRatio = getAspectRatio(parameters.Scale || '1:1');
   console.log('generateVideo: config', { duration, aspectRatio, length: parameters.Length || '5s', scale: parameters.Scale || '1:1' });
   
-  // Enhance prompt using OpenAI
+  // Enhance prompt using OpenAI or fallback
   const enhancedPrompt = await enhancePromptWithAI(prompt, parameters);
 
-  // Generate a starter image to satisfy Runway's promptImage requirement
-  const starterImage = await generateImage(prompt, parameters);
+  // Generate a motion-optimized starter image to satisfy Runway's promptImage requirement
+  const motionImagePrompt = createMotionImagePrompt(prompt, parameters);
+  const starterImage = await generateImageWithPrompt(motionImagePrompt, parameters);
   const promptImage = `data:image/${starterImage.format || 'png'};base64,${starterImage.content}`;
 
   console.log('Generating video with Runway:', { duration, aspectRatio, promptUsed: enhancedPrompt ? 'enhanced' : 'basic' });
@@ -378,13 +479,14 @@ async function generateVideo(prompt: string, parameters: any) {
         'Content-Type': 'application/json',
         'X-Runway-Version': '2024-11-06',
       },
-      body: JSON.stringify({
-        promptImage,
-        model: 'gen3a_turbo',
-        duration: duration,
-        ratio: aspectRatio,
-        seed: Math.floor(Math.random() * 1000000),
-      }),
+        body: JSON.stringify({
+          promptImage,
+          promptText: enhancedPrompt,
+          model: 'gen3a_turbo',
+          duration: duration,
+          ratio: aspectRatio,
+          seed: Math.floor(Math.random() * 1000000),
+        }),
     });
     console.log('Runway create task response', { status: createResponse.status, statusText: createResponse.statusText, triedRatio: aspectRatio });
 
