@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Calendar, Shield, Smartphone } from "lucide-react";
 import { siteContent } from "@/config/site-content";
 
@@ -8,30 +8,49 @@ const iconMap = {
   Smartphone
 };
 
-const DynamicSvgIcon = ({ url, className = '', ...props }) => {
+interface DynamicSvgIconProps {
+  url: string;
+  className?: string;
+  [key: string]: any;
+}
+
+const DynamicSvgIcon = memo(({ url, className = '', ...props }: DynamicSvgIconProps) => {
   const [svgContent, setSvgContent] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!url) return;
+    
+    let isCancelled = false;
+    setLoading(true);
 
     fetch(url)
       .then((res) => res.text())
       .then((text) => {
+        if (isCancelled) return;
+        
         // Process SVG to ensure it uses primary color
         const processedSvg = text
           .replace(/fill="[^"]*"/g, 'fill="currentColor"')
           .replace(/stroke="[^"]*"/g, 'stroke="currentColor"')
           .replace(/<svg([^>]*)>/, '<svg$1 class="w-full h-full">');
         setSvgContent(processedSvg);
+        setLoading(false);
       })
       .catch((err) => {
+        if (isCancelled) return;
         console.error('Failed to load SVG:', err);
         setSvgContent('');
+        setLoading(false);
       });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [url]);
 
-  if (!svgContent) {
-    return null;
+  if (loading || !svgContent) {
+    return <div className={`w-full h-full ${className}`} />;
   }
 
   return (
@@ -41,7 +60,7 @@ const DynamicSvgIcon = ({ url, className = '', ...props }) => {
       {...props}
     />
   );
-};
+});
 
 const FeaturesSection = () => {
   return (

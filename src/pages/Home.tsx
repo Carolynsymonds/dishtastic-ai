@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeroBanner from "@/components/HeroBanner";
@@ -15,32 +15,68 @@ import { siteContent } from "@/config/site-content";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
 import { toast } from "sonner";
 import { GenerationParameters } from "@/types/generation";
-const DynamicSvgIcon = ({
+
+interface DynamicSvgIconProps {
+  url: string;
+  className?: string;
+  [key: string]: any;
+}
+
+const DynamicSvgIcon = memo(({
   url,
   className = '',
   ...props
-}) => {
+}: DynamicSvgIconProps) => {
   const [svgContent, setSvgContent] = useState('');
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (!url) return;
-    fetch(url).then(res => res.text()).then(text => {
-      // Process SVG to ensure it uses primary color
-      const processedSvg = text.replace(/fill="[^"]*"/g, 'fill="currentColor"').replace(/stroke="[^"]*"/g, 'stroke="currentColor"').replace(/<svg([^>]*)>/, '<svg$1 class="w-full h-full">');
-      setSvgContent(processedSvg);
-    }).catch(err => {
-      console.error('Failed to load SVG:', err);
-      setSvgContent('');
-    });
+    
+    let isCancelled = false;
+    setLoading(true);
+
+    fetch(url)
+      .then(res => res.text())
+      .then(text => {
+        if (isCancelled) return;
+        
+        // Process SVG to ensure it uses primary color
+        const processedSvg = text
+          .replace(/fill="[^"]*"/g, 'fill="currentColor"')
+          .replace(/stroke="[^"]*"/g, 'stroke="currentColor"')
+          .replace(/<svg([^>]*)>/, '<svg$1 class="w-full h-full">');
+        setSvgContent(processedSvg);
+        setLoading(false);
+      })
+      .catch(err => {
+        if (isCancelled) return;
+        console.error('Failed to load SVG:', err);
+        setSvgContent('');
+        setLoading(false);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [url]);
-  return <div className={`text-primary ${className}`} dangerouslySetInnerHTML={{
-    __html: svgContent
-  }} {...props} />;
-};
+
+  if (loading || !svgContent) {
+    return <div className={`w-full h-full ${className}`} />;
+  }
+
+  return (
+    <div 
+      className={`text-primary ${className}`} 
+      dangerouslySetInnerHTML={{ __html: svgContent }} 
+      {...props} 
+    />
+  );
+});
 const Home = () => {
   const navigate = useNavigate();
   const { navigateWithUtm } = useUtmTracking();
   
-// Clean up debug log
   const [textareaValue, setTextareaValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [generationParameters, setGenerationParameters] = useState<GenerationParameters>({
@@ -82,17 +118,17 @@ const Home = () => {
     navigateWithUtm('/signup');
   };
 
-  const handleChipClick = (chipText: string, category: string) => {
+  const handleChipClick = useCallback((chipText: string, category: string) => {
     setGenerationParameters(prev => ({
       ...prev,
       [category]: chipText
     }));
     setActiveDropdown(null); // Close dropdown after selection
-  };
+  }, []);
 
-  const toggleDropdown = (category: string) => {
+  const toggleDropdown = useCallback((category: string) => {
     setActiveDropdown(activeDropdown === category ? null : category);
-  };
+  }, [activeDropdown]);
 
   const quickReplies = [
     {
