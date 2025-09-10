@@ -832,8 +832,7 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
   const requestBody: any = {
     model: lumaModel,
     prompt: enhancedPrompt,
-    aspect_ratio: aspectRatio,
-    duration: duration,
+    aspect_ratio: aspectRatio
   };
   // Only include loop when true to avoid API rejections
   if (shouldLoop) {
@@ -1164,8 +1163,7 @@ async function createLumaOptimizedPrompt(prompt: string, parameters: any, mode: 
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Create optimized prompt for: ${prompt}\nParameters: ${JSON.stringify(parameters)}` }
         ],
-        max_tokens: 500,
-        temperature: 0.7
+        max_completion_tokens: 500
       }),
     });
 
@@ -1264,7 +1262,7 @@ function createMotionOptimizedImagePrompt(prompt: string, parameters: any): stri
 async function generateVideo(prompt: string, parameters: any) {
   const requestId = crypto.randomUUID();
   const startTime = Date.now();
-  const strictVideo = parameters?.StrictVideo !== false;
+  const strictVideo = parameters?.StrictVideo === true;
   
   console.log('[VIDEO-GEN]', { 
     requestId, 
