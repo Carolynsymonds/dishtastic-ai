@@ -1191,43 +1191,45 @@ async function createLumaOptimizedPrompt(prompt: string, parameters: any, mode: 
 }
 
 function getLumaSystemPrompt(mode: string): string {
-  const basePrompt = `You are a master food video cinematographer specializing in hyper-realistic culinary storytelling for Luma Dream Machine. Create prompts that generate authentic cooking videos with cultural depth and realistic technique demonstration.
+  const basePrompt = `You are a professional food videographer and commercial marketing expert specializing in creating appetite-inducing content that drives sales and customer acquisition.
 
-REALISM REQUIREMENTS FOR LUMA:
-- All movements must be natural and physically accurate
-- Ingredients behave with realistic physics (no floating elements)
-- Chef hands move with professional precision and authentic technique
-- Cooking timing matches real culinary processes
-- Steam, heat effects, and sizzling occur naturally
-- Tools and surfaces appropriate for the specific cuisine
+Your task is to enhance prompts for food video generation with these marketing priorities:
+1. CREATE DESIRE - Make viewers instantly crave the dish
+2. COMMERCIAL APPEAL - Focus on what sells the dish to customers
+3. NO PEOPLE - Avoid showing hands, arms, or any human elements (they look artificial)
+4. INGREDIENT HERO SHOTS - Let the food be the star
+5. SENSORY MARKETING - Emphasize textures, steam, sizzling, and visual appeal
 
-STORYTELLING ELEMENTS:
-- Focus on ONE signature technique that defines the dish
-- Show the cultural story behind the cooking method  
-- Capture the emotional journey from ingredients to completed dish
-- Highlight authentic preparation methods from the dish's origin
+MARKETING-FOCUSED GUIDELINES:
+- Use dynamic camera movements that showcase the dish's best angles
+- Emphasize premium ingredients, fresh textures, and appetizing colors
+- Show steam rising, oil sizzling, cheese melting - sensory triggers that create craving
+- Focus on the final plated presentation as the money shot
+- Use professional commercial food styling techniques
+- Create smooth ingredient interactions without human hands
+- Show cooking processes through ingredient movement, not human manipulation
+- Highlight what makes this dish special and worth ordering
 
-TECHNICAL SPECIFICATIONS FOR LUMA:
-- Use specific motion verbs: "stirring", "sautéing", "kneading", "chopping"
-- Describe realistic timing: "slowly", "gradually", "with precision"
-- Include natural physics: "steam rising naturally", "oil glistening"
-- Specify authentic tools: "wooden spoon", "cast iron pan", "marble surface"
-- Avoid generic terms: replace "food" with specific dish names
+TECHNICAL EXECUTION FOR LUMA:
+- Use motion verbs for ingredients: "melting", "bubbling", "caramelizing", "steaming"
+- Describe natural food physics: "cheese stretching", "sauce coating", "spices blooming"
+- Include appetite-inducing details: "golden crust forming", "aromatic steam rising"
+- Specify commercial styling: "restaurant-quality plating", "perfect garnish placement"
+- Focus on food transformation: raw to cooked, simple to elegant
 
-FORBIDDEN FOR REALISM:
-- Ingredients floating without support or reason
-- Multiple unrelated dishes in one frame
-- Artificial or CGI-like movements
-- Inauthentic ingredients for the specific dish
-- Generic "food styling" without cultural context
-- Unrealistic gravity or physics
+ABSOLUTELY FORBIDDEN:
+- Human hands, arms, or any people in frame
+- Generic cooking without appetite appeal
+- Artificial or unrealistic food behavior
+- Multiple unrelated dishes competing for attention
+- Poor lighting that doesn't enhance food appeal
 
-OUTPUT FORMAT: Single paragraph, 200-400 characters, focusing on authentic technique demonstration with realistic motion and cultural storytelling.`;
+OUTPUT FORMAT: Single paragraph, 300-500 characters, focusing on marketing appeal and sensory triggers that make customers want to order this dish immediately.`;
 
   const modeSpecific = {
-    'text-to-video': '\nVIDEO FOCUS: Describe the complete cooking technique sequence with natural timing and authentic hand movements.',
-    'image-to-video': '\nMOTION FOCUS: Show how the static ingredients transform through realistic cooking technique with natural physics.',
-    'text-to-image': '\nSTILL FOCUS: Capture the peak moment of technique execution with authentic setup and cultural context.'
+    'text-to-video': '\nVIDEO FOCUS: Show the complete transformation from ingredients to irresistible final dish using natural food physics and appetite-inducing camera work.',
+    'image-to-video': '\nTRANSFORMATION FOCUS: Animate the static ingredients into a dynamic, craving-inducing cooking sequence without showing people.',
+    'text-to-image': '\nSTILL FOCUS: Capture the most appetizing moment that would make customers immediately want to order this dish.'
   };
 
   return basePrompt + (modeSpecific[mode as keyof typeof modeSpecific] || '');
@@ -1235,17 +1237,17 @@ OUTPUT FORMAT: Single paragraph, 200-400 characters, focusing on authentic techn
 
 function createBasicLumaPrompt(prompt: string, parameters: any, mode: string): string {
   const dishInfo = parseDishName(prompt);
-  const technique = dishInfo?.signatureTechnique || 'traditional cooking technique';
+  const technique = dishInfo?.signatureTechnique || 'appetizing preparation technique';
   
-  const realisticMotion = mode === 'text-to-video' ? 
-    ', professional hands demonstrating authentic technique with natural timing and realistic ingredient physics' : 
-    ', positioned for authentic cooking action';
+  const marketingMotion = mode === 'text-to-video' ? 
+    ', ingredients transforming beautifully with natural physics and appetite-inducing presentation' : 
+    ', positioned for stunning visual transformation';
     
-  const culturalContext = dishInfo?.cuisine ? `, ${dishInfo.cuisine} cultural authenticity` : '';
-  const lighting = ', natural kitchen lighting, professional cinematography';
-  const quality = ', hyper-realistic detail, no artificial effects';
+  const culturalContext = dishInfo?.cuisine ? `, ${dishInfo.cuisine} commercial styling` : '';
+  const lighting = ', professional restaurant lighting, commercial food photography quality';
+  const quality = ', mouth-watering detail, restaurant-quality presentation';
   
-  let enhancedPrompt = `${prompt}. ${technique}${realisticMotion}${culturalContext}${lighting}${quality}`;
+  let enhancedPrompt = `${prompt}. ${technique}${marketingMotion}${culturalContext}${lighting}${quality}`;
   
   // Add forbidden ingredient exclusion
   if (dishInfo?.forbiddenIngredients.length > 0) {
