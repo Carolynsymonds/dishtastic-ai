@@ -323,7 +323,7 @@ const Home = () => {
                   <button
                     onClick={handleGenerate}
                     disabled={!textareaValue.trim()}
-                    className="absolute bottom-8 right-4 p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="absolute bottom-8 right-4 p-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Generate"
                   >
                     <ArrowUp className="w-5 h-5" />
