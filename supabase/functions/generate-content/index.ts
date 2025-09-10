@@ -400,75 +400,86 @@ async function enhancePromptWithAI(prompt: string, parameters: any): Promise<str
   }
 
   try {
-const systemPrompt = `You are a master culinary storyteller specializing in authentic dish narratives. Convert the user's description into a JSON creative brief that captures the SIGNATURE TECHNIQUE and cultural soul of each specific dish.
+const systemPrompt = `You are a master culinary cinematographer specializing in authentic, story-driven food videos. Create hyper-realistic video prompts that tell the cultural story of each dish through its signature cooking technique.
 
-TECHNIQUE-BASED ACTION NARRATIVES:
-Focus on the ONE defining moment that makes each dish unique - the critical technique that transforms ingredients into culinary magic:
+STORYTELLING PRINCIPLES:
+- Focus on ONE authentic cooking technique that defines the dish
+- Tell the cultural story of how this dish comes alive
+- Show realistic cooking processes with proper timing
+- Use only authentic ingredients and traditional methods
+- Avoid any artificial, floating, or unrealistic elements
+- Create emotional connection through technique mastery
 
-PASTA TECHNIQUES:
-- Carbonara: "The Emulsion Moment" - Raw eggs meeting hot pasta, creating silk-like carbonara sauce through precise temperature control
-- Cacio e Pepe: "The Mantecatura" - Starchy pasta water binding with cheese to create creamy perfection without cream
-- Aglio e Olio: "The Golden Oil Dance" - Garlic transforming in olive oil, creating aromatic perfection
+REALISM REQUIREMENTS:
+- Hands must move naturally and purposefully
+- Ingredients behave with realistic physics
+- Cooking surfaces, tools, and environment must be authentic
+- Steam, sizzling, and heat effects appear naturally
+- Timing matches real cooking processes
+- No CGI-like effects or impossible movements
 
-ASIAN TECHNIQUES:
-- Pad Thai: "Wok Hei Fire Kiss" - The breath of the wok imparting smoky essence and perfect noodle texture
-- Ramen: "Broth Symphony" - Layering technique showing how each component builds the perfect bowl
-- Fried Rice: "Day-Old Rice Resurrection" - Individual grains separating and crisping in the wok's embrace
+DISH-SPECIFIC STORYTELLING:
+Identify the dish and focus on its signature moment:
 
-TECHNIQUE AUTHENTICITY:
-- Identify the dish's SIGNATURE TECHNIQUE from the user description
-- Use ONLY authentic ingredients for that technique
-- Forbidden ingredients go to negative_prompts
-- Focus on the CULTURAL STORY and EMOTIONAL JOURNEY of the technique
+PASTA: The precise technique (carbonara emulsion, cacio e pepe mantecatura, aglio e olio golden oil)
+ASIAN: Wok mastery, knife skills, or traditional preparation methods
+BAKING: Dough transformation, layering techniques, traditional shaping
+GRILLING: Heat control, timing, and authentic preparation
+
+FORBIDDEN ELEMENTS:
+- Ingredients floating in air without support
+- Unrealistic gravity-defying movements  
+- Generic "food styling" without cultural context
+- Inauthentic ingredients for the specific dish
+- Artificial or CGI-like visual effects
+- Multiple dishes or unrelated objects in frame
 
 Schema (return JSON only):
 {
-  "mode": "video | image",
-  "dish": {
-    "name": "string",
-    "cuisine": "string | null", 
-    "dish_type": "pasta | soup | noodles | steak | dessert | pastry | salad | pizza | bowl | sandwich | rice | fries | seafood | tacos | bbq | curry | other",
-    "key_ingredients": ["string"],
-    "signature_technique": "string"
+  "story_framework": {
+    "dish_identity": "specific dish name and cultural origin",
+    "signature_technique": "the ONE defining cooking method",
+    "cultural_narrative": "how this technique tells the dish's cultural story",
+    "emotional_arc": "the transformation journey from ingredients to completed dish"
   },
-  "technique_narrative": {
-    "action_style": "Signature Technique | Cultural Story | Transformation Drama | Sensory Journey",
-    "critical_moment": "string - the defining cooking moment",
-    "cultural_context": "string - how it's made in its homeland", 
-    "sensory_focus": "string - textures, aromas, sounds to highlight"
+  "realistic_cinematography": {
+    "camera_behavior": "steady handheld | locked tripod | gentle tracking | intimate macro",
+    "lighting": "natural kitchen | warm cooking light | authentic restaurant | traditional preparation space",
+    "timing": "real cooking pace | slow technique focus | natural rhythm"
   },
-  "cinematic_direction": {
-    "framing": "intimate close-up | artisan hands | cultural context | transformation focus",
-    "angle": "technique-revealing | ingredient-focused | cultural-authentic",
-    "emotion": "anticipation | mastery | tradition | satisfaction"
+  "authentic_elements": {
+    "cooking_surface": "traditional cookware and appropriate cooking surface",
+    "chef_hands": "realistic hand movements showing proper technique",
+    "ingredient_physics": "natural falling, mixing, and cooking behaviors",
+    "sound_design": "authentic cooking sounds - sizzling, chopping, mixing"
   },
-  "setting": {
-    "background": "Plain | Home Kitchen | Chef's Pass | Fine Dining | Farm Table | Coffee Shop | Garden Picnic | Rooftop Bar | Market Stand | Fastfood Venue | Hotel Buffet | Food Truck | Casual Diner | Family Dinner",
-    "cultural_authenticity": "string - environment matching dish origin",
-    "props": ["string - culturally appropriate tools/elements"]
+  "technique_focus": {
+    "critical_moment": "the 2-3 second technique that defines this dish",
+    "ingredient_sequence": "realistic order of ingredient addition",
+    "tool_usage": "authentic cooking tools used properly",
+    "temperature_cues": "steam, color changes, texture transformation"
   },
-  "tech": {
-    "aspect_ratio": "16:9 | 3:2 | 1:1 | 2:3 | 9:16",
-    "duration_seconds": "number | null", 
-    "style_strength": "realistic | cinematic | stylized",
-    "negative_prompts": ["string - forbidden ingredients and inauthentic elements"]
-  },
-  "runway_prompt": "string - technique-focused narrative using only authentic ingredients"
+  "runway_prompt": "story-driven realistic cooking video description focusing on authentic technique"
 }
 
 Instructions:
-- FIRST identify the specific dish and its signature technique
-- Create a narrative around that ONE defining cooking moment
-- Use technique_narrative.action_style from the user's Video Style parameter
-- Focus on authentic cooking processes, not generic filming styles
-- runway_prompt must tell the CULTURAL STORY of how the dish comes alive through its signature technique`;
+- FIRST identify the specific dish and its ONE signature technique
+- Create a realistic narrative showing hands performing authentic technique
+- Focus on the cultural story behind the cooking method
+- runway_prompt must describe realistic cooking action with authentic timing
+- Remove any elements that could create floating or unrealistic visuals
+- Emphasize proper technique execution and cultural authenticity`;
 
-    const userPrompt = `User description: ${prompt}
-Format: ${parameters.Format || 'Image'}
-Scale: ${parameters.Scale || '1:1'}
-Length: ${parameters.Length || '5s'}
-Video Style: ${parameters['Video Style'] || 'none'}
-Background: ${parameters.Background || 'Plain'}`;
+    const userPrompt = `Create a realistic, story-driven video for: ${prompt}
+    
+Parameters:
+- Format: ${parameters.Format || 'Video'}
+- Aspect Ratio: ${parameters.Scale || '16:9'} 
+- Duration: ${parameters.Length || '5s'}
+- Style Focus: ${parameters['Video Style'] || 'Signature Technique'}
+- Setting: ${parameters.Background || 'Professional Kitchen'}
+
+Focus on authentic cooking technique and cultural storytelling. Make it look completely real with proper physics and timing.`;
 
     console.log('Sending enhanced prompt request to OpenAI');
 
@@ -543,58 +554,69 @@ function createTechniqueNarrative(prompt: string, parameters: any): string {
   let dishSpecificContent = prompt;
   
   if (dishInfo) {
-    // Create technique-focused description
-    const ingredientList = dishInfo.canonicalIngredients.join(', ');
-    dishSpecificContent = `${dishInfo.name}: ${dishInfo.cuisine} ${dishInfo.type} featuring ${ingredientList}`;
+    // Create realistic technique-focused description
+    const ingredientList = dishInfo.canonicalIngredients.slice(0, 3).join(', '); // Limit to core ingredients
+    dishSpecificContent = `${dishInfo.name}: authentic ${dishInfo.cuisine} preparation showcasing ${ingredientList}`;
     
-    console.log(`Technique narrative for ${dishInfo.name}: ${dishInfo.signatureTechnique || 'using traditional method'}`);
+    console.log(`Realistic technique for ${dishInfo.name}: ${dishInfo.signatureTechnique || 'traditional method'}`);
   }
   
-  // Technique-based action narratives that capture the soul of each dish
-  const getTechniqueStory = (dishInfo: DishInfo | null, actionStyle: string): string => {
-    if (!dishInfo) return 'Ingredients coming together through authentic culinary technique, showcasing the artistry of traditional cooking methods';
+  // Realistic story-driven narratives focusing on authentic technique
+  const getRealisticStory = (dishInfo: DishInfo | null, actionStyle: string): string => {
+    if (!dishInfo) return 'Professional chef hands performing authentic cooking technique with realistic timing and natural movements. Focus on proper tool usage and ingredient interaction with natural physics.';
     
-    // Map user's video style to technique narrative focus
-    const narrativeMap: Record<string, string> = {
-      'Signature Technique': dishInfo.signatureTechnique || 'Traditional cooking technique showcasing authentic preparation methods',
-      'Cultural Story': `${dishInfo.culturalContext || `Traditional ${dishInfo.cuisine} preparation`} - ingredients transforming through time-honored methods`,
-      'Transformation Drama': `The magical moment when ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} transform into ${dishInfo.name} through precise technique`,
-      'Sensory Journey': `Experiencing the aromas, textures, and sounds as ${dishInfo.name} comes alive through ${dishInfo.cuisine} culinary mastery`
+    // Story-driven technique narratives with realism emphasis
+    const realisticNarratives: Record<string, string> = {
+      'Signature Technique': `${dishInfo.signatureTechnique || 'Traditional preparation'} - Professional chef hands demonstrating the authentic ${dishInfo.cuisine} technique. Each movement precise and purposeful, ingredients responding naturally to heat and handling. The camera captures the cultural mastery behind this time-honored cooking method.`,
+      
+      'Cultural Story': `${dishInfo.culturalContext || `Traditional ${dishInfo.cuisine} kitchen story`} - Experienced hands recreating generations of culinary wisdom. The scene tells the story of how ${dishInfo.name} comes alive through authentic technique, with realistic cooking timing and natural ingredient transformation.`,
+      
+      'Transformation Drama': `The pivotal moment when ${dishInfo.canonicalIngredients.slice(0, 2).join(' meets ')} through precise ${dishInfo.cuisine} technique. Professional hands guide the natural transformation with realistic timing - no artificial effects, just authentic cooking mastery creating ${dishInfo.name}.`,
+      
+      'Sensory Journey': `Experiencing authentic ${dishInfo.name} creation through sound, texture, and aroma. Professional technique creates natural steam, realistic sizzling, and proper color changes as ingredients transform through traditional ${dishInfo.cuisine} methods.`
     };
     
-    // Legacy video style mapping to technique narratives
-    const legacyStyleMap: Record<string, string> = {
-      'Ingredient Drop': dishInfo.signatureTechnique ? 
-        `${dishInfo.signatureTechnique} - Professional chef assembly in action: ingredients actively dropping and settling with realistic cooking physics. Sequential timing as elements fall naturally - base ingredients first, then complementary elements bouncing into perfect positions, finished with garnishes cascading down. Chef hands subtly guide the process with authentic technique precision and cultural cooking wisdom` :
-        'Dynamic chef assembly action: ingredients actively dropping with realistic physics and impact. Professional hands guiding sequential assembly - heavier ingredients settling first, lighter elements floating down naturally, creating authentic cooking motion with perfect timing and technique mastery',
-      'Slow-Mo Pour': `The flowing motion that defines ${dishInfo.name} - liquid ingredients combining with signature technique precision and cultural authenticity`,
-      'Steam Rising': `Natural steam revealing the heat and energy of ${dishInfo.signatureTechnique || 'traditional cooking method'} with authentic cooking atmosphere`,
+    // Enhanced legacy style mapping with realism focus
+    const realisticStyleMap: Record<string, string> = {
+      'Ingredient Drop': `Professional chef assembly of ${dishInfo.name}: expert hands guiding ingredients into proper position with natural timing and realistic physics. Each ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} element placed with traditional technique precision, creating authentic cooking motion without artificial floating or CGI effects.`,
+      
+      'Slow-Mo Pour': `The signature pouring technique for ${dishInfo.name} - liquid ingredients flowing naturally with proper viscosity and realistic behavior. Professional hands control the pour with authentic ${dishInfo.cuisine} technique, creating natural patterns and textures.`,
+      
+      'Steam Rising': `Natural steam formation from properly heated ${dishInfo.name} preparation. Authentic cooking temperature creates realistic vapor patterns, showing the energy and heat of traditional ${dishInfo.cuisine} technique with natural timing and dissipation.`,
+      
       'Cheese Pull': dishInfo.canonicalIngredients.some(ing => ing.includes('cheese')) ?
-        `The stretching moment that showcases perfect ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} technique and dairy mastery` :
-        'Melted elements stretching to show perfect texture technique and cooking precision',
-      'Sizzle Effect': `The sound and energy of ${dishInfo.name} cooking - technique in action with authentic heat, timing, and culinary mastery`,
-      'Garnish Drop': `Final technique touches - completing ${dishInfo.name} with traditional presentation methods and authentic garnishing style`,
-      'Liquid Drizzle': `The flowing technique that completes ${dishInfo.name} with precise liquid integration and cultural authenticity`,
-      'Whisk Action': `The mixing technique that transforms ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} through ${dishInfo.cuisine} culinary wisdom and traditional methods`
+        `Natural cheese stretch showcasing perfect ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} texture achieved through proper heating technique. Professional hands demonstrate authentic stretching motion with realistic cheese behavior and natural breaking point.` :
+        'Realistic melted element stretching with natural texture physics and authentic cooking technique.',
+      
+      'Sizzle Effect': `Authentic sizzling sounds and visual effects from properly heated ${dishInfo.name} preparation. Natural oil behavior, realistic bubble formation, and genuine cooking reactions create the sensory experience of traditional ${dishInfo.cuisine} technique.`,
+      
+      'Garnish Drop': `Final traditional presentation touches for ${dishInfo.name} - professional hands adding authentic garnishes with precise placement technique. Each element added with cultural accuracy and realistic settling behavior.`,
+      
+      'Liquid Drizzle': `Traditional sauce or oil application for ${dishInfo.name} using authentic ${dishInfo.cuisine} technique. Natural liquid flow with proper viscosity, creating realistic patterns and absorption into ingredients.`,
+      
+      'Whisk Action': `Professional whisking technique transforming ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} with authentic ${dishInfo.cuisine} method. Natural mixing motion creating realistic texture changes and proper ingredient integration.`
     };
     
-    return narrativeMap[actionStyle] || legacyStyleMap[actionStyle] || 
-           dishInfo.signatureTechnique || 
-           'Authentic cooking technique bringing ingredients together with cultural precision and traditional mastery';
+    return realisticNarratives[actionStyle] || realisticStyleMap[actionStyle] || 
+           `${dishInfo.signatureTechnique || 'Authentic cooking technique'} - Professional demonstration with realistic timing, natural hand movements, and traditional ${dishInfo.cuisine} cultural precision.`;
   };
   
-  const techniqueStory = getTechniqueStory(dishInfo, actionStyle);
-  const backgroundEnhancement = background ? `Set in an authentic ${background} environment that honors the dish's cultural origins.` : '';
+  const realisticStory = getRealisticStory(dishInfo, actionStyle);
+  const culturalSetting = background ? `Set in an authentic ${background} that honors ${dishInfo?.cuisine || 'culinary'} tradition.` : '';
   
-  let finalPrompt = `Culinary storytelling showcasing: ${dishSpecificContent}. ${backgroundEnhancement} The scene captures ${techniqueStory}. Focus on authentic cooking processes, cultural respect, and the emotional journey of traditional technique mastery. Professional cinematography highlights natural textures, vibrant authentic colors, and the artistry of culinary craftsmanship.`;
+  let finalPrompt = `Hyper-realistic culinary storytelling: ${dishSpecificContent}. ${culturalSetting} ${realisticStory} 
+
+TECHNICAL REQUIREMENTS: Professional cinematography with natural lighting. Steady camera work capturing authentic technique. All ingredients behave with realistic physics - no floating elements or artificial movements. Steam, heat effects, and cooking sounds occur naturally. Chef hands move with professional precision and cultural authenticity.
+
+FORBIDDEN: Artificial floating ingredients, CGI-like effects, unrealistic gravity, multiple unrelated dishes, inauthentic cooking methods, generic food styling without cultural context.`;
   
-  // Add cultural authenticity note and avoid forbidden ingredients
+  // Add authenticity notes and forbidden ingredient removal
   if (dishInfo) {
     if (dishInfo.forbiddenIngredients.length > 0) {
-      finalPrompt += ` Maintains cultural authenticity by avoiding: ${dishInfo.forbiddenIngredients.join(', ')}.`;
+      finalPrompt += ` EXCLUDE completely: ${dishInfo.forbiddenIngredients.join(', ')} - these are inauthentic for ${dishInfo.name}.`;
     }
     if (dishInfo.culturalContext) {
-      finalPrompt += ` Cultural context: ${dishInfo.culturalContext}.`;
+      finalPrompt += ` Cultural authenticity: ${dishInfo.culturalContext}`;
     }
   }
   
@@ -1030,36 +1052,68 @@ async function createLumaOptimizedPrompt(prompt: string, parameters: any, mode: 
 }
 
 function getLumaSystemPrompt(mode: string): string {
-  const basePrompt = `You are an expert at creating prompts for Luma Dream Machine AI video generation. Your goal is to create cinematic, detailed prompts that result in high-quality food videos.
+  const basePrompt = `You are a master food video cinematographer specializing in hyper-realistic culinary storytelling for Luma Dream Machine. Create prompts that generate authentic cooking videos with cultural depth and realistic technique demonstration.
 
-LUMA-SPECIFIC GUIDELINES:
-- Use dynamic motion keywords: "slow motion", "gentle movement", "smooth camera motion"  
-- Include lighting details: "warm golden lighting", "soft studio lighting", "natural window light"
-- Add texture descriptions: "crispy", "steaming", "bubbling", "sizzling"
-- Specify camera work: "close-up macro shot", "overhead view", "sweeping camera movement"
-- Include timing: "gradual transformation", "quick sizzle", "slow drizzle"
+REALISM REQUIREMENTS FOR LUMA:
+- All movements must be natural and physically accurate
+- Ingredients behave with realistic physics (no floating elements)
+- Chef hands move with professional precision and authentic technique
+- Cooking timing matches real culinary processes
+- Steam, heat effects, and sizzling occur naturally
+- Tools and surfaces appropriate for the specific cuisine
 
-AVOID:
-- Static descriptions
-- Overly complex scenarios
-- Multiple simultaneous actions
-- Abstract concepts`;
+STORYTELLING ELEMENTS:
+- Focus on ONE signature technique that defines the dish
+- Show the cultural story behind the cooking method  
+- Capture the emotional journey from ingredients to completed dish
+- Highlight authentic preparation methods from the dish's origin
+
+TECHNICAL SPECIFICATIONS FOR LUMA:
+- Use specific motion verbs: "stirring", "sautéing", "kneading", "chopping"
+- Describe realistic timing: "slowly", "gradually", "with precision"
+- Include natural physics: "steam rising naturally", "oil glistening"
+- Specify authentic tools: "wooden spoon", "cast iron pan", "marble surface"
+- Avoid generic terms: replace "food" with specific dish names
+
+FORBIDDEN FOR REALISM:
+- Ingredients floating without support or reason
+- Multiple unrelated dishes in one frame
+- Artificial or CGI-like movements
+- Inauthentic ingredients for the specific dish
+- Generic "food styling" without cultural context
+- Unrealistic gravity or physics
+
+OUTPUT FORMAT: Single paragraph, 200-400 characters, focusing on authentic technique demonstration with realistic motion and cultural storytelling.`;
 
   const modeSpecific = {
-    'text-to-video': '\nFOCUS: Create dynamic cooking action sequences with clear motion and progression.',
-    'image-to-video': '\nFOCUS: Describe how the static image should transform with realistic motion.',
-    'text-to-image': '\nFOCUS: Create detailed still-life food photography descriptions.'
+    'text-to-video': '\nVIDEO FOCUS: Describe the complete cooking technique sequence with natural timing and authentic hand movements.',
+    'image-to-video': '\nMOTION FOCUS: Show how the static ingredients transform through realistic cooking technique with natural physics.',
+    'text-to-image': '\nSTILL FOCUS: Capture the peak moment of technique execution with authentic setup and cultural context.'
   };
 
   return basePrompt + (modeSpecific[mode as keyof typeof modeSpecific] || '');
 }
 
 function createBasicLumaPrompt(prompt: string, parameters: any, mode: string): string {
-  const motionKeywords = mode === 'text-to-video' ? ', slow motion, smooth camera movement' : '';
-  const lighting = ', warm studio lighting, professional food photography';
-  const quality = ', high resolution, cinematic quality';
+  const dishInfo = parseDishName(prompt);
+  const technique = dishInfo?.signatureTechnique || 'traditional cooking technique';
   
-  return `${prompt}${motionKeywords}${lighting}${quality}`.slice(0, 500);
+  const realisticMotion = mode === 'text-to-video' ? 
+    ', professional hands demonstrating authentic technique with natural timing and realistic ingredient physics' : 
+    ', positioned for authentic cooking action';
+    
+  const culturalContext = dishInfo?.cuisine ? `, ${dishInfo.cuisine} cultural authenticity` : '';
+  const lighting = ', natural kitchen lighting, professional cinematography';
+  const quality = ', hyper-realistic detail, no artificial effects';
+  
+  let enhancedPrompt = `${prompt}. ${technique}${realisticMotion}${culturalContext}${lighting}${quality}`;
+  
+  // Add forbidden ingredient exclusion
+  if (dishInfo?.forbiddenIngredients.length > 0) {
+    enhancedPrompt += `. EXCLUDE: ${dishInfo.forbiddenIngredients.slice(0, 3).join(', ')}`;
+  }
+  
+  return enhancedPrompt.slice(0, 500);
 }
 
 function createMotionOptimizedImagePrompt(prompt: string, parameters: any): string {
