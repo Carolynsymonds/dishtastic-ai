@@ -1082,7 +1082,30 @@ async function generateVideo(prompt: string, parameters: any) {
 
   // ===== MULTI-API FALLBACK STRATEGY =====
   
-  // 1. PRIMARY: Luma Dream Machine (Text-to-Video)
+  // 1. PRIMARY: Runway Gen-3 Alpha (fixed with proper headers)
+  if (runwayApiKey) {
+    try {
+      console.log('[VIDEO-GEN]', { requestId, event: 'trying_runway_gen3' });
+      const result = await generateVideoWithRunway(prompt, parameters);
+      
+      console.log('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'runway_gen3_success', 
+        totalMs: Date.now() - startTime
+      });
+      
+      return result;
+    } catch (error) {
+      console.warn('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'runway_gen3_failed', 
+        error: (error as Error).message,
+        fallback: 'luma_text_to_video'
+      });
+    }
+  }
+
+  // 2. SECONDARY: Luma Dream Machine (Text-to-Video)
   if (falApiKey) {
     try {
       console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_text_to_video' });
@@ -1105,7 +1128,7 @@ async function generateVideo(prompt: string, parameters: any) {
     }
   }
 
-  // 2. SECONDARY: Luma Dream Machine (Image-to-Video)
+  // 3. TERTIARY: Luma Dream Machine (Image-to-Video)
   if (falApiKey) {
     try {
       console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_image_to_video' });
@@ -1122,29 +1145,6 @@ async function generateVideo(prompt: string, parameters: any) {
       console.warn('[VIDEO-GEN]', { 
         requestId, 
         event: 'luma_image_to_video_failed', 
-        error: (error as Error).message,
-        fallback: 'runway_gen3'
-      });
-    }
-  }
-
-  // 3. TERTIARY: Runway Gen-3 Alpha (existing implementation)
-  if (runwayApiKey) {
-    try {
-      console.log('[VIDEO-GEN]', { requestId, event: 'trying_runway_gen3' });
-      const result = await generateVideoWithRunway(prompt, parameters);
-      
-      console.log('[VIDEO-GEN]', { 
-        requestId, 
-        event: 'runway_gen3_success', 
-        totalMs: Date.now() - startTime
-      });
-      
-      return result;
-    } catch (error) {
-      console.warn('[VIDEO-GEN]', { 
-        requestId, 
-        event: 'runway_gen3_failed', 
         error: (error as Error).message,
         fallback: 'static_image'
       });
@@ -1200,18 +1200,52 @@ async function generateVideoWithRunway(prompt: string, parameters: any) {
     throw new Error('Runway API key not configured');
   }
 
-  // Map length to duration
+  // Map length to duration (handle both string formats like "5s" and descriptive names)
   const getDuration = (length: string) => {
-    switch (length) {
-      case 'Short': return 5;
-      case 'Medium': return 10;
-      case 'Long': return 15;
+    if (!length) return 10; // default
+    
+    // Handle time strings like "1s", "5s", "10s"
+    const timeMatch = length.match(/(\d+)s?/);
+    if (timeMatch) {
+      return parseInt(timeMatch[1]);
+    }
+    
+    // Handle descriptive names
+    switch (length.toLowerCase()) {
+      case 'short': return 5;
+      case 'medium': return 10;
+      case 'long': return 15;
       default: return 10;
     }
   };
 
+  // Map scale to aspect ratio for Runway
+  const getRatio = (scale: string) => {
+    switch (scale) {
+      case 'Portrait': 
+      case '2:3': 
+        return '768:1280'; // Portrait 9:16 equivalent
+      case 'Square':
+      case '1:1':
+        return '768:768';  // Square
+      case 'Landscape':
+      case '16:9':
+        return '1280:720'; // Landscape 16:9
+      default: 
+        return '768:768';  // Default square
+    }
+  };
+
   const duration = getDuration(parameters.Length || 'Medium');
-  console.log('[RUNWAY]', { requestId, event: 'duration_mapped', duration, originalLength: parameters.Length });
+  const ratio = getRatio(parameters.Scale || 'Square');
+  console.log('[RUNWAY]', { 
+    requestId, 
+    event: 'parameters_mapped', 
+    duration, 
+    ratio,
+    originalLength: parameters.Length,
+    originalScale: parameters.Scale
+  });
 
   // First, generate a starter image
   try {
@@ -1226,13 +1260,14 @@ async function generateVideoWithRunway(prompt: string, parameters: any) {
       headers: {
         'Authorization': `Bearer ${runwayApiKey}`,
         'Content-Type': 'application/json',
+        'X-Runway-Version': '2024-11-06', // Required header
       },
       body: JSON.stringify({
         promptImage: `data:image/${starterImage.format};base64,${starterImage.content}`,
         model: 'gen3a_turbo',
         promptText: prompt,
         duration: duration,
-        ratio: parameters.Scale === '16:9' ? '1280:768' : '768:768',
+        ratio: ratio, // Use the properly mapped ratio
         seed: Math.floor(Math.random() * 1000000)
       }),
     });
@@ -1267,7 +1302,10 @@ async function generateVideoWithRunway(prompt: string, parameters: any) {
 
       try {
         const statusResponse = await fetch(`https://api.dev.runwayml.com/v1/tasks/${taskId}`, {
-          headers: { 'Authorization': `Bearer ${runwayApiKey}` },
+          headers: { 
+            'Authorization': `Bearer ${runwayApiKey}`,
+            'X-Runway-Version': '2024-11-06' // Required header
+          },
         });
 
         if (!statusResponse.ok) {
