@@ -834,8 +834,11 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
     prompt: enhancedPrompt,
     aspect_ratio: aspectRatio,
     duration: duration,
-    loop: shouldLoop,
   };
+  // Only include loop when true to avoid API rejections
+  if (shouldLoop) {
+    requestBody.loop = true;
+  }
 
   // Add starter image for image-to-video mode
   if (generationMode === 'image-to-video' && starterImageUrl) {
@@ -1090,13 +1093,13 @@ async function generateTextToImageWithLuma(prompt: string, parameters: any) {
 function mapScaleToAspectRatio(scale: string): string {
   const mapping: Record<string, string> = {
     'Portrait': '9:16',
-    '2:3': '2:3', 
+    '2:3': '9:16', // Luma does not support 2:3; remap to 9:16 portrait
     '9:16': '9:16',
     'Landscape': '16:9',
     '16:9': '16:9',
     'Square': '1:1',
     '1:1': '1:1',
-    '4:3': '4:3'
+    '4:3': '16:9' // Remap unsupported 4:3 to 16:9
   };
   
   const result = mapping[scale] || '16:9';
@@ -1104,27 +1107,27 @@ function mapScaleToAspectRatio(scale: string): string {
   return result;
 }
 
-function mapLengthToDuration(length: string): string {
-  // Handle time formats like "5s", "10s" etc.
-  if (length && length.includes('s')) {
+function mapLengthToDuration(length: string): number {
+  // Handle time formats like "5s", "10s" etc. by extracting integer seconds
+  if (length && /\d/.test(length)) {
     const numMatch = length.match(/(\d+)/);
     if (numMatch) {
       const duration = parseInt(numMatch[1]);
-      // Luma only accepts "5s", "9s", or "10s"
-      const validDuration = duration <= 5 ? "5s" : duration <= 9 ? "9s" : "10s";
-      console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: validDuration, type: 'luma_format' });
+      // Luma accepts 5, 9, or 10 seconds; snap to nearest allowed value
+      const validDuration = duration <= 5 ? 5 : duration <= 9 ? 9 : 10;
+      console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: validDuration, type: 'seconds_int' });
       return validDuration;
     }
   }
   
   // Handle descriptive formats
-  const mapping: Record<string, string> = {
-    'Short': "5s",
-    'Medium': "5s", 
-    'Long': "10s"
+  const mapping: Record<string, number> = {
+    'Short': 5,
+    'Medium': 9,
+    'Long': 10
   };
   
-  const result = mapping[length] || "5s";
+  const result = mapping[length] || 9;
   console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: result, type: 'descriptive_format' });
   return result;
 }
