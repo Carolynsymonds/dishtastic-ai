@@ -305,7 +305,7 @@ const Home = () => {
                   <textarea
                     value={textareaValue}
                     onChange={(e) => setTextareaValue(e.target.value)}
-                    placeholder="Describe your food dish or recipe you want to generate..."
+                    placeholder="Describe the food or recipe you want to generate..."
                     className="w-full min-h-[140px] pl-14 pr-12 py-4 pb-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                     rows={5}
                   />
