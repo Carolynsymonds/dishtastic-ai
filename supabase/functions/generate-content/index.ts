@@ -1331,6 +1331,7 @@ async function generateVideo(prompt: string, parameters: any) {
       throw new Error('LUMA_API_KEY required for text-to-video generation');
     }
   }
+}
 
 async function generateVideoWithRunway(prompt: string, parameters: any) {
   const requestId = crypto.randomUUID();
