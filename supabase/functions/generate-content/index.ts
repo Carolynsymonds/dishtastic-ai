@@ -245,25 +245,27 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
     const startedAt = Date.now();
     const { prompt, parameters }: GenerationRequest = await req.json();
+    
+    // First declare the variable
+    const isVideoGeneration = parameters.Format === 'Video';
+    
     console.log('[generate-content]', { requestId, event: 'request_received', hasOPENAI: !!openAIApiKey, hasRUNWAY: !!runwayApiKey, hasFAL: !!falApiKey, parameters, promptPreview: (prompt || '').slice(0, 120) });
 
-  console.log('[generate-content]', { 
-    requestId,
-    event: 'generation_start', 
-    format: parameters.Format,
-    isVideoGeneration,
-    hasLuma: !!falApiKey,
-    hasRunway: !!runwayApiKey,
-    hasOpenAI: !!openAIApiKey,
-    parameters: {
-      Format: parameters.Format,
-      Scale: parameters.Scale,
-      Length: parameters.Length,
-      uploadedImage: !!parameters.uploadedImage
-    }
-  });
-
-    const isVideoGeneration = parameters.Format === 'Video';
+    console.log('[generate-content]', { 
+      requestId,
+      event: 'generation_start', 
+      format: parameters.Format,
+      isVideoGeneration,
+      hasLuma: !!falApiKey,
+      hasRunway: !!runwayApiKey,
+      hasOpenAI: !!openAIApiKey,
+      parameters: {
+        Format: parameters.Format,
+        Scale: parameters.Scale,
+        Length: parameters.Length,
+        uploadedImage: !!parameters.uploadedImage
+      }
+    });
 
     if (isVideoGeneration) {
       // Generate video using Runway ML
