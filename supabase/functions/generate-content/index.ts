@@ -1135,30 +1135,7 @@ async function generateVideo(prompt: string, parameters: any) {
 
   // ===== MULTI-API FALLBACK STRATEGY =====
   
-  // 1. PRIMARY: Runway Gen-3 Alpha (fixed with proper headers)
-  if (runwayApiKey) {
-    try {
-      console.log('[VIDEO-GEN]', { requestId, event: 'trying_runway_gen3' });
-      const result = await generateVideoWithRunway(prompt, parameters);
-      
-      console.log('[VIDEO-GEN]', { 
-        requestId, 
-        event: 'runway_gen3_success', 
-        totalMs: Date.now() - startTime
-      });
-      
-      return result;
-    } catch (error) {
-      console.warn('[VIDEO-GEN]', { 
-        requestId, 
-        event: 'runway_gen3_failed', 
-        error: (error as Error).message,
-        fallback: 'luma_text_to_video'
-      });
-    }
-  }
-
-  // 2. SECONDARY: Luma Dream Machine (Text-to-Video)
+  // 1. PRIMARY: Luma Dream Machine (Text-to-Video)
   if (falApiKey) {
     try {
       console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_text_to_video' });
@@ -1181,7 +1158,7 @@ async function generateVideo(prompt: string, parameters: any) {
     }
   }
 
-  // 3. TERTIARY: Luma Dream Machine (Image-to-Video)
+  // 2. SECONDARY: Luma Dream Machine (Image-to-Video)
   if (falApiKey) {
     try {
       console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_image_to_video' });
@@ -1198,6 +1175,29 @@ async function generateVideo(prompt: string, parameters: any) {
       console.warn('[VIDEO-GEN]', { 
         requestId, 
         event: 'luma_image_to_video_failed', 
+        error: (error as Error).message,
+        fallback: 'runway_gen3'
+      });
+    }
+  }
+
+  // 3. TERTIARY: Runway Gen-3 Alpha (fallback after Luma)
+  if (runwayApiKey) {
+    try {
+      console.log('[VIDEO-GEN]', { requestId, event: 'trying_runway_gen3' });
+      const result = await generateVideoWithRunway(prompt, parameters);
+      
+      console.log('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'runway_gen3_success', 
+        totalMs: Date.now() - startTime
+      });
+      
+      return result;
+    } catch (error) {
+      console.warn('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'runway_gen3_failed', 
         error: (error as Error).message,
         fallback: 'static_image'
       });
