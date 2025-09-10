@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TopBanner from "@/components/TopBanner";
 
 const GenerateVideo = () => {
   const [searchParams] = useSearchParams();
@@ -120,9 +121,10 @@ const GenerateVideo = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+      <TopBanner />
       <Header />
       
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-32">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center mb-8">
             <Button 
