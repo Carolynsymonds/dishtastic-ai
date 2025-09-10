@@ -107,11 +107,96 @@ export const secureStorage = {
   }
 };
 
+// Enhanced security violation monitoring
+const monitorSecurityViolations = () => {
+  // Monitor for potential XSS attempts
+  if (typeof Element !== 'undefined') {
+    const originalInnerHTML = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    if (originalInnerHTML) {
+      Object.defineProperty(Element.prototype, 'innerHTML', {
+        set: function(value) {
+          if (typeof value === 'string' && (
+            value.includes('<script') || 
+            value.includes('javascript:') || 
+            value.includes('onerror=') ||
+            value.includes('onload=')
+          )) {
+            logSecurityEvent('potential_xss', { 
+              element: this.tagName,
+              content: value.substring(0, 100) + '...'
+            });
+          }
+          return originalInnerHTML.set?.call(this, value);
+        },
+        get: function() {
+          return originalInnerHTML.get?.call(this);
+        }
+      });
+    }
+  }
+
+  // Monitor for excessive API calls
+  let apiCallCount = 0;
+  const apiCallWindow = 60000; // 1 minute
+  
+  if (typeof window !== 'undefined' && window.fetch) {
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      apiCallCount++;
+      
+      if (apiCallCount > 100) { // More than 100 API calls per minute
+        logSecurityEvent('excessive_api_calls', { 
+          count: apiCallCount,
+          url: args[0]?.toString().substring(0, 100)
+        });
+      }
+      
+      return originalFetch.apply(window, args);
+    };
+    
+    // Reset API call counter every minute
+    setInterval(() => {
+      apiCallCount = 0;
+    }, apiCallWindow);
+  }
+};
+
+// Cleanup expired verification tokens and security events
+const cleanupExpiredTokens = () => {
+  try {
+    // Clean up localStorage of expired security data
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith('security_') || key.startsWith('verification_')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key) || '{}');
+          if (data.expires && new Date(data.expires) < new Date()) {
+            localStorage.removeItem(key);
+          }
+        } catch (e) {
+          // Invalid JSON, remove it
+          localStorage.removeItem(key);
+        }
+      }
+    });
+    
+    logSecurityEvent('cleanup_completed', { timestamp: new Date().toISOString() });
+  } catch (error) {
+    logSecurityEvent('cleanup_failed', { error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+};
+
 // Initialize security monitoring
 export const initSecurity = () => {
   if (typeof window !== 'undefined') {
     try {
+      console.log('[SECURITY] Initializing enhanced security monitoring...');
+      
+      // Detect suspicious activity
       detectSuspiciousActivity();
+      
+      // Enhanced security monitoring
+      monitorSecurityViolations();
       
       // Monitor for console manipulation attempts (only initialize once)
       if (!(window as any).__securityInitialized) {
@@ -122,6 +207,10 @@ export const initSecurity = () => {
           }
           originalLog.apply(console, args);
         };
+        
+        // Initialize cleanup intervals
+        setInterval(cleanupExpiredTokens, 3600000); // Clean up every hour
+        
         (window as any).__securityInitialized = true;
       }
     } catch (error) {

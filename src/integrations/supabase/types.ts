@@ -414,6 +414,10 @@ export type Database = {
         Args: { "": string }
         Returns: string
       }
+      cleanup_expired_verifications: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       get_landing_page_analytics: {
         Args: { days_back?: number; min_leads?: number }
         Returns: {
@@ -428,6 +432,10 @@ export type Database = {
           signup_to_onboard_pct: number
           signups: number
         }[]
+      }
+      log_verification_access: {
+        Args: { p_action: string; p_email: string; p_token?: string }
+        Returns: undefined
       }
     }
     Enums: {
