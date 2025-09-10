@@ -210,6 +210,7 @@ export type Database = {
           processing_status: string
           updated_at: string
           user_email: string
+          user_id: string | null
         }
         Insert: {
           analysis_results?: Json | null
@@ -221,6 +222,7 @@ export type Database = {
           processing_status?: string
           updated_at?: string
           user_email: string
+          user_id?: string | null
         }
         Update: {
           analysis_results?: Json | null
@@ -232,6 +234,7 @@ export type Database = {
           processing_status?: string
           updated_at?: string
           user_email?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -496,6 +499,10 @@ export type Database = {
       log_verification_access: {
         Args: { p_action: string; p_email: string; p_token?: string }
         Returns: undefined
+      }
+      migrate_menu_uploads_to_user_ids: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
       process_contact_submission: {
         Args: {
