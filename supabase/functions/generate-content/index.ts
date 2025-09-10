@@ -268,10 +268,29 @@ serve(async (req) => {
     });
 
     if (isVideoGeneration) {
-      // Generate video using Runway ML
+      // Generate video using available services
       const videoStart = Date.now();
+      console.log('[generate-content]', { 
+        requestId, 
+        event: 'video_generation_start',
+        availableServices: {
+          luma: !!falApiKey,
+          runway: !!runwayApiKey
+        }
+      });
+      
       const videoResult = await generateVideo(prompt, parameters);
-      console.log('[generate-content]', { requestId, event: 'video_generated', ms: Date.now() - videoStart });
+      
+      console.log('[generate-content]', { 
+        requestId, 
+        event: 'video_generation_complete',
+        actualType: videoResult.type,
+        actualFormat: videoResult.format,
+        contentPreview: videoResult.content?.slice(0, 100),
+        ms: Date.now() - videoStart,
+        isActuallyVideo: videoResult.type === 'video'
+      });
+      
       return new Response(JSON.stringify(videoResult), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json', 'x-request-id': requestId },
       });
@@ -829,7 +848,15 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
 
   try {
     const apiCallStart = Date.now();
-    const response = await fetch('https://queue.fal.ai/fal-ai/luma-dream-machine', {
+    console.log('[LUMA-VIDEO]', { 
+      requestId, 
+      event: 'api_call_details', 
+      endpoint: 'https://queue.fal.run/fal-ai/luma-dream-machine',
+      method: 'POST',
+      bodyPreview: JSON.stringify(requestBody).slice(0, 200)
+    });
+    
+    const response = await fetch('https://queue.fal.run/fal-ai/luma-dream-machine', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${falApiKey}`,
@@ -858,13 +885,37 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
     }
 
     const data = await response.json();
+    
+    console.log('[LUMA-VIDEO]', { 
+      requestId, 
+      event: 'response_analysis', 
+      hasVideo: !!data.video,
+      hasVideoUrl: !!data.video?.url,
+      videoUrlPreview: data.video?.url?.slice(0, 100),
+      responseKeys: Object.keys(data),
+      videoKeys: data.video ? Object.keys(data.video) : null,
+      ms: Date.now() - apiCallStart
+    });
+    
+    // Validate that we actually got a video
+    if (!data.video || !data.video.url) {
+      console.error('[LUMA-VIDEO]', { 
+        requestId, 
+        event: 'invalid_response', 
+        error: 'No video URL in response',
+        responseData: data
+      });
+      throw new Error('No video URL returned from Luma API');
+    }
+    
     const totalTime = Date.now() - startTime;
     
     console.log('[LUMA-VIDEO]', { 
       requestId, 
       event: 'generation_success', 
+      contentType: 'video',
       totalMs: totalTime,
-      videoUrl: data.video?.url?.slice(0, 100),
+      videoUrl: data.video.url.slice(0, 100),
       hasTaskId: !!data.request_id
     });
 
@@ -937,12 +988,13 @@ async function generateTextToImageWithLuma(prompt: string, parameters: any) {
     
     console.log('[LUMA-T2I]', { 
       requestId, 
-      event: 'api_request', 
+      event: 'api_request_details', 
       aspectRatio,
-      promptLength: enhancedPrompt.length
+      promptLength: enhancedPrompt.length,
+      endpoint: 'https://queue.fal.run/fal-ai/luma-photon'
     });
 
-    const response = await fetch('https://queue.fal.ai/fal-ai/luma-photon', {
+    const response = await fetch('https://queue.fal.run/fal-ai/luma-photon', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${falApiKey}`,
@@ -1172,7 +1224,10 @@ async function generateVideo(prompt: string, parameters: any) {
         
         console.log('[VIDEO-GEN]', { 
           requestId, 
-          event: 'luma_image_to_video_success', 
+          event: 'luma_image_to_video_success',
+          actualType: result.type,
+          actualFormat: result.format,
+          contentPreview: result.content?.slice(0, 100),
           totalMs: Date.now() - startTime
         });
         
@@ -1221,7 +1276,10 @@ async function generateVideo(prompt: string, parameters: any) {
         
         console.log('[VIDEO-GEN]', { 
           requestId, 
-          event: 'luma_text_to_video_success', 
+          event: 'luma_text_to_video_success',
+          actualType: result.type,
+          actualFormat: result.format,
+          contentPreview: result.content?.slice(0, 100),
           totalMs: Date.now() - startTime
         });
         
@@ -1244,7 +1302,10 @@ async function generateVideo(prompt: string, parameters: any) {
         
         console.log('[VIDEO-GEN]', { 
           requestId, 
-          event: 'luma_image_to_video_success', 
+          event: 'luma_image_to_video_success',
+          actualType: result.type,
+          actualFormat: result.format,
+          contentPreview: result.content?.slice(0, 100),
           totalMs: Date.now() - startTime
         });
         
@@ -1267,7 +1328,10 @@ async function generateVideo(prompt: string, parameters: any) {
         
         console.log('[VIDEO-GEN]', { 
           requestId, 
-          event: 'runway_gen3_success', 
+          event: 'runway_gen3_success',
+          actualType: result.type,
+          actualFormat: result.format,
+          contentPreview: result.content?.slice(0, 100),
           totalMs: Date.now() - startTime
         });
         
@@ -1327,7 +1391,11 @@ async function generateVideo(prompt: string, parameters: any) {
       
       console.log('[VIDEO-GEN]', { 
         requestId, 
-        event: 'static_image_fallback_success', 
+        event: 'static_image_fallback_success',
+        actualType: 'image',
+        actualFormat: imageResult.format,
+        contentPreview: imageResult.content?.slice(0, 100),
+        fallbackReason: 'video_generation_failed',
         totalMs: Date.now() - startTime
       });
       
