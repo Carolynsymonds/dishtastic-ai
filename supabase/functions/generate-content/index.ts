@@ -1276,237 +1276,61 @@ async function generateVideo(prompt: string, parameters: any) {
     promptPreview: prompt.slice(0, 100)
   });
   console.log('[VIDEO-GEN]', { requestId, event: 'strict_video_mode', strictVideo });
+  console.log('[VIDEO-GEN]', { requestId, event: 'single_generation_policy', message: 'only_one_video_per_request' });
 
-  // ===== INTELLIGENT ROUTING BASED on INPUT TYPE =====
+  // ===== SINGLE VIDEO GENERATION POLICY =====
+  // Only attempt one video generation per request - no fallbacks to prevent multiple generations
   
   // Check if user uploaded an image
   const hasUploadedImage = parameters.uploadedImage;
   
   if (hasUploadedImage) {
-    console.log('[VIDEO-GEN]', { requestId, event: 'image_uploaded_routing_to_image_to_video' });
+    console.log('[VIDEO-GEN]', { requestId, event: 'image_uploaded_using_luma_image_to_video' });
     
-    // Route 1: Image Upload → Image-to-Video Priority
-    // 1. PRIMARY: Luma Image-to-Video (with uploaded image)
+    // Route 1: Image Upload → Luma Image-to-Video ONLY
     if (lumaApiKey) {
-      try {
-        console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_image_to_video_with_upload' });
-        const result = await generateVideoWithLuma(prompt, { 
-          ...parameters,
-          mode: 'image_to_video',
-          image_url: parameters.uploadedImage 
-        }, 'image-to-video');
-        
-        console.log('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'luma_image_to_video_success',
-          actualType: result.type,
-          actualFormat: result.format,
-          contentPreview: result.content?.slice(0, 100),
-          totalMs: Date.now() - startTime
-        });
-        
-        return result;
-      } catch (error) {
-        console.warn('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'luma_image_to_video_failed', 
-          error: (error as Error).message,
-          fallback: 'runway_gen3'
-        });
-      }
-    }
-    
-    // 2. SECONDARY: Runway Gen-3 Alpha (fallback for image uploads)
-    if (runwayApiKey) {
-      try {
-        console.log('[VIDEO-GEN]', { requestId, event: 'trying_runway_gen3_after_luma_failed' });
-        const result = await generateVideoWithRunway(prompt, parameters);
-        
-        console.log('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'runway_gen3_success', 
-          totalMs: Date.now() - startTime
-        });
-        
-        return result;
-      } catch (error) {
-        console.warn('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'runway_gen3_failed', 
-          error: (error as Error).message,
-          fallback: 'static_image'
-        });
-      }
-    }
-  } else {
-    console.log('[VIDEO-GEN]', { requestId, event: 'text_only_routing_to_text_to_video' });
-    
-    // Route 2: Text Only → Text-to-Video Priority
-    // 1. PRIMARY: Luma Text-to-Video
-    if (lumaApiKey) {
-      try {
-        console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_text_to_video' });
-        const result = await generateVideoWithLuma(prompt, parameters, 'text-to-video');
-        
-        console.log('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'luma_text_to_video_success',
-          actualType: result.type,
-          actualFormat: result.format,
-          contentPreview: result.content?.slice(0, 100),
-          totalMs: Date.now() - startTime
-        });
-        
-        return result;
-      } catch (error) {
-        console.warn('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'luma_text_to_video_failed', 
-          error: (error as Error).message,
-          fallback: 'luma_image_to_video'
-        });
-      }
-    }
-
-    // 2. SECONDARY: Luma Image-to-Video (generate image first, then video)
-    if (lumaApiKey) {
-      try {
-        console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_image_to_video_generated' });
-        const result = await generateImageToVideoWithLuma(prompt, parameters);
-        
-        console.log('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'luma_image_to_video_success',
-          actualType: result.type,
-          actualFormat: result.format,
-          contentPreview: result.content?.slice(0, 100),
-          totalMs: Date.now() - startTime
-        });
-        
-        return result;
-      } catch (error) {
-        console.warn('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'luma_image_to_video_failed', 
-          error: (error as Error).message,
-          fallback: 'runway_gen3'
-        });
-      }
-    }
-
-    // 3. TERTIARY: Runway Gen-3 Alpha (fallback after both Luma methods)
-    if (runwayApiKey) {
-      try {
-        console.log('[VIDEO-GEN]', { requestId, event: 'trying_runway_gen3_after_luma_methods' });
-        const result = await generateVideoWithRunway(prompt, parameters);
-        
-        console.log('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'runway_gen3_success',
-          actualType: result.type,
-          actualFormat: result.format,
-          contentPreview: result.content?.slice(0, 100),
-          totalMs: Date.now() - startTime
-        });
-        
-        return result;
-      } catch (error) {
-        console.warn('[VIDEO-GEN]', { 
-          requestId, 
-          event: 'runway_gen3_failed', 
-          error: (error as Error).message,
-          fallback: 'static_image'
-        });
-      }
-    }
-  }
-
-  // 3. TERTIARY: Runway Gen-3 Alpha (fallback after Luma)
-  if (runwayApiKey) {
-    try {
-      console.log('[VIDEO-GEN]', { requestId, event: 'trying_runway_gen3' });
-      const result = await generateVideoWithRunway(prompt, parameters);
+      console.log('[VIDEO-GEN]', { requestId, event: 'generating_luma_image_to_video' });
+      const result = await generateVideoWithLuma(prompt, { 
+        ...parameters,
+        mode: 'image_to_video',
+        image_url: parameters.uploadedImage 
+      }, 'image-to-video');
       
       console.log('[VIDEO-GEN]', { 
         requestId, 
-        event: 'runway_gen3_success', 
+        event: 'luma_image_to_video_success',
+        actualType: result.type,
+        actualFormat: result.format,
+        contentPreview: result.content?.slice(0, 100),
         totalMs: Date.now() - startTime
       });
       
       return result;
-    } catch (error) {
-      console.warn('[VIDEO-GEN]', { 
-        requestId, 
-        event: 'runway_gen3_failed', 
-        error: (error as Error).message,
-        fallback: 'static_image'
-      });
+    } else {
+      throw new Error('LUMA_API_KEY required for image-to-video generation');
     }
-  }
-
-  // 4. FINAL FALLBACK: Static Image with Motion Hints (ONLY if video was requested but failed)
-  if (!strictVideo && openAIApiKey) {
-    console.warn('[VIDEO-GEN]', { 
-      requestId, 
-      event: 'falling_back_to_static_image',
-      reason: 'all_video_methods_failed',
-      availableApis: { 
-        luma: !!lumaApiKey, 
-        runway: !!runwayApiKey, 
-        openai: !!openAIApiKey 
-      }
-    });
+  } else {
+    console.log('[VIDEO-GEN]', { requestId, event: 'text_only_using_luma_text_to_video' });
     
-    try {
-      console.log('[VIDEO-GEN]', { requestId, event: 'trying_static_image_fallback' });
-      
-      const motionPrompt = `${prompt}. Professional food photography optimized for potential video animation, perfect composition for motion graphics, studio lighting, high resolution commercial quality.`;
-      const imageResult = await generateImage(motionPrompt, parameters);
+    // Route 2: Text Only → Luma Text-to-Video ONLY
+    if (lumaApiKey) {
+      console.log('[VIDEO-GEN]', { requestId, event: 'generating_luma_text_to_video' });
+      const result = await generateVideoWithLuma(prompt, parameters, 'text-to-video');
       
       console.log('[VIDEO-GEN]', { 
         requestId, 
-        event: 'static_image_fallback_success',
-        actualType: 'image',
-        actualFormat: imageResult.format,
-        contentPreview: imageResult.content?.slice(0, 100),
-        fallbackReason: 'video_generation_failed',
+        event: 'luma_text_to_video_success',
+        actualType: result.type,
+        actualFormat: result.format,
+        contentPreview: result.content?.slice(0, 100),
         totalMs: Date.now() - startTime
       });
       
-      return {
-        ...imageResult,
-        type: 'image', // Explicitly set as image since video generation failed
-        fallbackReason: 'video_generation_failed',
-        suggestedAction: 'Check API keys: FAL_API_KEY and RUNWAY_API_KEY must be configured for video generation',
-        availableApis: { 
-          luma: !!lumaApiKey, 
-          runway: !!runwayApiKey, 
-          openai: !!openAIApiKey 
-        }
-      };
-    } catch (error) {
-      console.error('[VIDEO-GEN]', { 
-        requestId, 
-        event: 'all_fallbacks_failed', 
-        error: (error as Error).message,
-        totalMs: Date.now() - startTime
-      });
+      return result;
+    } else {
+      throw new Error('LUMA_API_KEY required for text-to-video generation');
     }
-  } else {
-    console.warn('[VIDEO-GEN]', { requestId, event: 'strict_video_no_image_fallback' });
-    throw new Error('All video generation methods failed (strict mode).');
   }
-
-  // If all methods fail
-  console.error('[VIDEO-GEN]', { 
-    requestId, 
-    event: 'complete_failure', 
-    availableApis: { luma: !!lumaApiKey, runway: !!runwayApiKey, openai: !!openAIApiKey },
-    totalMs: Date.now() - startTime
-  });
-  
-  throw new Error('All video generation methods failed. Please check API configurations and try again.');
-}
 
 async function generateVideoWithRunway(prompt: string, parameters: any) {
   const requestId = crypto.randomUUID();
