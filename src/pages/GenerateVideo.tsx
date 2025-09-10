@@ -36,18 +36,31 @@ const GenerateVideo = () => {
       hasStartedGeneration.current = true;
       handleGenerate(prompt, parameters);
     } catch (error) {
+      console.error('Parameter parsing error:', error);
       toast.error("Invalid parameters format");
       navigate('/');
     }
-  }, [prompt, parametersString, navigate]);
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      if (hasStartedGeneration.current && isGenerating) {
+        console.log('Component cleanup during generation');
+      }
+    };
+  }, [prompt, parametersString]); // Removed navigate from dependencies
 
   const handleGenerate = async (prompt: string, parameters: any) => {
+    const startTime = performance.now();
+    console.log('[GENERATION] Starting generation process');
+    
     setIsGenerating(true);
     setGenerationError(null);
 
     try {
       const isVideo = parameters.Format === 'Video';
       toast.info(isVideo ? "Generating video... This may take up to 2 minutes" : "Generating image...");
+      
+      console.log('[GENERATION] Calling edge function', { isVideo, promptLength: prompt.length });
       
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
@@ -57,26 +70,39 @@ const GenerateVideo = () => {
       });
 
       if (error) {
+        console.error('[GENERATION] Edge function error:', error);
         throw error;
       }
 
+      console.log('[GENERATION] Success', { 
+        type: data.type, 
+        format: data.format, 
+        dataSize: data.content?.length || 0,
+        duration: performance.now() - startTime
+      });
+
       toast.success(`${isVideo ? 'Video' : 'Image'} generated successfully!`);
       
-      // Redirect to video display page after successful generation
-      const redirectParams = new URLSearchParams({
+      // Store data in sessionStorage to avoid URL size limits
+      const generationData = {
         url: data.type === 'video' ? data.content : `data:image/${data.format};base64,${data.content}`,
         prompt: data.prompt,
         type: data.type,
         format: data.format,
-        parameters: JSON.stringify(data.parameters)
-      });
+        parameters: data.parameters,
+        generatedAt: new Date().toISOString()
+      };
       
-      // Small delay to show success message
+      sessionStorage.setItem('generatedContent', JSON.stringify(generationData));
+      
+      // Use minimal URL parameters and redirect
       setTimeout(() => {
-        navigate(`/video?${redirectParams.toString()}`);
+        navigate('/video?id=' + Date.now());
       }, 1500);
     } catch (error: any) {
-      console.error('Generation error:', error);
+      console.error('[GENERATION] Error:', error, { 
+        duration: performance.now() - startTime 
+      });
       setGenerationError(error.message || 'Failed to generate content');
       toast.error(error.message || 'Failed to generate content');
       hasStartedGeneration.current = false; // Allow retry

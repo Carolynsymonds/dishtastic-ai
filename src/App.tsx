@@ -22,6 +22,7 @@ import GenerateVideo from "./pages/GenerateVideo";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { useUtmTracking } from "./hooks/useUtmTracking";
 import { useGoogleAnalytics } from "./hooks/useGoogleAnalytics";
 import TopBanner from "./components/TopBanner";
@@ -67,8 +68,16 @@ const App = () => (
            <Route path="/app/purchases" element={<PurchasesBySupplier />} />
            <Route path="/app/inventory" element={<Inventory />} />
             <Route path="/app/inventory/analytics" element={<InventoryAnalytics />} />
-            <Route path="/video" element={<VideoDisplay />} />
-            <Route path="/generate" element={<GenerateVideo />} />
+             <Route path="/video" element={
+               <ErrorBoundary>
+                 <VideoDisplay />
+               </ErrorBoundary>
+             } />
+             <Route path="/generate" element={
+               <ErrorBoundary>
+                 <GenerateVideo />
+               </ErrorBoundary>
+             } />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-conditions" element={<TermsConditions />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

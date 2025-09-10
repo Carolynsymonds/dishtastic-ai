@@ -1,19 +1,55 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Download, Share2 } from "lucide-react";
+import { ArrowLeft, Download, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const VideoDisplay = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [contentData, setContentData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [mediaError, setMediaError] = useState(false);
   
-  const videoUrl = searchParams.get('url');
-  const prompt = searchParams.get('prompt');
-  const type = searchParams.get('type');
-  const format = searchParams.get('format');
-  const parametersString = searchParams.get('parameters');
-  const parameters = parametersString ? JSON.parse(decodeURIComponent(parametersString)) : null;
+  useEffect(() => {
+    console.log('[VIDEO-DISPLAY] Component mounted');
+    
+    // Try to get data from sessionStorage first (optimized approach)
+    const storedData = sessionStorage.getItem('generatedContent');
+    if (storedData) {
+      try {
+        const data = JSON.parse(storedData);
+        console.log('[VIDEO-DISPLAY] Using stored data', { type: data.type, size: data.url?.length });
+        setContentData(data);
+        setIsLoading(false);
+        return;
+      } catch (error) {
+        console.error('[VIDEO-DISPLAY] Failed to parse stored data:', error);
+      }
+    }
+    
+    // Fallback to URL parameters
+    const videoUrl = searchParams.get('url');
+    const prompt = searchParams.get('prompt');
+    const type = searchParams.get('type');
+    const format = searchParams.get('format');
+    const parametersString = searchParams.get('parameters');
+    
+    if (videoUrl && prompt) {
+      try {
+        const parameters = parametersString ? JSON.parse(decodeURIComponent(parametersString)) : null;
+        setContentData({ url: videoUrl, prompt, type, format, parameters });
+        console.log('[VIDEO-DISPLAY] Using URL parameters', { type, size: videoUrl.length });
+      } catch (error) {
+        console.error('[VIDEO-DISPLAY] Failed to parse URL parameters:', error);
+      }
+    }
+    
+    setIsLoading(false);
+  }, [searchParams]);
+  
+  const { url: videoUrl, prompt, type, format, parameters } = contentData || {};
   
   const handleDownload = () => {
     if (videoUrl) {
@@ -48,6 +84,18 @@ const VideoDisplay = () => {
       toast.success(`${type === 'video' ? 'Video' : 'Content'} link copied to clipboard!`);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="p-8 text-center max-w-md">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <h2 className="text-lg font-semibold mb-2">Loading Content...</h2>
+          <p className="text-muted-foreground">Please wait while we prepare your generated content.</p>
+        </Card>
+      </div>
+    );
+  }
 
   if (!videoUrl) {
     return (
@@ -100,14 +148,33 @@ const VideoDisplay = () => {
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Content Display */}
           <Card className="overflow-hidden">
-            {type === 'video' ? (
+            {mediaError ? (
+              <div className="flex flex-col items-center justify-center p-12 bg-muted/50">
+                <p className="text-muted-foreground mb-4">Failed to load {type === 'video' ? 'video' : 'image'}</p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setMediaError(false);
+                    // Force reload
+                    window.location.reload();
+                  }}
+                >
+                  Try Again
+                </Button>
+              </div>
+            ) : type === 'video' ? (
               <video 
                 src={videoUrl} 
                 controls 
-                autoPlay
                 loop
                 className="w-full h-auto max-h-[70vh] bg-black"
                 poster="/placeholder.svg"
+                onError={() => {
+                  console.error('[VIDEO-DISPLAY] Video load error');
+                  setMediaError(true);
+                }}
+                onLoadStart={() => console.log('[VIDEO-DISPLAY] Video load start')}
+                onCanPlay={() => console.log('[VIDEO-DISPLAY] Video can play')}
               >
                 Your browser does not support the video tag.
               </video>
@@ -116,6 +183,11 @@ const VideoDisplay = () => {
                 src={videoUrl}
                 alt="Generated content"
                 className="w-full h-auto max-h-[70vh] object-contain bg-black"
+                onError={() => {
+                  console.error('[VIDEO-DISPLAY] Image load error');
+                  setMediaError(true);
+                }}
+                onLoad={() => console.log('[VIDEO-DISPLAY] Image loaded successfully')}
               />
             )}
           </Card>
