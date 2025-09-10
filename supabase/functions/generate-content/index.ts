@@ -1066,12 +1066,6 @@ function createMotionOptimizedImagePrompt(prompt: string, parameters: any): stri
   return `Professional food photography setup for video animation: ${prompt}. Perfect for motion generation, optimal ingredient placement, clear textures, studio lighting, ready for dynamic movement, high resolution commercial quality.`;
 }
 
-async function generateImageWithPrompt(prompt: string, parameters: any) {
-  console.log('[IMAGE-GEN]', { event: 'start', prompt: prompt.slice(0, 100) });
-  
-  // Use existing image generation logic
-  return await generateImage(prompt, parameters);
-}
 
 async function generateVideo(prompt: string, parameters: any) {
   const requestId = crypto.randomUUID();
