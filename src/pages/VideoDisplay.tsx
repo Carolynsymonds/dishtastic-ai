@@ -4,6 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Download, Share2, Loader2, Lock, Crown } from "lucide-react";
 import { toast } from "sonner";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const VideoDisplay = () => {
   const [searchParams] = useSearchParams();
@@ -11,6 +20,7 @@ const VideoDisplay = () => {
   const [contentData, setContentData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mediaError, setMediaError] = useState(false);
+  const [showSignupDialog, setShowSignupDialog] = useState(false);
   
   useEffect(() => {
     console.log('[VIDEO-DISPLAY] Component mounted');
@@ -67,12 +77,12 @@ const VideoDisplay = () => {
   };
 
   const handleUnlock = () => {
-    toast.success("To access the other generated videos you'll need to sign up", {
-      duration: 3000,
-    });
-    setTimeout(() => {
-      navigate('/signup');
-    }, 2000);
+    setShowSignupDialog(true);
+  };
+
+  const handleSignupConfirm = () => {
+    setShowSignupDialog(false);
+    navigate('/signup');
   };
 
   const handleShare = async () => {
@@ -287,6 +297,34 @@ const VideoDisplay = () => {
           </div>
         </div>
       </main>
+
+      {/* Signup Dialog */}
+      <AlertDialog open={showSignupDialog} onOpenChange={setShowSignupDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-semibold">
+              🔒 Premium Feature
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base">
+              To access additional generated videos with different styles, you'll need to sign up for an account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowSignupDialog(false)}
+            >
+              Maybe Later
+            </Button>
+            <AlertDialogAction 
+              onClick={handleSignupConfirm}
+              className="bg-primary hover:bg-primary/90"
+            >
+              Sign Up Now
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
