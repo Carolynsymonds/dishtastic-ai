@@ -66,6 +66,13 @@ const VideoDisplay = () => {
     }
   };
 
+  const handleUnlock = () => {
+    toast.info("To access the other generated videos you'll need to sign up");
+    setTimeout(() => {
+      navigate('/signup');
+    }, 2000);
+  };
+
   const handleShare = async () => {
     if (navigator.share && videoUrl) {
       try {
@@ -220,7 +227,7 @@ const VideoDisplay = () => {
                   <Lock className="w-8 h-8 mx-auto mb-3 text-gray-600" />
                   <h3 className="font-semibold mb-2">Premium Variant</h3>
                   <p className="text-sm text-gray-600 mb-3">Cinematic Style</p>
-                  <Button size="sm" className="bg-primary hover:bg-primary/90">
+                  <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleUnlock}>
                     <Crown className="w-4 h-4 mr-2" />
                     Unlock
                   </Button>
@@ -241,7 +248,7 @@ const VideoDisplay = () => {
                   <Lock className="w-8 h-8 mx-auto mb-3 text-gray-600" />
                   <h3 className="font-semibold mb-2">Premium Variant</h3>
                   <p className="text-sm text-gray-600 mb-3">Artistic Style</p>
-                  <Button size="sm" className="bg-primary hover:bg-primary/90">
+                  <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleUnlock}>
                     <Crown className="w-4 h-4 mr-2" />
                     Unlock
                   </Button>
@@ -262,7 +269,7 @@ const VideoDisplay = () => {
                   <Lock className="w-8 h-8 mx-auto mb-3 text-gray-600" />
                   <h3 className="font-semibold mb-2">Premium Variant</h3>
                   <p className="text-sm text-gray-600 mb-3">Professional Style</p>
-                  <Button size="sm" className="bg-primary hover:bg-primary/90">
+                  <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleUnlock}>
                     <Crown className="w-4 h-4 mr-2" />
                     Unlock
                   </Button>
