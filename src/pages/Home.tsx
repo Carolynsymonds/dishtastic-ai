@@ -240,9 +240,9 @@ const Home = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative min-h-[140vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5 overflow-visible">
+      <section className="relative min-h-[100vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5 overflow-visible">
         {/* Background Images - Two Rows */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pt-20" style={{ gap: '2px' }}>
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pt-8" style={{ gap: '2px' }}>
           {/* First Row */}
           <div className="flex gap-0.5 w-full max-w-full px-4 opacity-60">
             <img 
@@ -292,7 +292,7 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center justify-center min-h-[80vh]">
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center justify-center min-h-[60vh]">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
               Make A Food Dish Image or Video in Seconds
