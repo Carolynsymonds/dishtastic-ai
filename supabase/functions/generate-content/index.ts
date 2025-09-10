@@ -1158,12 +1158,13 @@ async function createLumaOptimizedPrompt(prompt: string, parameters: any, mode: 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Create optimized prompt for: ${prompt}\nParameters: ${JSON.stringify(parameters)}` }
         ],
-        max_completion_tokens: 500
+        max_completion_tokens: 500,
+        temperature: 0.7
       }),
     });
 
