@@ -20,6 +20,186 @@ interface GenerationRequest {
   };
 }
 
+interface DishInfo {
+  name: string;
+  canonicalIngredients: string[];
+  forbiddenIngredients: string[];
+  cuisine: string;
+  type: string;
+}
+
+// Comprehensive dish database for personalized video generation
+const DISH_DB: Record<string, DishInfo> = {
+  // Italian Pasta Dishes
+  'carbonara': {
+    name: 'Carbonara',
+    canonicalIngredients: ['fresh pasta', 'eggs', 'pecorino romano cheese', 'guanciale', 'black pepper'],
+    forbiddenIngredients: ['cream', 'garlic', 'bacon', 'parmesan', 'peas', 'mushrooms'],
+    cuisine: 'Italian',
+    type: 'pasta'
+  },
+  'aglio e olio': {
+    name: 'Aglio e Olio',
+    canonicalIngredients: ['spaghetti', 'garlic', 'olive oil', 'red pepper flakes', 'parsley'],
+    forbiddenIngredients: ['cream', 'cheese', 'tomatoes', 'meat'],
+    cuisine: 'Italian',
+    type: 'pasta'
+  },
+  'cacio e pepe': {
+    name: 'Cacio e Pepe',
+    canonicalIngredients: ['spaghetti', 'pecorino romano', 'black pepper', 'pasta water'],
+    forbiddenIngredients: ['garlic', 'oil', 'butter', 'cream', 'parmesan'],
+    cuisine: 'Italian',
+    type: 'pasta'
+  },
+  'amatriciana': {
+    name: 'Amatriciana',
+    canonicalIngredients: ['pasta', 'guanciale', 'tomatoes', 'pecorino romano', 'red pepper flakes'],
+    forbiddenIngredients: ['garlic', 'onions', 'bacon', 'cream'],
+    cuisine: 'Italian',
+    type: 'pasta'
+  },
+  'bolognese': {
+    name: 'Bolognese',
+    canonicalIngredients: ['ground beef', 'ground pork', 'carrots', 'celery', 'onions', 'tomatoes', 'red wine', 'milk'],
+    forbiddenIngredients: ['garlic', 'herbs', 'bell peppers'],
+    cuisine: 'Italian',
+    type: 'pasta'
+  },
+
+  // Asian Dishes
+  'pad thai': {
+    name: 'Pad Thai',
+    canonicalIngredients: ['rice noodles', 'shrimp', 'tofu', 'eggs', 'bean sprouts', 'tamarind paste', 'fish sauce', 'palm sugar'],
+    forbiddenIngredients: ['soy sauce', 'oyster sauce', 'broccoli'],
+    cuisine: 'Thai',
+    type: 'noodles'
+  },
+  'ramen': {
+    name: 'Ramen',
+    canonicalIngredients: ['ramen noodles', 'pork broth', 'chashu pork', 'soft-boiled eggs', 'green onions', 'nori', 'bamboo shoots'],
+    forbiddenIngredients: ['chicken broth', 'beef', 'hard-boiled eggs'],
+    cuisine: 'Japanese',
+    type: 'noodles'
+  },
+  'fried rice': {
+    name: 'Fried Rice',
+    canonicalIngredients: ['day-old rice', 'eggs', 'soy sauce', 'green onions', 'sesame oil'],
+    forbiddenIngredients: ['fresh rice', 'cream', 'cheese'],
+    cuisine: 'Chinese',
+    type: 'rice'
+  },
+
+  // Mexican Dishes
+  'tacos': {
+    name: 'Tacos',
+    canonicalIngredients: ['corn tortillas', 'meat', 'onions', 'cilantro', 'lime', 'salsa'],
+    forbiddenIngredients: ['flour tortillas', 'lettuce', 'cheese', 'sour cream'],
+    cuisine: 'Mexican',
+    type: 'tacos'
+  },
+  'guacamole': {
+    name: 'Guacamole',
+    canonicalIngredients: ['avocados', 'lime juice', 'onions', 'cilantro', 'jalapeños', 'salt'],
+    forbiddenIngredients: ['mayo', 'sour cream', 'peas'],
+    cuisine: 'Mexican',
+    type: 'other'
+  },
+
+  // American Dishes
+  'burger': {
+    name: 'Burger',
+    canonicalIngredients: ['ground beef', 'burger buns', 'lettuce', 'tomato', 'onions', 'pickles'],
+    forbiddenIngredients: ['chicken', 'turkey'],
+    cuisine: 'American',
+    type: 'sandwich'
+  },
+  'mac and cheese': {
+    name: 'Mac and Cheese',
+    canonicalIngredients: ['macaroni', 'cheddar cheese', 'milk', 'butter', 'flour'],
+    forbiddenIngredients: ['cream cheese', 'mozzarella only'],
+    cuisine: 'American',
+    type: 'pasta'
+  },
+
+  // French Dishes
+  'french omelette': {
+    name: 'French Omelette',
+    canonicalIngredients: ['eggs', 'butter', 'salt', 'chives'],
+    forbiddenIngredients: ['milk', 'cream', 'cheese filling'],
+    cuisine: 'French',
+    type: 'other'
+  },
+  'croissant': {
+    name: 'Croissant',
+    canonicalIngredients: ['flour', 'butter', 'yeast', 'milk', 'sugar', 'salt'],
+    forbiddenIngredients: ['oil', 'margarine'],
+    cuisine: 'French',
+    type: 'pastry'
+  },
+
+  // Indian Dishes
+  'butter chicken': {
+    name: 'Butter Chicken',
+    canonicalIngredients: ['chicken', 'tomatoes', 'cream', 'butter', 'garam masala', 'ginger', 'garlic'],
+    forbiddenIngredients: ['coconut milk', 'yogurt as base'],
+    cuisine: 'Indian',
+    type: 'curry'
+  },
+  'biryani': {
+    name: 'Biryani',
+    canonicalIngredients: ['basmati rice', 'meat', 'saffron', 'yogurt', 'onions', 'whole spices'],
+    forbiddenIngredients: ['regular rice', 'cream'],
+    cuisine: 'Indian',
+    type: 'rice'
+  }
+};
+
+function parseDishName(prompt: string): DishInfo | null {
+  const lowerPrompt = prompt.toLowerCase();
+  
+  // Try to find exact matches first
+  for (const [key, dishInfo] of Object.entries(DISH_DB)) {
+    if (lowerPrompt.includes(key)) {
+      return dishInfo;
+    }
+  }
+  
+  // Try partial matches for compound names
+  const dishNames = Object.keys(DISH_DB);
+  for (const dishName of dishNames) {
+    const words = dishName.split(' ');
+    if (words.length > 1 && words.every(word => lowerPrompt.includes(word))) {
+      return DISH_DB[dishName];
+    }
+  }
+  
+  return null;
+}
+
+function sanitizePromptForDish(prompt: string, originalPrompt: string): string {
+  const dishInfo = parseDishName(originalPrompt);
+  
+  if (!dishInfo || dishInfo.forbiddenIngredients.length === 0) {
+    return prompt;
+  }
+  
+  let sanitizedPrompt = prompt;
+  
+  // Remove forbidden ingredients from the prompt
+  for (const forbidden of dishInfo.forbiddenIngredients) {
+    const regex = new RegExp(`\\b${forbidden.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+    sanitizedPrompt = sanitizedPrompt.replace(regex, '');
+  }
+  
+  // Clean up any double spaces or punctuation issues
+  sanitizedPrompt = sanitizedPrompt.replace(/\s+/g, ' ').replace(/,\s*,/g, ',').trim();
+  
+  console.log(`Sanitized prompt for ${dishInfo.name}: removed [${dishInfo.forbiddenIngredients.join(', ')}]`);
+  
+  return sanitizedPrompt;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -187,6 +367,16 @@ async function enhancePromptWithAI(prompt: string, parameters: any): Promise<str
   try {
     const systemPrompt = `You are a professional food content creator specializing in realistic, appetizing culinary visuals. Convert the user's description and parameters into a JSON creative brief for photoreal, mouth-watering food imagery that focuses on authentic cooking processes and natural food behavior.
 
+CRITICAL DISH AUTHENTICITY REQUIREMENTS:
+- For known dishes, use ONLY their authentic, canonical ingredients
+- Carbonara: eggs, pecorino romano, guanciale, black pepper, pasta (NO cream, garlic, bacon, peas)
+- Aglio e Olio: garlic, olive oil, red pepper flakes, parsley, spaghetti (NO cream, cheese, tomatoes)
+- Cacio e Pepe: pecorino romano, black pepper, pasta water, spaghetti (NO garlic, oil, butter, cream)
+- Pad Thai: rice noodles, tamarind paste, fish sauce, palm sugar, shrimp/tofu (NO soy sauce, oyster sauce)
+- French Omelette: eggs, butter, salt, chives (NO milk, cream, cheese filling)
+- Identify the specific dish from the user description and use ONLY its traditional ingredients
+- Include forbidden ingredients in negative_prompts to ensure they don't appear
+
 Rules:
 - Return **valid JSON only**, no explanations.
 - Follow this schema exactly:
@@ -244,6 +434,9 @@ Rules:
 }
 
 Heuristics:
+- FIRST identify the specific dish from the user prompt (carbonara, pad thai, etc.)
+- Use ONLY authentic ingredients for that dish in key_ingredients and runway_prompt
+- Add any commonly mistaken ingredients to negative_prompts
 - If Format = "Video", set "mode": "video" and use Length (in seconds) as "duration_seconds".  
 - If Format = "Image", set "mode": "image" and "duration_seconds": null.  
 - Map Video Style to "motion_style" focusing on food behavior, not filming techniques.  
@@ -251,8 +444,7 @@ Heuristics:
 - Infer plateware & tabletop style from cuisine, dish_type, and background.  
 - Focus on realistic food physics: steam rising naturally, ingredients falling gracefully, liquids flowing smoothly, cheese stretching authentically.  
 - Always include tabletop details that enhance food presentation.  
-- Negative prompts: artificial look, plastic appearance, unrealistic proportions, equipment visible, technical gear.  
-- runway_prompt must describe **realistic food behavior and cooking processes** - steam patterns, ingredient interactions, natural textures, authentic colors, and appetizing motion without mentioning filming equipment.`;
+- runway_prompt must describe **realistic food behavior and cooking processes** using ONLY the dish's authentic ingredients - steam patterns, ingredient interactions, natural textures, authentic colors, and appetizing motion without mentioning filming equipment.`;
 
     const userPrompt = `User description: ${prompt}
 Format: ${parameters.Format || 'Image'}
@@ -305,8 +497,11 @@ Background: ${parameters.Background || 'Plain'}`;
         throw new Error('Missing runway_prompt in JSON response');
       }
 
-      console.log('Using runway_prompt:', runwayPrompt);
-      return runwayPrompt;
+      // Sanitize the runway_prompt to remove forbidden ingredients
+      const sanitizedPrompt = sanitizePromptForDish(runwayPrompt, prompt);
+
+      console.log('Using sanitized runway_prompt:', sanitizedPrompt);
+      return sanitizedPrompt;
       
     } catch (parseError) {
       console.error('Failed to parse JSON response:', parseError);
@@ -326,16 +521,38 @@ function createMotionPrompt(prompt: string, parameters: any): string {
   const videoStyle = parameters['Video Style'];
   const background = parameters.Background;
   
+  // Parse dish to get specific ingredients
+  const dishInfo = parseDishName(prompt);
+  let dishSpecificContent = prompt;
+  
+  if (dishInfo) {
+    // Create dish-specific description with canonical ingredients
+    const ingredientList = dishInfo.canonicalIngredients.join(', ');
+    dishSpecificContent = `${dishInfo.name}: ${dishInfo.cuisine} ${dishInfo.type} featuring ${ingredientList}`;
+    
+    // Add forbidden ingredients to avoid in negative space
+    const forbiddenList = dishInfo.forbiddenIngredients.join(', ');
+    console.log(`Dish-specific prompt for ${dishInfo.name}: using [${ingredientList}], avoiding [${forbiddenList}]`);
+  }
+  
   // Realistic food behavior instructions for each video style
   const motionInstructions = {
-    'Ingredient Drop': 'Fresh ingredients gracefully cascading through the air with natural physics, landing softly into the dish creating beautiful splashes and gentle movements as they settle into place',
+    'Ingredient Drop': dishInfo 
+      ? `${dishInfo.canonicalIngredients.slice(0, 3).join(', ')} gracefully cascading through the air with natural physics, landing softly into the dish creating beautiful splashes and gentle movements as they settle into place`
+      : 'Fresh ingredients gracefully cascading through the air with natural physics, landing softly into the dish creating beautiful splashes and gentle movements as they settle into place',
     'Slow-Mo Pour': 'Liquid flowing in elegant slow motion with smooth, natural curves and realistic viscosity, creating mesmerizing patterns as it streams into the dish with authentic splash dynamics',
     'Steam Rising': 'Delicate steam naturally rising from hot food in organic, wispy patterns, dancing upward with realistic heat convection, creating an appetizing visual of freshly prepared warmth',
-    'Cheese Pull': 'Melted cheese stretching authentically with golden, elastic strands that flow naturally with realistic texture, showing the perfect melt and appetizing stretch without any artificial tension',
+    'Cheese Pull': dishInfo?.canonicalIngredients.some(ing => ing.includes('cheese'))
+      ? `Melted ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} stretching authentically with golden, elastic strands that flow naturally with realistic texture, showing the perfect melt and appetizing stretch without any artificial tension`
+      : 'Melted cheese stretching authentically with golden, elastic strands that flow naturally with realistic texture, showing the perfect melt and appetizing stretch without any artificial tension',
     'Sizzle Effect': 'Food naturally sizzling with authentic bubbling, gentle steam wisps, and realistic heat effects that create an appetizing sensory experience of active cooking',
-    'Garnish Drop': 'Fresh herbs or seasonings gently falling through the air with natural grace, landing delicately on the dish surface with realistic scatter patterns',
+    'Garnish Drop': dishInfo?.canonicalIngredients.slice(-2).join(' and ')
+      ? `${dishInfo.canonicalIngredients.slice(-2).join(' and ')} gently falling through the air with natural grace, landing delicately on the dish surface with realistic scatter patterns`
+      : 'Fresh herbs or seasonings gently falling through the air with natural grace, landing delicately on the dish surface with realistic scatter patterns',
     'Liquid Drizzle': 'Sauce, oil, or honey flowing in smooth streams with natural viscosity and authentic dripping patterns that enhance the dish\'s appetizing appearance',
-    'Whisk Action': 'Ingredients naturally swirling and blending with realistic fluid dynamics, creating appetizing textures and natural mixing patterns'
+    'Whisk Action': dishInfo
+      ? `${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} naturally swirling and blending with realistic fluid dynamics, creating appetizing textures and natural mixing patterns`
+      : 'Ingredients naturally swirling and blending with realistic fluid dynamics, creating appetizing textures and natural mixing patterns'
   };
   
   const motionInstruction = motionInstructions[videoStyle as keyof typeof motionInstructions] || 'natural, appetizing food motion with realistic cooking behavior and authentic culinary physics';
@@ -343,30 +560,63 @@ function createMotionPrompt(prompt: string, parameters: any): string {
   // Background-specific enhancements
   const backgroundEnhancement = background ? `Set in a beautiful ${background} environment that complements the food presentation.` : '';
   
-  // Create realistic food behavior prompt
-  return `Stunning food videography showcasing: ${prompt}. ${backgroundEnhancement} The scene features ${motionInstruction}. Professional lighting highlights natural textures, vibrant colors, and appetizing details. The focus is on authentic cooking processes and realistic food physics that make the dish look incredibly fresh and delicious.`;
+  // Create realistic food behavior prompt with dish-specific ingredients
+  let finalPrompt = `Stunning food videography showcasing: ${dishSpecificContent}. ${backgroundEnhancement} The scene features ${motionInstruction}. Professional lighting highlights natural textures, vibrant colors, and appetizing details. The focus is on authentic cooking processes and realistic food physics that make the dish look incredibly fresh and delicious.`;
+  
+  // Add negative prompts for forbidden ingredients if we have dish info
+  if (dishInfo && dishInfo.forbiddenIngredients.length > 0) {
+    finalPrompt += ` Avoid: ${dishInfo.forbiddenIngredients.join(', ')}.`;
+  }
+  
+  return finalPrompt;
 }
 
 function createMotionImagePrompt(prompt: string, parameters: any): string {
   const videoStyle = parameters['Video Style'];
   const background = parameters.Background;
   
+  // Parse dish to get specific ingredients
+  const dishInfo = parseDishName(prompt);
+  let dishSpecificContent = prompt;
+  
+  if (dishInfo) {
+    // Create dish-specific description with canonical ingredients
+    const ingredientList = dishInfo.canonicalIngredients.join(', ');
+    dishSpecificContent = `${dishInfo.name}: ${dishInfo.cuisine} ${dishInfo.type} featuring ${ingredientList}`;
+    console.log(`Image prompt for ${dishInfo.name}: using [${ingredientList}]`);
+  }
+  
   // Create image prompts optimized for realistic motion generation
   const motionSetups = {
-    'Ingredient Drop': 'Fresh ingredients naturally positioned above the dish with perfect spacing for graceful falling motion, arranged to showcase natural physics and authentic ingredient behavior',
+    'Ingredient Drop': dishInfo
+      ? `${dishInfo.canonicalIngredients.slice(0, 3).join(', ')} naturally positioned above the dish with perfect spacing for graceful falling motion, arranged to showcase natural physics and authentic ingredient behavior`
+      : 'Fresh ingredients naturally positioned above the dish with perfect spacing for graceful falling motion, arranged to showcase natural physics and authentic ingredient behavior',
     'Slow-Mo Pour': 'Liquid captured at the perfect pouring moment with realistic trajectory, positioned for smooth, natural flowing motion with authentic viscosity and stream patterns',
     'Steam Rising': 'Freshly prepared hot dish with natural steam patterns beginning to rise, positioned to show authentic heat emanation and organic vapor movement',
-    'Cheese Pull': 'Perfectly melted cheese in natural stretch position with golden, elastic texture, arranged for authentic cheese-pulling motion that showcases realistic dairy physics',
+    'Cheese Pull': dishInfo?.canonicalIngredients.some(ing => ing.includes('cheese'))
+      ? `Perfectly melted ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} in natural stretch position with golden, elastic texture, arranged for authentic cheese-pulling motion that showcases realistic dairy physics`
+      : 'Perfectly melted cheese in natural stretch position with golden, elastic texture, arranged for authentic cheese-pulling motion that showcases realistic dairy physics',
     'Sizzle Effect': 'Food positioned in hot cooking environment with natural heat effects and authentic bubbling patterns that suggest realistic cooking processes',
-    'Garnish Drop': 'Fresh herbs or seasonings naturally positioned above the dish with perfect spacing for graceful falling motion and authentic scatter patterns',
+    'Garnish Drop': dishInfo?.canonicalIngredients.slice(-2).join(' and ')
+      ? `${dishInfo.canonicalIngredients.slice(-2).join(' and ')} naturally positioned above the dish with perfect spacing for graceful falling motion and authentic scatter patterns`
+      : 'Fresh herbs or seasonings naturally positioned above the dish with perfect spacing for graceful falling motion and authentic scatter patterns',
     'Liquid Drizzle': 'Sauce, honey, or oil positioned for natural drizzling motion with realistic viscosity patterns and authentic flow behavior',
-    'Whisk Action': 'Ingredients arranged in natural mixing position with authentic textures that suggest realistic blending and fluid dynamics'
+    'Whisk Action': dishInfo
+      ? `${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} arranged in natural mixing position with authentic textures that suggest realistic blending and fluid dynamics`
+      : 'Ingredients arranged in natural mixing position with authentic textures that suggest realistic blending and fluid dynamics'
   };
   
   const motionSetup = motionSetups[videoStyle as keyof typeof motionSetups] || 'Food beautifully arranged for natural, appetizing motion and authentic culinary behavior';
   const backgroundEnhancement = background ? `Set in a stunning ${background} environment that enhances the food presentation.` : '';
   
-  return `Professional food photography: ${prompt}. ${backgroundEnhancement} ${motionSetup}. The composition emphasizes realistic food physics and natural culinary processes with perfect lighting that showcases authentic textures, vibrant colors, and appetizing details optimized for the most realistic motion generation.`;
+  let finalPrompt = `Professional food photography: ${dishSpecificContent}. ${backgroundEnhancement} ${motionSetup}. The composition emphasizes realistic food physics and natural culinary processes with perfect lighting that showcases authentic textures, vibrant colors, and appetizing details optimized for the most realistic motion generation.`;
+  
+  // Add negative prompts for forbidden ingredients if we have dish info
+  if (dishInfo && dishInfo.forbiddenIngredients.length > 0) {
+    finalPrompt += ` Avoid: ${dishInfo.forbiddenIngredients.join(', ')}.`;
+  }
+  
+  return finalPrompt;
 }
 
 async function generateImageWithPrompt(customPrompt: string, parameters: any) {
