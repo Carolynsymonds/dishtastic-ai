@@ -15,10 +15,10 @@ export const useUtmTracking = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  console.log('UTM Tracking hook initialized for location:', location.pathname, location.search);
-
   // Capture and store UTM parameters on initial page load
   useEffect(() => {
+    console.log('UTM Tracking hook initialized for location:', location.pathname, location.search);
+    
     const urlParams = new URLSearchParams(location.search);
     const hasUtmParams = Array.from(urlParams.keys()).some(key => key.startsWith('utm_'));
     

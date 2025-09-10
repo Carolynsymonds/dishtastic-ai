@@ -110,15 +110,22 @@ export const secureStorage = {
 // Initialize security monitoring
 export const initSecurity = () => {
   if (typeof window !== 'undefined') {
-    detectSuspiciousActivity();
-    
-    // Monitor for console manipulation attempts
-    const originalLog = console.log;
-    console.log = function(...args) {
-      if (args.some(arg => typeof arg === 'string' && arg.includes('password'))) {
-        logSecurityEvent('console_password_exposure', { args: args.map(String) });
+    try {
+      detectSuspiciousActivity();
+      
+      // Monitor for console manipulation attempts (only initialize once)
+      if (!(window as any).__securityInitialized) {
+        const originalLog = console.log;
+        console.log = function(...args) {
+          if (args.some(arg => typeof arg === 'string' && arg.includes('password'))) {
+            logSecurityEvent('console_password_exposure', { args: args.map(String) });
+          }
+          originalLog.apply(console, args);
+        };
+        (window as any).__securityInitialized = true;
       }
-      originalLog.apply(console, args);
-    };
+    } catch (error) {
+      console.error('Security initialization error:', error);
+    }
   }
 };

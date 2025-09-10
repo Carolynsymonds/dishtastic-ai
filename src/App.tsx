@@ -36,10 +36,14 @@ const UtmTracker = () => {
   useUtmTracking(); // Initialize UTM tracking
   useGoogleAnalytics(); // Initialize Google Analytics
   
-  // Initialize security monitoring
+  // Initialize security monitoring only once
   useEffect(() => {
-    initSecurity();
-  }, []);
+    try {
+      initSecurity();
+    } catch (error) {
+      console.error('Security initialization failed:', error);
+    }
+  }, []); // Empty dependency array ensures this runs only once
   
   return null;
 };
