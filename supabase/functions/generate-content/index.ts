@@ -26,45 +26,57 @@ interface DishInfo {
   forbiddenIngredients: string[];
   cuisine: string;
   type: string;
+  signatureTechnique?: string;
+  culturalContext?: string;
 }
 
-// Comprehensive dish database for personalized video generation
-const DISH_DB: Record<string, DishInfo> = {
+// Enhanced dish database with signature techniques for personalized video generation  
+const DISH_DB: Record<string, DishInfo & { signatureTechnique: string; culturalContext: string }> = {
   // Italian Pasta Dishes
   'carbonara': {
     name: 'Carbonara',
     canonicalIngredients: ['fresh pasta', 'eggs', 'pecorino romano cheese', 'guanciale', 'black pepper'],
     forbiddenIngredients: ['cream', 'garlic', 'bacon', 'parmesan', 'peas', 'mushrooms'],
     cuisine: 'Italian',
-    type: 'pasta'
+    type: 'pasta',
+    signatureTechnique: 'The Emulsion Moment - Raw eggs meeting hot pasta to create silky carbonara sauce through precise temperature control',
+    culturalContext: 'Roman trattorias where shepherds created this dish using available ingredients'
   },
   'aglio e olio': {
     name: 'Aglio e Olio',
     canonicalIngredients: ['spaghetti', 'garlic', 'olive oil', 'red pepper flakes', 'parsley'],
     forbiddenIngredients: ['cream', 'cheese', 'tomatoes', 'meat'],
     cuisine: 'Italian',
-    type: 'pasta'
+    type: 'pasta',
+    signatureTechnique: 'The Golden Oil Dance - Garlic slowly transforming in olive oil, creating aromatic perfection without burning',
+    culturalContext: 'Neapolitan midnight dish made from pantry staples'
   },
   'cacio e pepe': {
     name: 'Cacio e Pepe',
     canonicalIngredients: ['spaghetti', 'pecorino romano', 'black pepper', 'pasta water'],
     forbiddenIngredients: ['garlic', 'oil', 'butter', 'cream', 'parmesan'],
     cuisine: 'Italian',
-    type: 'pasta'
+    type: 'pasta',
+    signatureTechnique: 'The Mantecatura - Starchy pasta water binding with cheese to create creamy perfection without cream',
+    culturalContext: 'Ancient Roman technique using sheep cheese and pepper from trade routes'
   },
   'amatriciana': {
     name: 'Amatriciana',
     canonicalIngredients: ['pasta', 'guanciale', 'tomatoes', 'pecorino romano', 'red pepper flakes'],
     forbiddenIngredients: ['garlic', 'onions', 'bacon', 'cream'],
     cuisine: 'Italian',
-    type: 'pasta'
+    type: 'pasta',
+    signatureTechnique: 'Guanciale Rendering - Crispy pork jowl releasing its fat to create the sauce base',
+    culturalContext: 'Shepherds from Amatrice using preserved pork and tomatoes'
   },
   'bolognese': {
     name: 'Bolognese',
     canonicalIngredients: ['ground beef', 'ground pork', 'carrots', 'celery', 'onions', 'tomatoes', 'red wine', 'milk'],
     forbiddenIngredients: ['garlic', 'herbs', 'bell peppers'],
     cuisine: 'Italian',
-    type: 'pasta'
+    type: 'pasta',
+    signatureTechnique: 'The Soffritto Foundation - Holy trinity of vegetables building deep flavor through slow cooking',
+    culturalContext: 'Bolognese kitchens where the sauce simmers for hours to achieve perfect richness'
   },
 
   // Asian Dishes
@@ -73,21 +85,27 @@ const DISH_DB: Record<string, DishInfo> = {
     canonicalIngredients: ['rice noodles', 'shrimp', 'tofu', 'eggs', 'bean sprouts', 'tamarind paste', 'fish sauce', 'palm sugar'],
     forbiddenIngredients: ['soy sauce', 'oyster sauce', 'broccoli'],
     cuisine: 'Thai',
-    type: 'noodles'
+    type: 'noodles',
+    signatureTechnique: 'Wok Hei Fire Kiss - High-heat stir-frying imparting smoky essence and perfect texture',
+    culturalContext: 'Bangkok street vendors mastering the balance of sweet, sour, salty, and spicy'
   },
   'ramen': {
     name: 'Ramen',
     canonicalIngredients: ['ramen noodles', 'pork broth', 'chashu pork', 'soft-boiled eggs', 'green onions', 'nori', 'bamboo shoots'],
     forbiddenIngredients: ['chicken broth', 'beef', 'hard-boiled eggs'],
     cuisine: 'Japanese',
-    type: 'noodles'
+    type: 'noodles',
+    signatureTechnique: 'Broth Layering Symphony - Each component building the perfect umami harmony',
+    culturalContext: 'Japanese ramen masters spending decades perfecting their secret broth recipes'
   },
   'fried rice': {
     name: 'Fried Rice',
     canonicalIngredients: ['day-old rice', 'eggs', 'soy sauce', 'green onions', 'sesame oil'],
     forbiddenIngredients: ['fresh rice', 'cream', 'cheese'],
     cuisine: 'Chinese',
-    type: 'rice'
+    type: 'rice',
+    signatureTechnique: 'Day-Old Rice Resurrection - Individual grains separating and crisping in the wok\'s embrace',
+    culturalContext: 'Chinese home cooks transforming leftover rice into golden perfection'
   },
 
   // Mexican Dishes
@@ -96,14 +114,18 @@ const DISH_DB: Record<string, DishInfo> = {
     canonicalIngredients: ['corn tortillas', 'meat', 'onions', 'cilantro', 'lime', 'salsa'],
     forbiddenIngredients: ['flour tortillas', 'lettuce', 'cheese', 'sour cream'],
     cuisine: 'Mexican',
-    type: 'tacos'
+    type: 'tacos',
+    signatureTechnique: 'Tortilla Warming Alchemy - Corn tortillas gaining flexibility and flavor over flame',
+    culturalContext: 'Mexican taquerias where simplicity and quality ingredients create perfection'
   },
   'guacamole': {
     name: 'Guacamole',
     canonicalIngredients: ['avocados', 'lime juice', 'onions', 'cilantro', 'jalapeños', 'salt'],
     forbiddenIngredients: ['mayo', 'sour cream', 'peas'],
     cuisine: 'Mexican',
-    type: 'other'
+    type: 'other',
+    signatureTechnique: 'The Molcajete Crush - Stone mortar releasing avocado oils while maintaining perfect texture',
+    culturalContext: 'Aztec origins where avocados were prepared with volcanic stone tools'
   },
 
   // American Dishes
@@ -112,14 +134,18 @@ const DISH_DB: Record<string, DishInfo> = {
     canonicalIngredients: ['ground beef', 'burger buns', 'lettuce', 'tomato', 'onions', 'pickles'],
     forbiddenIngredients: ['chicken', 'turkey'],
     cuisine: 'American',
-    type: 'sandwich'
+    type: 'sandwich',
+    signatureTechnique: 'The Maillard Sear - High-heat caramelization creating the perfect crust',
+    culturalContext: 'American diners where the perfect patty meets flame for that iconic sear'
   },
   'mac and cheese': {
     name: 'Mac and Cheese',
     canonicalIngredients: ['macaroni', 'cheddar cheese', 'milk', 'butter', 'flour'],
     forbiddenIngredients: ['cream cheese', 'mozzarella only'],
     cuisine: 'American',
-    type: 'pasta'
+    type: 'pasta',
+    signatureTechnique: 'Roux Foundation - Flour and butter creating the silky cheese sauce base',
+    culturalContext: 'American comfort food tradition from colonial kitchens to modern tables'
   },
 
   // French Dishes
@@ -128,14 +154,18 @@ const DISH_DB: Record<string, DishInfo> = {
     canonicalIngredients: ['eggs', 'butter', 'salt', 'chives'],
     forbiddenIngredients: ['milk', 'cream', 'cheese filling'],
     cuisine: 'French',
-    type: 'other'
+    type: 'other',
+    signatureTechnique: 'The Gentle Scramble - Low heat and constant motion creating silk-like texture',
+    culturalContext: 'French culinary schools where this technique separates novices from masters'
   },
   'croissant': {
     name: 'Croissant',
     canonicalIngredients: ['flour', 'butter', 'yeast', 'milk', 'sugar', 'salt'],
     forbiddenIngredients: ['oil', 'margarine'],
     cuisine: 'French',
-    type: 'pastry'
+    type: 'pastry',
+    signatureTechnique: 'Lamination Magic - Butter layers creating hundreds of flaky sheets',
+    culturalContext: 'Parisian bakeries where dawn brings the aroma of fresh-baked perfection'
   },
 
   // Indian Dishes
@@ -144,14 +174,18 @@ const DISH_DB: Record<string, DishInfo> = {
     canonicalIngredients: ['chicken', 'tomatoes', 'cream', 'butter', 'garam masala', 'ginger', 'garlic'],
     forbiddenIngredients: ['coconut milk', 'yogurt as base'],
     cuisine: 'Indian',
-    type: 'curry'
+    type: 'curry',
+    signatureTechnique: 'Tandoori Char Integration - Smoky grilled chicken melding with creamy tomato sauce',
+    culturalContext: 'Delhi restaurants where Mughlai techniques meet modern innovation'
   },
   'biryani': {
     name: 'Biryani',
     canonicalIngredients: ['basmati rice', 'meat', 'saffron', 'yogurt', 'onions', 'whole spices'],
     forbiddenIngredients: ['regular rice', 'cream'],
     cuisine: 'Indian',
-    type: 'rice'
+    type: 'rice',
+    signatureTechnique: 'Dum Cooking Transformation - Steam pressure melding rice and meat into aromatic unity',
+    culturalContext: 'Hyderabad kitchens where Persian techniques created the ultimate rice dish'
   }
 };
 
@@ -361,90 +395,72 @@ async function generateImageFallback(prompt: string, parameters: any) {
 async function enhancePromptWithAI(prompt: string, parameters: any): Promise<string> {
   if (!openAIApiKey) {
     console.log('OpenAI API key not available, using enhanced fallback');
-    return createMotionPrompt(prompt, parameters);
+    return createTechniqueNarrative(prompt, parameters);
   }
 
   try {
-    const systemPrompt = `You are a professional food content creator specializing in realistic, appetizing culinary visuals. Convert the user's description and parameters into a JSON creative brief for photoreal, mouth-watering food imagery that focuses on authentic cooking processes and natural food behavior.
+const systemPrompt = `You are a master culinary storyteller specializing in authentic dish narratives. Convert the user's description into a JSON creative brief that captures the SIGNATURE TECHNIQUE and cultural soul of each specific dish.
 
-CRITICAL DISH AUTHENTICITY REQUIREMENTS:
-- For known dishes, use ONLY their authentic, canonical ingredients
-- Carbonara: eggs, pecorino romano, guanciale, black pepper, pasta (NO cream, garlic, bacon, peas)
-- Aglio e Olio: garlic, olive oil, red pepper flakes, parsley, spaghetti (NO cream, cheese, tomatoes)
-- Cacio e Pepe: pecorino romano, black pepper, pasta water, spaghetti (NO garlic, oil, butter, cream)
-- Pad Thai: rice noodles, tamarind paste, fish sauce, palm sugar, shrimp/tofu (NO soy sauce, oyster sauce)
-- French Omelette: eggs, butter, salt, chives (NO milk, cream, cheese filling)
-- Identify the specific dish from the user description and use ONLY its traditional ingredients
-- Include forbidden ingredients in negative_prompts to ensure they don't appear
+TECHNIQUE-BASED ACTION NARRATIVES:
+Focus on the ONE defining moment that makes each dish unique - the critical technique that transforms ingredients into culinary magic:
 
-Rules:
-- Return **valid JSON only**, no explanations.
-- Follow this schema exactly:
+PASTA TECHNIQUES:
+- Carbonara: "The Emulsion Moment" - Raw eggs meeting hot pasta, creating silk-like carbonara sauce through precise temperature control
+- Cacio e Pepe: "The Mantecatura" - Starchy pasta water binding with cheese to create creamy perfection without cream
+- Aglio e Olio: "The Golden Oil Dance" - Garlic transforming in olive oil, creating aromatic perfection
 
+ASIAN TECHNIQUES:
+- Pad Thai: "Wok Hei Fire Kiss" - The breath of the wok imparting smoky essence and perfect noodle texture
+- Ramen: "Broth Symphony" - Layering technique showing how each component builds the perfect bowl
+- Fried Rice: "Day-Old Rice Resurrection" - Individual grains separating and crisping in the wok's embrace
+
+TECHNIQUE AUTHENTICITY:
+- Identify the dish's SIGNATURE TECHNIQUE from the user description
+- Use ONLY authentic ingredients for that technique
+- Forbidden ingredients go to negative_prompts
+- Focus on the CULTURAL STORY and EMOTIONAL JOURNEY of the technique
+
+Schema (return JSON only):
 {
   "mode": "video | image",
   "dish": {
     "name": "string",
-    "cuisine": "string | null",
+    "cuisine": "string | null", 
     "dish_type": "pasta | soup | noodles | steak | dessert | pastry | salad | pizza | bowl | sandwich | rice | fries | seafood | tacos | bbq | curry | other",
     "key_ingredients": ["string"],
-    "textures": ["string"]
+    "signature_technique": "string"
   },
-  "visual_direction": {
-    "motion_style": "Ingredient Cascade | Steam Rising | Liquid Flow | Cheese Stretch | Sizzle Effect | Natural Motion | Falling Elements | Texture Reveal | Color Enhancement | Aromatic Steam | none",
-    "framing": "macro close-up | three-quarter | overhead | side-on",
-    "angle": "eye-level | top-down | 45-degree"
+  "technique_narrative": {
+    "action_style": "Signature Technique | Cultural Story | Transformation Drama | Sensory Journey",
+    "critical_moment": "string - the defining cooking moment",
+    "cultural_context": "string - how it's made in its homeland", 
+    "sensory_focus": "string - textures, aromas, sounds to highlight"
+  },
+  "cinematic_direction": {
+    "framing": "intimate close-up | artisan hands | cultural context | transformation focus",
+    "angle": "technique-revealing | ingredient-focused | cultural-authentic",
+    "emotion": "anticipation | mastery | tradition | satisfaction"
   },
   "setting": {
     "background": "Plain | Home Kitchen | Chef's Pass | Fine Dining | Farm Table | Coffee Shop | Garden Picnic | Rooftop Bar | Market Stand | Fastfood Venue | Hotel Buffet | Food Truck | Casual Diner | Family Dinner",
-    "servingware": "string",
-    "props": ["string"],
-    "lighting": "string",
-    "mood": "string"
-  },
-  "tabletop": {
-    "surface_material": "marble | rustic wood | lacquered wood | slate | stainless steel | terrazzo | linen-covered | laminate | bamboo",
-    "surface_color": "string",
-    "linens": "none | natural linen napkin | crisp white tablecloth | paper liner",
-    "cutlery": "polished stainless | brushed brass | black matte | stainless chopsticks & spoon | none",
-    "glassware": "none | water tumbler | wine glass | beer glass | tea cup",
-    "plate_style": "classic white rimmed | rustic stoneware | modern coupe | bamboo tray | cast-iron skillet | diner china | lacquered tray",
-    "garnish_style": "minimalist | abundant | rustic scatter | fine-dining microgreens",
-    "color_palette": ["string"]
-  },
-  "people": {
-    "presence": "none | chef hands | diners",
-    "action": "string | null"
+    "cultural_authenticity": "string - environment matching dish origin",
+    "props": ["string - culturally appropriate tools/elements"]
   },
   "tech": {
     "aspect_ratio": "16:9 | 3:2 | 1:1 | 2:3 | 9:16",
-    "duration_seconds": "number | null",
-    "fps": "number | null",
+    "duration_seconds": "number | null", 
     "style_strength": "realistic | cinematic | stylized",
-    "lens": "string",
-    "depth_of_field": "shallow | medium | deep",
-    "negative_prompts": ["string"]
+    "negative_prompts": ["string - forbidden ingredients and inauthentic elements"]
   },
-  "runway_prompt": "string",
-  "runway_params": {
-    "aspect_ratio": "16:9 | 3:2 | 1:1 | 2:3 | 9:16",
-    "seconds": "number | null",
-    "seed": "number"
-  }
+  "runway_prompt": "string - technique-focused narrative using only authentic ingredients"
 }
 
-Heuristics:
-- FIRST identify the specific dish from the user prompt (carbonara, pad thai, etc.)
-- Use ONLY authentic ingredients for that dish in key_ingredients and runway_prompt
-- Add any commonly mistaken ingredients to negative_prompts
-- If Format = "Video", set "mode": "video" and use Length (in seconds) as "duration_seconds".  
-- If Format = "Image", set "mode": "image" and "duration_seconds": null.  
-- Map Video Style to "motion_style" focusing on food behavior, not filming techniques.  
-- Use Background for "setting.background".  
-- Infer plateware & tabletop style from cuisine, dish_type, and background.  
-- Focus on realistic food physics: steam rising naturally, ingredients falling gracefully, liquids flowing smoothly, cheese stretching authentically.  
-- Always include tabletop details that enhance food presentation.  
-- runway_prompt must describe **realistic food behavior and cooking processes** using ONLY the dish's authentic ingredients - steam patterns, ingredient interactions, natural textures, authentic colors, and appetizing motion without mentioning filming equipment.`;
+Instructions:
+- FIRST identify the specific dish and its signature technique
+- Create a narrative around that ONE defining cooking moment
+- Use technique_narrative.action_style from the user's Video Style parameter
+- Focus on authentic cooking processes, not generic filming styles
+- runway_prompt must tell the CULTURAL STORY of how the dish comes alive through its signature technique`;
 
     const userPrompt = `User description: ${prompt}
 Format: ${parameters.Format || 'Image'}
@@ -513,73 +529,72 @@ Background: ${parameters.Background || 'Plain'}`;
   } catch (error) {
     console.error('Error enhancing prompt with AI:', error);
     // Fallback to enhanced motion-specific prompt
-    return createMotionPrompt(prompt, parameters);
+    return createTechniqueNarrative(prompt, parameters);
   }
 }
 
-function createMotionPrompt(prompt: string, parameters: any): string {
-  const videoStyle = parameters['Video Style'];
+function createTechniqueNarrative(prompt: string, parameters: any): string {
+  const actionStyle = parameters['Video Style'];
   const background = parameters.Background;
   
-  // Parse dish to get specific ingredients
+  // Parse dish to get technique information
   const dishInfo = parseDishName(prompt);
   let dishSpecificContent = prompt;
   
   if (dishInfo) {
-    // Create dish-specific description with canonical ingredients
+    // Create technique-focused description
     const ingredientList = dishInfo.canonicalIngredients.join(', ');
     dishSpecificContent = `${dishInfo.name}: ${dishInfo.cuisine} ${dishInfo.type} featuring ${ingredientList}`;
     
-    // Add forbidden ingredients to avoid in negative space
-    const forbiddenList = dishInfo.forbiddenIngredients.join(', ');
-    console.log(`Dish-specific prompt for ${dishInfo.name}: using [${ingredientList}], avoiding [${forbiddenList}]`);
+    console.log(`Technique narrative for ${dishInfo.name}: ${dishInfo.signatureTechnique || 'using traditional method'}`);
   }
   
-  // Dish-specific assembly sequences for realistic cooking processes
-  const getAssemblySequence = (dishInfo: DishInfo | null): string => {
-    if (!dishInfo) return 'Fresh ingredients gracefully assembling to form the dish with natural physics and realistic cooking behavior';
+  // Technique-based action narratives that capture the soul of each dish
+  const getTechniqueStory = (dishInfo: DishInfo | null, actionStyle: string): string => {
+    if (!dishInfo) return 'Ingredients coming together through authentic culinary technique, showcasing the artistry of traditional cooking methods';
     
-    const assemblySequences: Record<string, string> = {
-      'Carbonara': 'Hot steaming pasta tumbling into a bowl, followed by raw eggs and grated pecorino romano cascading down, creating a creamy emulsion as they mix with the heat, finished with crispy guanciale pieces and freshly ground black pepper sprinkling naturally over the top',
-      'Aglio e Olio': 'Al dente spaghetti twirling into the plate, golden garlic-infused olive oil drizzling over creating a glossy coating, red pepper flakes dancing down and fresh parsley leaves gently settling on top in a natural scatter pattern',
-      'Cacio e Pepe': 'Hot spaghetti nestling into a warm bowl, starchy pasta water creating steam, pecorino romano cheese cascading and immediately melting into creamy ribbons, finished with freshly cracked black pepper tumbling naturally across the surface',
-      'Pad Thai': 'Soaked rice noodles sliding into a hot wok, tamarind-fish sauce mixture splashing and coating the noodles, scrambled eggs folding in naturally, bean sprouts and shrimp adding layers, finished with lime wedges and crushed peanuts sprinkling on top',
-      'Ramen': 'Fresh ramen noodles lowering into rich steaming broth, sliced chashu pork arranging perfectly, soft-boiled egg halves settling with runny yolks, green onions scattering naturally, and nori sheets placing elegantly on the surface',
-      'Tacos': 'Warm corn tortillas laying flat, seasoned meat filling spreading evenly across the center, diced white onions and fresh cilantro sprinkling naturally on top, finished with lime juice misting over and salsa drizzling along the edges'
+    // Map user's video style to technique narrative focus
+    const narrativeMap: Record<string, string> = {
+      'Signature Technique': dishInfo.signatureTechnique || 'Traditional cooking technique showcasing authentic preparation methods',
+      'Cultural Story': `${dishInfo.culturalContext || `Traditional ${dishInfo.cuisine} preparation`} - ingredients transforming through time-honored methods`,
+      'Transformation Drama': `The magical moment when ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} transform into ${dishInfo.name} through precise technique`,
+      'Sensory Journey': `Experiencing the aromas, textures, and sounds as ${dishInfo.name} comes alive through ${dishInfo.cuisine} culinary mastery`
     };
     
-    return assemblySequences[dishInfo.name] || `${dishInfo.canonicalIngredients.join(', ')} assembling in proper cooking sequence to form authentic ${dishInfo.name}, with ingredients layering and combining as they would in traditional preparation`;
+    // Legacy video style mapping to technique narratives
+    const legacyStyleMap: Record<string, string> = {
+      'Ingredient Drop': dishInfo.signatureTechnique ? 
+        `${dishInfo.signatureTechnique} - ingredients assembling in perfect sequence to demonstrate this authentic technique` :
+        'Ingredients falling into place through traditional assembly method showcasing proper cooking sequence',
+      'Slow-Mo Pour': `The flowing motion that defines ${dishInfo.name} - liquid ingredients combining with signature technique precision and cultural authenticity`,
+      'Steam Rising': `Natural steam revealing the heat and energy of ${dishInfo.signatureTechnique || 'traditional cooking method'} with authentic cooking atmosphere`,
+      'Cheese Pull': dishInfo.canonicalIngredients.some(ing => ing.includes('cheese')) ?
+        `The stretching moment that showcases perfect ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} technique and dairy mastery` :
+        'Melted elements stretching to show perfect texture technique and cooking precision',
+      'Sizzle Effect': `The sound and energy of ${dishInfo.name} cooking - technique in action with authentic heat, timing, and culinary mastery`,
+      'Garnish Drop': `Final technique touches - completing ${dishInfo.name} with traditional presentation methods and authentic garnishing style`,
+      'Liquid Drizzle': `The flowing technique that completes ${dishInfo.name} with precise liquid integration and cultural authenticity`,
+      'Whisk Action': `The mixing technique that transforms ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} through ${dishInfo.cuisine} culinary wisdom and traditional methods`
+    };
+    
+    return narrativeMap[actionStyle] || legacyStyleMap[actionStyle] || 
+           dishInfo.signatureTechnique || 
+           'Authentic cooking technique bringing ingredients together with cultural precision and traditional mastery';
   };
-
-  // Realistic food behavior instructions for each video style
-  const motionInstructions = {
-    'Ingredient Drop': getAssemblySequence(dishInfo),
-    'Slow-Mo Pour': 'Liquid flowing in elegant slow motion with smooth, natural curves and realistic viscosity, creating mesmerizing patterns as it streams into the dish with authentic splash dynamics',
-    'Steam Rising': 'Delicate steam naturally rising from hot food in organic, wispy patterns, dancing upward with realistic heat convection, creating an appetizing visual of freshly prepared warmth',
-    'Cheese Pull': dishInfo?.canonicalIngredients.some(ing => ing.includes('cheese'))
-      ? `Melted ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} stretching authentically with golden, elastic strands that flow naturally with realistic texture, showing the perfect melt and appetizing stretch without any artificial tension`
-      : 'Melted cheese stretching authentically with golden, elastic strands that flow naturally with realistic texture, showing the perfect melt and appetizing stretch without any artificial tension',
-    'Sizzle Effect': 'Food naturally sizzling with authentic bubbling, gentle steam wisps, and realistic heat effects that create an appetizing sensory experience of active cooking',
-    'Garnish Drop': dishInfo?.canonicalIngredients.slice(-2).join(' and ')
-      ? `${dishInfo.canonicalIngredients.slice(-2).join(' and ')} gently falling through the air with natural grace, landing delicately on the dish surface with realistic scatter patterns`
-      : 'Fresh herbs or seasonings gently falling through the air with natural grace, landing delicately on the dish surface with realistic scatter patterns',
-    'Liquid Drizzle': 'Sauce, oil, or honey flowing in smooth streams with natural viscosity and authentic dripping patterns that enhance the dish\'s appetizing appearance',
-    'Whisk Action': dishInfo
-      ? `${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} naturally swirling and blending with realistic fluid dynamics, creating appetizing textures and natural mixing patterns`
-      : 'Ingredients naturally swirling and blending with realistic fluid dynamics, creating appetizing textures and natural mixing patterns'
-  };
   
-  const motionInstruction = motionInstructions[videoStyle as keyof typeof motionInstructions] || 'natural, appetizing food motion with realistic cooking behavior and authentic culinary physics';
+  const techniqueStory = getTechniqueStory(dishInfo, actionStyle);
+  const backgroundEnhancement = background ? `Set in an authentic ${background} environment that honors the dish's cultural origins.` : '';
   
-  // Background-specific enhancements
-  const backgroundEnhancement = background ? `Set in a beautiful ${background} environment that complements the food presentation.` : '';
+  let finalPrompt = `Culinary storytelling showcasing: ${dishSpecificContent}. ${backgroundEnhancement} The scene captures ${techniqueStory}. Focus on authentic cooking processes, cultural respect, and the emotional journey of traditional technique mastery. Professional cinematography highlights natural textures, vibrant authentic colors, and the artistry of culinary craftsmanship.`;
   
-  // Create realistic food behavior prompt with dish-specific ingredients
-  let finalPrompt = `Stunning food videography showcasing: ${dishSpecificContent}. ${backgroundEnhancement} The scene features ${motionInstruction}. Professional lighting highlights natural textures, vibrant colors, and appetizing details. The focus is on authentic cooking processes and realistic food physics that make the dish look incredibly fresh and delicious.`;
-  
-  // Add negative prompts for forbidden ingredients if we have dish info
-  if (dishInfo && dishInfo.forbiddenIngredients.length > 0) {
-    finalPrompt += ` Avoid: ${dishInfo.forbiddenIngredients.join(', ')}.`;
+  // Add cultural authenticity note and avoid forbidden ingredients
+  if (dishInfo) {
+    if (dishInfo.forbiddenIngredients.length > 0) {
+      finalPrompt += ` Maintains cultural authenticity by avoiding: ${dishInfo.forbiddenIngredients.join(', ')}.`;
+    }
+    if (dishInfo.culturalContext) {
+      finalPrompt += ` Cultural context: ${dishInfo.culturalContext}.`;
+    }
   }
   
   return finalPrompt;
