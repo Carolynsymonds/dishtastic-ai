@@ -387,7 +387,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dish_analyses_demo: {
+        Row: {
+          created_at: string | null
+          dish_name: string | null
+          id: string | null
+          is_demo: boolean | null
+          profit_range: string | null
+          public_analysis: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          dish_name?: string | null
+          id?: string | null
+          is_demo?: never
+          profit_range?: never
+          public_analysis?: never
+        }
+        Update: {
+          created_at?: string | null
+          dish_name?: string | null
+          id?: string | null
+          is_demo?: never
+          profit_range?: never
+          public_analysis?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       citext: {
@@ -433,9 +459,22 @@ export type Database = {
           signups: number
         }[]
       }
+      log_security_event: {
+        Args: { event_data?: Json; event_type: string }
+        Returns: undefined
+      }
       log_verification_access: {
         Args: { p_action: string; p_email: string; p_token?: string }
         Returns: undefined
+      }
+      process_contact_submission: {
+        Args: {
+          p_email: string
+          p_landing_page_id?: string
+          p_message?: string
+          p_subject?: string
+        }
+        Returns: string
       }
     }
     Enums: {
