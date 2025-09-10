@@ -564,8 +564,8 @@ function createTechniqueNarrative(prompt: string, parameters: any): string {
     // Legacy video style mapping to technique narratives
     const legacyStyleMap: Record<string, string> = {
       'Ingredient Drop': dishInfo.signatureTechnique ? 
-        `${dishInfo.signatureTechnique} - ingredients assembling in perfect sequence to demonstrate this authentic technique` :
-        'Ingredients falling into place through traditional assembly method showcasing proper cooking sequence',
+        `${dishInfo.signatureTechnique} - Professional chef assembly in action: ingredients actively dropping and settling with realistic cooking physics. Sequential timing as elements fall naturally - base ingredients first, then complementary elements bouncing into perfect positions, finished with garnishes cascading down. Chef hands subtly guide the process with authentic technique precision and cultural cooking wisdom` :
+        'Dynamic chef assembly action: ingredients actively dropping with realistic physics and impact. Professional hands guiding sequential assembly - heavier ingredients settling first, lighter elements floating down naturally, creating authentic cooking motion with perfect timing and technique mastery',
       'Slow-Mo Pour': `The flowing motion that defines ${dishInfo.name} - liquid ingredients combining with signature technique precision and cultural authenticity`,
       'Steam Rising': `Natural steam revealing the heat and energy of ${dishInfo.signatureTechnique || 'traditional cooking method'} with authentic cooking atmosphere`,
       'Cheese Pull': dishInfo.canonicalIngredients.some(ing => ing.includes('cheese')) ?
@@ -620,12 +620,12 @@ function createMotionImagePrompt(prompt: string, parameters: any): string {
     if (!dishInfo) return 'Fresh ingredients naturally positioned above the dish with perfect spacing for assembly motion';
     
     const imageSetups: Record<string, string> = {
-      'Carbonara': 'Hot steaming pasta suspended above a bowl, with raw eggs, grated pecorino romano, crispy guanciale pieces, and black peppercorns positioned at different heights, ready to cascade down in proper cooking sequence',
-      'Aglio e Olio': 'Al dente spaghetti hovering above a plate, with golden garlic-infused olive oil in mid-drizzle, red pepper flakes and fresh parsley leaves positioned to fall naturally in layers',
-      'Cacio e Pepe': 'Hot spaghetti suspended over a warm bowl with visible steam rising, pecorino romano cheese positioned to fall and melt, black peppercorns ready to scatter naturally',
-      'Pad Thai': 'Rice noodles positioned above a hot wok, with tamarind sauce ready to splash down, bean sprouts and shrimp arranged to layer in naturally, lime wedges positioned for final garnish',
-      'Ramen': 'Fresh ramen noodles suspended above steaming broth, with chashu pork slices, halved soft-boiled eggs, green onions, and nori sheets positioned to settle into their traditional arrangement',
-      'Tacos': 'Warm tortillas laid flat with seasoned meat positioned above the center, diced onions and cilantro ready to sprinkle naturally, lime juice droplets captured mid-spray'
+      'Carbonara': 'Hot steaming pasta suspended above a bowl at varying heights, with freshly cracked eggs positioned to pour in golden streams, grated pecorino romano ready to rain down and melt on contact, crispy guanciale pieces arranged to bounce naturally into place, black peppercorns positioned for final sprinkling cascade - all arranged for sequential dropping with realistic cooking physics',
+      'Aglio e Olio': 'Al dente spaghetti hovering above a warm plate, with golden garlic-infused olive oil captured mid-drizzle trajectory, red pepper flakes positioned to scatter with natural bounce, fresh parsley leaves arranged to fall like confetti with authentic leaf physics',
+      'Cacio e Pepe': 'Hot spaghetti suspended over a warm bowl with visible steam rising, pecorino romano cheese positioned at perfect melting height for heat contact, black peppercorns arranged in natural scattering formation ready to bounce and settle authentically',
+      'Pad Thai': 'Rice noodles positioned above a sizzling hot wok, with tamarind sauce ready to splash down with realistic liquid physics, bean sprouts and shrimp arranged in natural dropping sequence, lime wedges positioned for dynamic juice spray finale',
+      'Ramen': 'Fresh ramen noodles suspended above steaming rich broth, with chashu pork slices ready to settle naturally, halved soft-boiled eggs positioned to drop with authentic weight, green onions and nori sheets arranged for graceful floating descent',
+      'Tacos': 'Warm tortillas laid flat with seasoned meat positioned for authentic gravity drop and natural spread, diced onions ready to scatter with realistic bounce physics, fresh cilantro arranged to fall like green confetti, lime juice captured in mid-spray droplets'
     };
     
     return imageSetups[dishInfo.name] || `${dishInfo.canonicalIngredients.join(', ')} positioned in assembly formation above the dish, arranged to show proper cooking sequence and authentic ingredient layering`;
@@ -633,7 +633,7 @@ function createMotionImagePrompt(prompt: string, parameters: any): string {
 
   // Create image prompts optimized for realistic motion generation
   const motionSetups = {
-    'Ingredient Drop': getAssemblyImageSetup(dishInfo),
+    'Ingredient Drop': `Dynamic chef assembly setup: ${getAssemblyImageSetup(dishInfo)}. Professional chef hands subtly visible, positioned to guide the authentic cooking process. Ingredients arranged at natural falling heights with realistic spacing for sequential dropping motion - heavier base ingredients positioned higher for impactful drops, delicate garnishes positioned for graceful cascading. The composition emphasizes realistic cooking physics and authentic ingredient interactions.`,
     'Slow-Mo Pour': 'Liquid captured at the perfect pouring moment with realistic trajectory, positioned for smooth, natural flowing motion with authentic viscosity and stream patterns',
     'Steam Rising': 'Freshly prepared hot dish with natural steam patterns beginning to rise, positioned to show authentic heat emanation and organic vapor movement',
     'Cheese Pull': dishInfo?.canonicalIngredients.some(ing => ing.includes('cheese'))
