@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -27,12 +28,19 @@ import { useUtmTracking } from "./hooks/useUtmTracking";
 import { useGoogleAnalytics } from "./hooks/useGoogleAnalytics";
 import TopBanner from "./components/TopBanner";
 import { AuthProvider } from "./contexts/AuthContext";
+import { initSecurity } from "./lib/security";
 
 const queryClient = new QueryClient();
 
 const UtmTracker = () => {
   useUtmTracking(); // Initialize UTM tracking
   useGoogleAnalytics(); // Initialize Google Analytics
+  
+  // Initialize security monitoring
+  useEffect(() => {
+    initSecurity();
+  }, []);
+  
   return null;
 };
 

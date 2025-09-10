@@ -10,22 +10,43 @@ import { Link } from "react-router-dom";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
 import { siteContent } from "@/config/site-content";
 import TrustedBy from "@/components/TrustedBy";
+import { signupSchema, sanitizeEmail, authRateLimiter } from "@/lib/validation";
 
 const SignupSplit = () => {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const { getStoredUtmParams, createUrlWithUtm } = useUtmTracking();
 
-  // Email validation
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  // Enhanced validation using Zod schemas
+  const validateEmail = (email: string): boolean => {
+    try {
+      signupSchema.shape.email.parse(email);
+      setValidationErrors(prev => ({ ...prev, email: '' }));
+      return true;
+    } catch (error: any) {
+      const errorMessage = error.errors?.[0]?.message || 'Invalid email';
+      setValidationErrors(prev => ({ ...prev, email: errorMessage }));
+      return false;
+    }
   };
 
-  // Password validation
+  const validatePassword = (password: string): boolean => {
+    try {
+      signupSchema.shape.password.parse(password);
+      setValidationErrors(prev => ({ ...prev, password: '' }));
+      return true;
+    } catch (error: any) {
+      const errorMessage = error.errors?.[0]?.message || 'Invalid password';
+      setValidationErrors(prev => ({ ...prev, password: errorMessage }));
+      return false;
+    }
+  };
+
+  // Password validation for UI feedback
   const passwordValidation = {
     minLength: password.length >= 10,
     hasNumber: /\d/.test(password),
@@ -33,7 +54,7 @@ const SignupSplit = () => {
     hasUppercase: /[A-Z]/.test(password),
   };
 
-  const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+  const isPasswordValid = validatePassword(password) && Object.values(passwordValidation).every(Boolean);
 
    // Handle signup process with UTM parameters
   const handleSignupProcess = async (email: string) => {
@@ -79,11 +100,24 @@ const SignupSplit = () => {
   };
 
   const handleEmailContinue = async () => {
-    if (isValidEmail(email)) {
+    // Rate limiting check
+    const clientId = `${sanitizeEmail(email)}_${navigator.userAgent.slice(0, 50)}`;
+    if (!authRateLimiter.isAllowed(clientId)) {
+      const remainingTime = Math.ceil(authRateLimiter.getRemainingTime(clientId) / 1000 / 60);
+      toast({
+        title: "Too many attempts",
+        description: `Please try again in ${remainingTime} minutes.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const sanitizedEmail = sanitizeEmail(email);
+    if (validateEmail(sanitizedEmail)) {
       setIsCreatingAccount(true);
       try {
         // Handle complete signup process with UTM parameters, lead creation, and account creation
-        await handleSignupProcess(email);
+        await handleSignupProcess(sanitizedEmail);
         
         // Redirect directly to app with email parameter (preserving UTM)
         const appUrl = createUrlWithUtm('/app', { email });
@@ -194,15 +228,19 @@ const SignupSplit = () => {
                   type="email"
                   placeholder="Business email address"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    const sanitized = sanitizeEmail(e.target.value);
+                    setEmail(sanitized);
+                    validateEmail(sanitized);
+                  }}
                   onKeyDown={handleKeyDown}
-                  className="rounded-lg border-gray-300 h-12"
+                  className={`rounded-lg border-gray-300 h-12 ${validationErrors.email ? 'border-red-500' : ''}`}
                 />
               </div>
 
               <Button
                 onClick={handleEmailContinue}
-                disabled={!email || isCreatingAccount}
+                disabled={!validateEmail(email) || isCreatingAccount}
                 className="w-full rounded-lg shadow-sm h-12"
               >
                 {isCreatingAccount ? "Creating account..." : "Continue for free"}

@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { siteContent } from "@/config/site-content";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
+import { loginSchema, signupSchema, sanitizeEmail, authRateLimiter } from "@/lib/validation";
 
 interface SignUpFormProps {
   isLogin?: boolean;
@@ -27,13 +28,34 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
   const { getStoredUtmParams, createUrlWithUtm } = useUtmTracking();
 
 
-  // Email validation
-  const isValidEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  // Enhanced validation using Zod schemas
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  const validateEmail = (email: string): boolean => {
+    try {
+      loginSchema.shape.email.parse(email);
+      setValidationErrors(prev => ({ ...prev, email: '' }));
+      return true;
+    } catch (error: any) {
+      const errorMessage = error.errors?.[0]?.message || 'Invalid email';
+      setValidationErrors(prev => ({ ...prev, email: errorMessage }));
+      return false;
+    }
   };
 
-  // Password validation
+  const validatePassword = (password: string): boolean => {
+    try {
+      signupSchema.shape.password.parse(password);
+      setValidationErrors(prev => ({ ...prev, password: '' }));
+      return true;
+    } catch (error: any) {
+      const errorMessage = error.errors?.[0]?.message || 'Invalid password';
+      setValidationErrors(prev => ({ ...prev, password: errorMessage }));
+      return false;
+    }
+  };
+
+  // Password validation for UI feedback
   const passwordValidation = {
     minLength: password.length >= 10,
     hasNumber: /\d/.test(password),
@@ -41,7 +63,7 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
     hasUppercase: /[A-Z]/.test(password),
   };
 
-  const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+  const isPasswordValid = validatePassword(password) && Object.values(passwordValidation).every(Boolean);
 
 
   // Handle signup process with UTM parameters
@@ -88,14 +110,15 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
   };
 
   const handleEmailContinue = async () => {
-    if (isValidEmail(email)) {
+    const sanitizedEmail = sanitizeEmail(email);
+    if (validateEmail(sanitizedEmail)) {
       setIsCreatingAccount(true);
       try {
         // Handle complete signup process with UTM parameters, lead creation, and account creation
-        await handleSignupProcess(email);
+        await handleSignupProcess(sanitizedEmail);
         
         // Redirect directly to app with email parameter (preserving UTM)
-        const appUrl = createUrlWithUtm('/app', { email });
+        const appUrl = createUrlWithUtm('/app', { email: sanitizedEmail });
         window.location.href = appUrl;
       } catch (error) {
         toast({
@@ -110,12 +133,35 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
   };
 
   const handleLogin = async () => {
+    // Rate limiting check
+    const clientId = `${sanitizeEmail(email)}_${navigator.userAgent.slice(0, 50)}`;
+    if (!authRateLimiter.isAllowed(clientId)) {
+      const remainingTime = Math.ceil(authRateLimiter.getRemainingTime(clientId) / 1000 / 60);
+      toast({
+        title: "Too many attempts",
+        description: `Please try again in ${remainingTime} minutes.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate input before proceeding
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!validateEmail(sanitizedEmail)) {
+      toast({
+        title: "Invalid email",
+        description: validationErrors.email,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoggingIn(true);
     setShowForgotPassword(false);
     try {
-      // Attempt login directly
+      // Attempt login with sanitized input
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: sanitizedEmail,
         password,
       });
       
@@ -128,10 +174,10 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
           description: "Invalid email or password. Please try again.",
           variant: "destructive",
         });
-      } else {
-        const appUrl = createUrlWithUtm('/app', { email });
-        window.location.href = appUrl;
-      }
+        } else {
+          const appUrl = createUrlWithUtm('/app', { email: sanitizedEmail });
+          window.location.href = appUrl;
+        }
     } catch (error) {
       toast({
         title: "Error",
@@ -175,17 +221,40 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
   };
 
   const handleCreateAccount = async () => {
+    // Rate limiting check
+    const clientId = `${sanitizeEmail(email)}_${navigator.userAgent.slice(0, 50)}`;
+    if (!authRateLimiter.isAllowed(clientId)) {
+      const remainingTime = Math.ceil(authRateLimiter.getRemainingTime(clientId) / 1000 / 60);
+      toast({
+        title: "Too many attempts",
+        description: `Please try again in ${remainingTime} minutes.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate inputs
+    const sanitizedEmail = sanitizeEmail(email);
+    if (!validateEmail(sanitizedEmail) || !isPasswordValid) {
+      toast({
+        title: "Invalid input",
+        description: validationErrors.email || validationErrors.password || "Please check your input",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (isPasswordValid) {
       setIsCreatingAccount(true);
       try {
         // Handle signup process with UTM parameters and lead creation
-        await handleSignupProcess(email);
+        await handleSignupProcess(sanitizedEmail);
         
         const { error } = await supabase.auth.signUp({
-          email,
+          email: sanitizedEmail,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/app`
+            emailRedirectTo: `${window.location.origin}/auth/callback`
           }
         });
         
@@ -197,7 +266,7 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
           });
         } else {
           // Redirect directly to app without email verification (preserving UTM)
-          const appUrl = createUrlWithUtm('/app', { email });
+          const appUrl = createUrlWithUtm('/app', { email: sanitizedEmail });
           window.location.href = appUrl;
         }
       } catch (error) {
@@ -305,11 +374,11 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (mode === 'login') {
-        if (isValidEmail(email) && password && !isLoggingIn) {
+        if (validateEmail(email) && password && !isLoggingIn) {
           handleLogin();
         }
       } else if (mode === 'signup') {
-        if (step === 1 && isValidEmail(email) && !isCreatingAccount) {
+        if (step === 1 && validateEmail(email) && !isCreatingAccount) {
           handleEmailContinue();
         } else if (step === 2 && isPasswordValid && !isCreatingAccount) {
           handleCreateAccount();
@@ -440,9 +509,13 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="h-12 border-[#bdc4be]"
+                className={`h-12 border-[#bdc4be] ${validationErrors.email ? 'border-red-500' : ''}`}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  const sanitized = sanitizeEmail(e.target.value);
+                  setEmail(sanitized);
+                  validateEmail(sanitized);
+                }}
                 onKeyDown={handleKeyDown}
               />
             </div>
@@ -459,9 +532,13 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
               />
             </div>
 
+            {validationErrors.email && (
+              <p className="text-sm text-red-500">{validationErrors.email}</p>
+            )}
+
             <Button 
               className="w-full h-12" 
-              disabled={!isValidEmail(email) || !password || isLoggingIn}
+              disabled={!validateEmail(email) || !password || isLoggingIn}
               onClick={handleLogin}
             >
               {isLoggingIn ? "Signing in..." : "Sign in"}
@@ -506,7 +583,7 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
 
             <Button 
               className="w-full h-12" 
-              disabled={!isValidEmail(email) || isCreatingAccount}
+              disabled={!validateEmail(email) || isCreatingAccount}
               onClick={handleEmailContinue}
             >
               {isCreatingAccount ? "Creating account..." : "Continue"}

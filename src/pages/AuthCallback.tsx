@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthCallback = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
   const { createUrlWithUtm } = useUtmTracking();
+  const { toast } = useToast();
 
   useEffect(() => {
     const processAuth = async () => {
@@ -21,19 +24,44 @@ const AuthCallback = () => {
       
       if (errorParam) {
         console.error('OAuth error from URL:', errorParam, errorDescription);
-        setError(`OAuth Error: ${errorParam} - ${errorDescription}`);
+        // Log security events for monitoring  
+        console.warn('[SECURITY] OAuth authentication failed:', {
+          error: errorParam,
+          description: errorDescription,
+          url: window.location.href,
+          timestamp: new Date().toISOString()
+        });
+        setError(`Authentication failed. Please try again.`);
         setLoading(false);
         return;
       }
       
       try {
-        // Get the current session from Supabase
-        const { data, error } = await supabase.auth.getSession();
+        // Add timeout to prevent hanging
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session check timeout')), 10000)
+        );
+        
+        // Get the current session from Supabase with timeout
+        const sessionPromise = supabase.auth.getSession();
+        const { data, error } = await Promise.race([sessionPromise, timeoutPromise]) as any;
         
         if (data.session && data.session.user) {
-          console.log('User authenticated, storing userId...');
+          console.log('[AUTH] User authenticated successfully');
           
-          // Store userId in localStorage for OAuth auth
+          // Validate session integrity
+          if (!data.session.access_token || !data.session.user.email) {
+            throw new Error('Invalid session data received');
+          }
+          
+          // Log successful authentication for monitoring
+          console.log('[SECURITY] Authentication successful:', {
+            userId: data.session.user.id,
+            email: data.session.user.email,
+            provider: data.session.user.app_metadata?.provider,
+            timestamp: new Date().toISOString()
+          });
+          
           const userId = data.session.user.id;
           localStorage.setItem('userId', userId);
           
@@ -81,9 +109,24 @@ const AuthCallback = () => {
         setError('No authentication session found. Please try signing in again.');
         setLoading(false);
         
-      } catch (err) {
-        console.error('Auth processing error:', err);
-        setError(`Processing Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        } catch (err) {
+        console.error('[AUTH] Processing error:', err);
+        
+        // Log security events
+        console.warn('[SECURITY] Authentication processing failed:', {
+          error: err instanceof Error ? err.message : 'Unknown error',
+          retryCount,
+          timestamp: new Date().toISOString()
+        });
+
+        // Implement retry logic for transient failures
+        if (retryCount < 2 && (err instanceof Error && err.message.includes('timeout'))) {
+          setRetryCount(prev => prev + 1);
+          setTimeout(processAuth, 2000); // Retry after 2 seconds
+          return;
+        }
+
+        setError('Authentication failed. Please try signing in again.');
         setLoading(false);
       }
     };
