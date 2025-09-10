@@ -797,12 +797,14 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
 
   // Enhanced parameter mapping with detailed logging
   const aspectRatio = mapScaleToAspectRatio(parameters.Scale || '16:9');
+  const duration = mapLengthToDuration(parameters.Length || '5s');
   const shouldLoop = shouldEnableLoop(parameters);
   
   console.log('[LUMA-VIDEO]', { 
     requestId, 
     event: 'parameters_mapped', 
     aspectRatio, 
+    duration,
     shouldLoop,
     originalScale: parameters.Scale,
     originalLength: parameters.Length
@@ -827,8 +829,10 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
 
   // Prepare API request body for direct Luma API
   const requestBody: any = {
+    model: 'luma-v1.6',
     prompt: enhancedPrompt,
     aspect_ratio: aspectRatio,
+    duration: duration,
     loop: shouldLoop,
   };
 
@@ -1100,6 +1104,17 @@ function mapScaleToAspectRatio(scale: string): string {
 }
 
 function mapLengthToDuration(length: string): number {
+  // Handle time formats like "5s", "10s" etc.
+  if (length && length.includes('s')) {
+    const numMatch = length.match(/(\d+)/);
+    if (numMatch) {
+      const duration = parseInt(numMatch[1]);
+      console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: duration, type: 'time_format' });
+      return duration;
+    }
+  }
+  
+  // Handle descriptive formats
   const mapping: Record<string, number> = {
     'Short': 3,
     'Medium': 5, 
@@ -1107,7 +1122,7 @@ function mapLengthToDuration(length: string): number {
   };
   
   const result = mapping[length] || 5;
-  console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: result });
+  console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: result, type: 'descriptive_format' });
   return result;
 }
 
