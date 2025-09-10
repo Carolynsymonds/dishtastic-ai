@@ -9,6 +9,7 @@ const corsHeaders = {
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const runwayApiKey = Deno.env.get('RUNWAY_API_KEY');
 const falApiKey = Deno.env.get('FAL_API_KEY');
+const lumaApiKey = Deno.env.get('LUMA_API_KEY');
 
 interface GenerationRequest {
   prompt: string;
@@ -249,14 +250,14 @@ serve(async (req) => {
     // First declare the variable
     const isVideoGeneration = parameters.Format === 'Video';
     
-    console.log('[generate-content]', { requestId, event: 'request_received', hasOPENAI: !!openAIApiKey, hasRUNWAY: !!runwayApiKey, hasFAL: !!falApiKey, parameters, promptPreview: (prompt || '').slice(0, 120) });
+    console.log('[generate-content]', { requestId, event: 'request_received', hasOPENAI: !!openAIApiKey, hasRUNWAY: !!runwayApiKey, hasFAL: !!falApiKey, hasLUMA: !!lumaApiKey, parameters, promptPreview: (prompt || '').slice(0, 120) });
 
     console.log('[generate-content]', { 
       requestId,
       event: 'generation_start', 
       format: parameters.Format,
       isVideoGeneration,
-      hasLuma: !!falApiKey,
+      hasLuma: !!lumaApiKey,
       hasRunway: !!runwayApiKey,
       hasOpenAI: !!openAIApiKey,
       parameters: {
@@ -274,7 +275,7 @@ serve(async (req) => {
         requestId, 
         event: 'video_generation_start',
         availableServices: {
-          luma: !!falApiKey,
+          luma: !!lumaApiKey,
           runway: !!runwayApiKey
         }
       });
@@ -789,21 +790,19 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
     promptPreview: prompt.slice(0, 100)
   });
 
-  if (!falApiKey) {
-    console.error('[LUMA-VIDEO]', { requestId, event: 'error', error: 'Fal.ai API key not configured' });
-    throw new Error('Fal.ai API key not configured');
+  if (!lumaApiKey) {
+    console.error('[LUMA-VIDEO]', { requestId, event: 'error', error: 'Luma API key not configured' });
+    throw new Error('Luma API key not configured');
   }
 
   // Enhanced parameter mapping with detailed logging
   const aspectRatio = mapScaleToAspectRatio(parameters.Scale || '16:9');
-  const duration = mapLengthToDuration(parameters.Length || 'Medium');
   const shouldLoop = shouldEnableLoop(parameters);
   
   console.log('[LUMA-VIDEO]', { 
     requestId, 
     event: 'parameters_mapped', 
     aspectRatio, 
-    duration, 
     shouldLoop,
     originalScale: parameters.Scale,
     originalLength: parameters.Length
@@ -826,7 +825,7 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
     enhancedPrompt = createBasicLumaPrompt(prompt, parameters, generationMode);
   }
 
-  // Prepare API request body
+  // Prepare API request body for direct Luma API
   const requestBody: any = {
     prompt: enhancedPrompt,
     aspect_ratio: aspectRatio,
@@ -835,31 +834,37 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
 
   // Add starter image for image-to-video mode
   if (generationMode === 'image-to-video' && starterImageUrl) {
-    requestBody.image_url = starterImageUrl;
+    requestBody.keyframes = {
+      frame0: {
+        type: "image",
+        url: starterImageUrl
+      }
+    };
     console.log('[LUMA-VIDEO]', { requestId, event: 'image_to_video_mode', starterImageUrl: starterImageUrl.slice(0, 100) });
   }
 
   console.log('[LUMA-VIDEO]', { 
     requestId, 
     event: 'api_request_start', 
-    endpoint: 'luma-dream-machine',
+    endpoint: 'luma-dream-machine-direct',
     requestBodySize: JSON.stringify(requestBody).length
   });
 
   try {
+    // Step 1: Create generation task using direct Luma API
     const apiCallStart = Date.now();
     console.log('[LUMA-VIDEO]', { 
       requestId, 
       event: 'api_call_details', 
-      endpoint: 'https://queue.fal.run/fal-ai/luma-dream-machine',
+      endpoint: 'https://api.lumalabs.ai/dream-machine/v1/generations',
       method: 'POST',
       bodyPreview: JSON.stringify(requestBody).slice(0, 200)
     });
     
-    const response = await fetch('https://queue.fal.run/fal-ai/luma-dream-machine', {
+    const createResponse = await fetch('https://api.lumalabs.ai/dream-machine/v1/generations', {
       method: 'POST',
       headers: {
-        'Authorization': `Key ${falApiKey}`,
+        'Authorization': `Bearer ${lumaApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
@@ -867,69 +872,114 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
 
     console.log('[LUMA-VIDEO]', { 
       requestId, 
-      event: 'api_response', 
-      status: response.status, 
-      statusText: response.statusText,
+      event: 'create_response', 
+      status: createResponse.status, 
+      statusText: createResponse.statusText,
       ms: Date.now() - apiCallStart
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
+    if (!createResponse.ok) {
+      const errorData = await createResponse.json();
       console.error('[LUMA-VIDEO]', { 
         requestId, 
-        event: 'api_error', 
-        status: response.status,
+        event: 'create_error', 
+        status: createResponse.status,
         error: errorData
       });
       throw new Error(`Luma Dream Machine API error: ${errorData.error || errorData.detail || 'Unknown error'}`);
     }
 
-    const data = await response.json();
+    const createData = await createResponse.json();
+    const generationId = createData.id;
     
     console.log('[LUMA-VIDEO]', { 
       requestId, 
-      event: 'response_analysis', 
-      hasVideo: !!data.video,
-      hasVideoUrl: !!data.video?.url,
-      videoUrlPreview: data.video?.url?.slice(0, 100),
-      responseKeys: Object.keys(data),
-      videoKeys: data.video ? Object.keys(data.video) : null,
-      ms: Date.now() - apiCallStart
-    });
-    
-    // Validate that we actually got a video
-    if (!data.video || !data.video.url) {
-      console.error('[LUMA-VIDEO]', { 
-        requestId, 
-        event: 'invalid_response', 
-        error: 'No video URL in response',
-        responseData: data
-      });
-      throw new Error('No video URL returned from Luma API');
-    }
-    
-    const totalTime = Date.now() - startTime;
-    
-    console.log('[LUMA-VIDEO]', { 
-      requestId, 
-      event: 'generation_success', 
-      contentType: 'video',
-      totalMs: totalTime,
-      videoUrl: data.video.url.slice(0, 100),
-      hasTaskId: !!data.request_id
+      event: 'generation_created', 
+      generationId: generationId,
+      state: createData.state
     });
 
-    return {
-      type: 'video',
-      content: data.video.url,
-      format: 'mp4',
-      parameters,
-      prompt: enhancedPrompt,
-      duration: duration,
-      taskId: data.request_id,
-      generationMode,
-      aspectRatio
-    };
+    // Step 2: Poll for completion
+    const maxAttempts = 120; // 10 minutes max (5 second intervals)
+    let attempts = 0;
+    let lastState = '';
+
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+      attempts++;
+
+      try {
+        const statusResponse = await fetch(`https://api.lumalabs.ai/dream-machine/v1/generations/${generationId}`, {
+          headers: { 
+            'Authorization': `Bearer ${lumaApiKey}`,
+            'Content-Type': 'application/json'
+          },
+        });
+
+        if (!statusResponse.ok) {
+          console.warn('[LUMA-VIDEO]', { requestId, event: 'status_check_failed', attempt: attempts, generationId });
+          continue;
+        }
+
+        const statusData = await statusResponse.json();
+        
+        if (statusData.state !== lastState) {
+          console.log('[LUMA-VIDEO]', { 
+            requestId, 
+            event: 'status_update', 
+            attempt: attempts, 
+            state: statusData.state,
+            generationId: generationId,
+            hasVideo: !!statusData.assets?.video
+          });
+          lastState = statusData.state;
+        }
+
+        if (statusData.state === 'completed' && statusData.assets?.video) {
+          console.log('[LUMA-VIDEO]', { 
+            requestId, 
+            event: 'generation_success', 
+            attempts,
+            totalMs: Date.now() - startTime,
+            videoUrl: statusData.assets.video.slice(0, 100)
+          });
+
+          return {
+            type: 'video',
+            content: statusData.assets.video,
+            format: 'mp4',
+            parameters,
+            prompt: enhancedPrompt,
+            taskId: generationId,
+            generationMode,
+            aspectRatio
+          };
+        }
+
+        if (statusData.state === 'failed') {
+          console.error('[LUMA-VIDEO]', { 
+            requestId, 
+            event: 'generation_failed_status', 
+            attempts, 
+            generationId,
+            failure_reason: statusData.failure_reason || 'Unknown failure'
+          });
+          throw new Error(`Generation failed: ${statusData.failure_reason || 'Unknown failure'}`);
+        }
+      } catch (pollError) {
+        console.warn('[LUMA-VIDEO]', { requestId, event: 'polling_error', attempt: attempts, error: (pollError as Error).message });
+      }
+    }
+
+    // Timeout
+    console.error('[LUMA-VIDEO]', { 
+      requestId, 
+      event: 'generation_timeout', 
+      attempts, 
+      generationId,
+      totalMs: Date.now() - startTime
+    });
+    throw new Error('Generation timed out after 10 minutes');
 
   } catch (error) {
     const totalTime = Date.now() - startTime;
@@ -978,8 +1028,8 @@ async function generateTextToImageWithLuma(prompt: string, parameters: any) {
   const requestId = crypto.randomUUID();
   console.log('[LUMA-T2I]', { requestId, event: 'start', prompt: prompt.slice(0, 100) });
 
-  if (!falApiKey) {
-    throw new Error('Fal.ai API key not configured');
+  if (!lumaApiKey) {
+    throw new Error('Luma API key not configured');
   }
 
   try {
@@ -1194,10 +1244,10 @@ async function generateVideo(prompt: string, parameters: any) {
   const requestId = crypto.randomUUID();
   const startTime = Date.now();
   
-  console.log('[VIDEO-GEN]', { 
+    console.log('[VIDEO-GEN]', { 
     requestId, 
-    event: 'generation_start', 
-    hasLuma: !!falApiKey,
+    event: 'generation_start',
+    hasLuma: !!lumaApiKey,
     hasRunway: !!runwayApiKey,
     parameters,
     promptPreview: prompt.slice(0, 100)
@@ -1213,7 +1263,7 @@ async function generateVideo(prompt: string, parameters: any) {
     
     // Route 1: Image Upload → Image-to-Video Priority
     // 1. PRIMARY: Luma Image-to-Video (with uploaded image)
-    if (falApiKey) {
+    if (lumaApiKey) {
       try {
         console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_image_to_video_with_upload' });
         const result = await generateVideoWithLuma(prompt, { 
@@ -1269,7 +1319,7 @@ async function generateVideo(prompt: string, parameters: any) {
     
     // Route 2: Text Only → Text-to-Video Priority
     // 1. PRIMARY: Luma Text-to-Video
-    if (falApiKey) {
+    if (lumaApiKey) {
       try {
         console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_text_to_video' });
         const result = await generateVideoWithLuma(prompt, parameters, 'text-to-video');
@@ -1295,7 +1345,7 @@ async function generateVideo(prompt: string, parameters: any) {
     }
 
     // 2. SECONDARY: Luma Image-to-Video (generate image first, then video)
-    if (falApiKey) {
+    if (lumaApiKey) {
       try {
         console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_image_to_video_generated' });
         const result = await generateImageToVideoWithLuma(prompt, parameters);
@@ -1377,7 +1427,7 @@ async function generateVideo(prompt: string, parameters: any) {
       event: 'falling_back_to_static_image',
       reason: 'all_video_methods_failed',
       availableApis: { 
-        luma: !!falApiKey, 
+        luma: !!lumaApiKey, 
         runway: !!runwayApiKey, 
         openai: !!openAIApiKey 
       }
@@ -1405,7 +1455,7 @@ async function generateVideo(prompt: string, parameters: any) {
         fallbackReason: 'video_generation_failed',
         suggestedAction: 'Check API keys: FAL_API_KEY and RUNWAY_API_KEY must be configured for video generation',
         availableApis: { 
-          luma: !!falApiKey, 
+          luma: !!lumaApiKey, 
           runway: !!runwayApiKey, 
           openai: !!openAIApiKey 
         }
@@ -1424,7 +1474,7 @@ async function generateVideo(prompt: string, parameters: any) {
   console.error('[VIDEO-GEN]', { 
     requestId, 
     event: 'complete_failure', 
-    availableApis: { luma: !!falApiKey, runway: !!runwayApiKey, openai: !!openAIApiKey },
+    availableApis: { luma: !!lumaApiKey, runway: !!runwayApiKey, openai: !!openAIApiKey },
     totalMs: Date.now() - startTime
   });
   
