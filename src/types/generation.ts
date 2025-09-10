@@ -4,6 +4,7 @@ export interface GenerationParameters {
   Length?: string;
   'Video Style'?: string;
   Background?: string;
+  uploadedImage?: string; // base64 encoded image data
 }
 
 export interface GenerationResult {

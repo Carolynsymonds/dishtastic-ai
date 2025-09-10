@@ -79,6 +79,7 @@ const Home = () => {
   
   const [textareaValue, setTextareaValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [generationParameters, setGenerationParameters] = useState<GenerationParameters>({
     Format: 'Video',
     Scale: 'Portrait',
@@ -93,10 +94,16 @@ const Home = () => {
       return;
     }
 
+    // Include uploaded image in parameters
+    const parametersWithImage = {
+      ...generationParameters,
+      uploadedImage: uploadedImages.length > 0 ? uploadedImages[0] : undefined
+    };
+
     // Navigate to generation page with parameters
     const params = new URLSearchParams();
     params.set('prompt', textareaValue);
-    params.set('parameters', encodeURIComponent(JSON.stringify(generationParameters)));
+    params.set('parameters', encodeURIComponent(JSON.stringify(parametersWithImage)));
     
     navigate(`/generate?${params.toString()}`);
   };
@@ -368,13 +375,48 @@ const Home = () => {
                       id="image-upload"
                       type="file"
                       accept="image/*"
-                      multiple
                       className="hidden"
                       onChange={(e) => {
-                        // Handle image upload logic here
-                        console.log('Selected files:', e.target.files);
+                        const files = e.target.files;
+                        if (files && files.length > 0) {
+                          const file = files[0];
+                          // Check file size (max 10MB)
+                          if (file.size > 10 * 1024 * 1024) {
+                            toast.error("Image must be smaller than 10MB");
+                            return;
+                          }
+                          
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            const result = event.target?.result as string;
+                            setUploadedImages([result]);
+                          };
+                          reader.readAsDataURL(file);
+                        }
                       }}
                     />
+                    
+                    {/* Image preview */}
+                    {uploadedImages.length > 0 && (
+                      <div className="absolute top-12 left-3 right-3">
+                        <div className="bg-muted p-2 rounded-lg flex items-center gap-2">
+                          <img 
+                            src={uploadedImages[0]} 
+                            alt="Uploaded dish"
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <span className="text-sm text-muted-foreground flex-1">
+                            {uploadedImages.length > 0 && 'Image uploaded - will use Image-to-Video'}
+                          </span>
+                          <button
+                            onClick={() => setUploadedImages([])}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    )}
                 </div>
               </div>
             </div>
