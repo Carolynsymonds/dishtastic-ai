@@ -93,14 +93,13 @@ const GenerateVideo = () => {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
       <Header />
       
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center mb-8">
             <Button 
               onClick={goBack}
               variant="ghost" 
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-white/10"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Home
