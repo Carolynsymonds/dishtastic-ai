@@ -63,7 +63,10 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
     hasUppercase: /[A-Z]/.test(password),
   };
 
-  const isPasswordValid = validatePassword(password) && Object.values(passwordValidation).every(Boolean);
+  // Pure validators for render-time checks (no state updates)
+  const emailIsValid = loginSchema.shape.email.safeParse(email).success;
+  const passwordSchemaValid = signupSchema.shape.password.safeParse(password).success;
+  const isPasswordValid = passwordSchemaValid && Object.values(passwordValidation).every(Boolean);
 
 
   // Handle signup process with UTM parameters
@@ -538,7 +541,7 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
 
             <Button 
               className="w-full h-12" 
-              disabled={!validateEmail(email) || !password || isLoggingIn}
+              disabled={!emailIsValid || !password || isLoggingIn}
               onClick={handleLogin}
             >
               {isLoggingIn ? "Signing in..." : "Sign in"}
@@ -583,7 +586,7 @@ const SignUpForm = ({ isLogin = false }: SignUpFormProps) => {
 
             <Button 
               className="w-full h-12" 
-              disabled={!validateEmail(email) || isCreatingAccount}
+              disabled={!emailIsValid || isCreatingAccount}
               onClick={handleEmailContinue}
             >
               {isCreatingAccount ? "Creating account..." : "Continue"}

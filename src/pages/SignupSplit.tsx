@@ -54,7 +54,10 @@ const SignupSplit = () => {
     hasUppercase: /[A-Z]/.test(password),
   };
 
-  const isPasswordValid = validatePassword(password) && Object.values(passwordValidation).every(Boolean);
+  // Pure validators for render-time checks (no state updates)
+  const emailIsValid = signupSchema.shape.email.safeParse(email).success;
+  const passwordSchemaValid = signupSchema.shape.password.safeParse(password).success;
+  const isPasswordValid = passwordSchemaValid && Object.values(passwordValidation).every(Boolean);
 
    // Handle signup process with UTM parameters
   const handleSignupProcess = async (email: string) => {
@@ -240,7 +243,7 @@ const SignupSplit = () => {
 
               <Button
                 onClick={handleEmailContinue}
-                disabled={!validateEmail(email) || isCreatingAccount}
+                disabled={!emailIsValid || isCreatingAccount}
                 className="w-full rounded-lg shadow-sm h-12"
               >
                 {isCreatingAccount ? "Creating account..." : "Continue for free"}
