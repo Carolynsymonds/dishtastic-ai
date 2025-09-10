@@ -67,7 +67,9 @@ const VideoDisplay = () => {
   };
 
   const handleUnlock = () => {
-    toast.info("To access the other generated videos you'll need to sign up");
+    toast.success("To access the other generated videos you'll need to sign up", {
+      duration: 3000,
+    });
     setTimeout(() => {
       navigate('/signup');
     }, 2000);
