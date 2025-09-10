@@ -25,7 +25,7 @@ export const siteContent = {
 
   // Headline Section
   headline: {
-    title: "Generate Stunning Food Images or Videos in Seconds — ",
+    title: "AI image generation and editing for restaurants — ",
     titleHighlight: "For Free",
     subtitle: "Experience the power of stunning food imagery and videos that drive sales and engagement, for free for 12 months.",
     buttonText: "Try for free ",
