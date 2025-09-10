@@ -11,7 +11,7 @@ export const siteContent = {
 
    // Top Banner
   topBanner: {
-    text: "Try DinerTargetIQ FREE for 30 days",
+    text: "Try DishtasticAI FREE for 30 days",
     buttonText: "Join Free"
   },
 
