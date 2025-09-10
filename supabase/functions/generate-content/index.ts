@@ -828,8 +828,9 @@ async function generateVideoWithLuma(prompt: string, parameters: any, generation
   }
 
   // Prepare API request body for direct Luma API
+  const lumaModel = 'ray-1-6';
   const requestBody: any = {
-    model: 'luma-v1.6',
+    model: lumaModel,
     prompt: enhancedPrompt,
     aspect_ratio: aspectRatio,
     duration: duration,
@@ -1258,8 +1259,9 @@ function createMotionOptimizedImagePrompt(prompt: string, parameters: any): stri
 async function generateVideo(prompt: string, parameters: any) {
   const requestId = crypto.randomUUID();
   const startTime = Date.now();
+  const strictVideo = parameters?.StrictVideo !== false;
   
-    console.log('[VIDEO-GEN]', { 
+  console.log('[VIDEO-GEN]', { 
     requestId, 
     event: 'generation_start',
     hasLuma: !!lumaApiKey,
@@ -1267,6 +1269,7 @@ async function generateVideo(prompt: string, parameters: any) {
     parameters,
     promptPreview: prompt.slice(0, 100)
   });
+  console.log('[VIDEO-GEN]', { requestId, event: 'strict_video_mode', strictVideo });
 
   // ===== INTELLIGENT ROUTING BASED on INPUT TYPE =====
   
@@ -1436,7 +1439,7 @@ async function generateVideo(prompt: string, parameters: any) {
   }
 
   // 4. FINAL FALLBACK: Static Image with Motion Hints (ONLY if video was requested but failed)
-  if (openAIApiKey) {
+  if (!strictVideo && openAIApiKey) {
     console.warn('[VIDEO-GEN]', { 
       requestId, 
       event: 'falling_back_to_static_image',
@@ -1483,6 +1486,9 @@ async function generateVideo(prompt: string, parameters: any) {
         totalMs: Date.now() - startTime
       });
     }
+  } else {
+    console.warn('[VIDEO-GEN]', { requestId, event: 'strict_video_no_image_fallback' });
+    throw new Error('All video generation methods failed (strict mode).');
   }
 
   // If all methods fail
@@ -1579,16 +1585,7 @@ async function generateVideoWithRunway(prompt: string, parameters: any) {
     if (!taskResponse.ok) {
       const errorData = await taskResponse.json();
       console.error('[RUNWAY]', { requestId, event: 'task_creation_failed', error: errorData });
-      
-      // Return the starter image as fallback
-      return {
-        type: 'image',
-        content: starterImage.content,
-        format: starterImage.format,
-        parameters,
-        prompt: imagePrompt,
-        fallbackReason: 'runway_task_creation_failed'
-      };
+      throw new Error(`Runway task creation failed`);
     }
 
     const taskData = await taskResponse.json();
@@ -1648,16 +1645,9 @@ async function generateVideoWithRunway(prompt: string, parameters: any) {
       }
     }
 
-    // Timeout or failure - return starter image
+    // Timeout or failure
     console.warn('[RUNWAY]', { requestId, event: 'generation_timeout', attempts });
-    return {
-      type: 'image',
-      content: starterImage.content,
-      format: starterImage.format,
-      parameters,
-      prompt: imagePrompt,
-      fallbackReason: 'runway_generation_timeout'
-    };
+    throw new Error('Runway generation timeout');
 
   } catch (error) {
     console.error('[RUNWAY]', { requestId, event: 'generation_failed', error: (error as Error).message });
