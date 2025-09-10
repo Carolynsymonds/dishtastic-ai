@@ -1104,25 +1104,27 @@ function mapScaleToAspectRatio(scale: string): string {
   return result;
 }
 
-function mapLengthToDuration(length: string): number {
+function mapLengthToDuration(length: string): string {
   // Handle time formats like "5s", "10s" etc.
   if (length && length.includes('s')) {
     const numMatch = length.match(/(\d+)/);
     if (numMatch) {
       const duration = parseInt(numMatch[1]);
-      console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: duration, type: 'time_format' });
-      return duration;
+      // Luma only accepts "5s", "9s", or "10s"
+      const validDuration = duration <= 5 ? "5s" : duration <= 9 ? "9s" : "10s";
+      console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: validDuration, type: 'luma_format' });
+      return validDuration;
     }
   }
   
   // Handle descriptive formats
-  const mapping: Record<string, number> = {
-    'Short': 3,
-    'Medium': 5, 
-    'Long': 10
+  const mapping: Record<string, string> = {
+    'Short': "5s",
+    'Medium': "5s", 
+    'Long': "10s"
   };
   
-  const result = mapping[length] || 5;
+  const result = mapping[length] || "5s";
   console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: result, type: 'descriptive_format' });
   return result;
 }

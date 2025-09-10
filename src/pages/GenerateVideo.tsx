@@ -53,6 +53,9 @@ const GenerateVideo = () => {
     const startTime = performance.now();
     console.log('[GENERATION] Starting generation process');
     
+    // Clear any stale generation results from session storage
+    sessionStorage.removeItem('generationResult');
+    
     setIsGenerating(true);
     setGenerationError(null);
 
