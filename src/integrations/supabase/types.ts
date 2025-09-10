@@ -84,31 +84,43 @@ export type Database = {
       }
       dish_analysis_verifications: {
         Row: {
+          access_count: number | null
           created_at: string
           dishes_data: Json
+          domain_hash: string | null
           email: string
+          email_hash: string | null
           expires_at: string
           id: string
+          last_accessed_at: string | null
           updated_at: string
           verification_token: string
           verified_at: string | null
         }
         Insert: {
+          access_count?: number | null
           created_at?: string
           dishes_data: Json
+          domain_hash?: string | null
           email: string
+          email_hash?: string | null
           expires_at?: string
           id?: string
+          last_accessed_at?: string | null
           updated_at?: string
           verification_token: string
           verified_at?: string | null
         }
         Update: {
+          access_count?: number | null
           created_at?: string
           dishes_data?: Json
+          domain_hash?: string | null
           email?: string
+          email_hash?: string | null
           expires_at?: string
           id?: string
+          last_accessed_at?: string | null
           updated_at?: string
           verification_token?: string
           verified_at?: string | null
@@ -418,6 +430,74 @@ export type Database = {
           },
         ]
       }
+      verification_audit_log: {
+        Row: {
+          access_ip_hash: string | null
+          action: string
+          created_at: string | null
+          email_hash: string
+          id: string
+          success: boolean | null
+          user_agent_hash: string | null
+          verification_id: string | null
+        }
+        Insert: {
+          access_ip_hash?: string | null
+          action: string
+          created_at?: string | null
+          email_hash: string
+          id?: string
+          success?: boolean | null
+          user_agent_hash?: string | null
+          verification_id?: string | null
+        }
+        Update: {
+          access_ip_hash?: string | null
+          action?: string
+          created_at?: string | null
+          email_hash?: string
+          id?: string
+          success?: boolean | null
+          user_agent_hash?: string | null
+          verification_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_audit_log_verification_id_fkey"
+            columns: ["verification_id"]
+            isOneToOne: false
+            referencedRelation: "dish_analysis_verifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_rate_limits: {
+        Row: {
+          attempt_count: number | null
+          email_hash: string
+          first_attempt_at: string | null
+          id: string
+          ip_hash: string | null
+          last_attempt_at: string | null
+        }
+        Insert: {
+          attempt_count?: number | null
+          email_hash: string
+          first_attempt_at?: string | null
+          id?: string
+          ip_hash?: string | null
+          last_attempt_at?: string | null
+        }
+        Update: {
+          attempt_count?: number | null
+          email_hash?: string
+          first_attempt_at?: string | null
+          id?: string
+          ip_hash?: string | null
+          last_attempt_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       dish_analyses_demo: {
@@ -449,6 +529,10 @@ export type Database = {
       }
     }
     Functions: {
+      check_verification_rate_limit: {
+        Args: { p_email: string; p_ip_address?: string }
+        Returns: boolean
+      }
       citext: {
         Args: { "": boolean } | { "": string } | { "": unknown }
         Returns: string
@@ -477,6 +561,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      cleanup_expired_verifications_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       get_landing_page_analytics: {
         Args: { days_back?: number; min_leads?: number }
         Returns: {
@@ -500,6 +588,16 @@ export type Database = {
         Args: { p_action: string; p_email: string; p_token?: string }
         Returns: undefined
       }
+      log_verification_access_enhanced: {
+        Args: {
+          p_action: string
+          p_email: string
+          p_ip_address?: string
+          p_token?: string
+          p_user_agent?: string
+        }
+        Returns: undefined
+      }
       migrate_menu_uploads_to_user_ids: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -512,6 +610,10 @@ export type Database = {
           p_subject?: string
         }
         Returns: string
+      }
+      validate_email_domain: {
+        Args: { email_address: string }
+        Returns: boolean
       }
     }
     Enums: {

@@ -9,17 +9,22 @@ export const SECURITY_HEADERS = {
   'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
 };
 
-export const CSP_HEADER = `
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com;
-  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  font-src 'self' https://fonts.gstatic.com;
-  img-src 'self' data: https: blob:;
-  connect-src 'self' https://jsjklbekqyhzqbabizve.supabase.co https://www.google-analytics.com;
-  frame-ancestors 'none';
-  base-uri 'self';
-  form-action 'self';
-`.replace(/\s+/g, ' ').trim();
+export const CSP_HEADER = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google-analytics.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  "connect-src 'self' https://jsjklbekqyhzqbabizve.supabase.co https://*.supabase.co https://*.stripe.com https://www.google-analytics.com",
+  "media-src 'self' data: blob:",
+  "object-src 'none'",
+  "frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://www.youtube.com",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "upgrade-insecure-requests",
+  "block-all-mixed-content"
+].join("; ");
 
 // Client-side security monitoring
 export const logSecurityEvent = (event: string, details: Record<string, any>) => {
