@@ -247,6 +247,22 @@ serve(async (req) => {
     const { prompt, parameters }: GenerationRequest = await req.json();
     console.log('[generate-content]', { requestId, event: 'request_received', hasOPENAI: !!openAIApiKey, hasRUNWAY: !!runwayApiKey, hasFAL: !!falApiKey, parameters, promptPreview: (prompt || '').slice(0, 120) });
 
+  console.log('[generate-content]', { 
+    requestId,
+    event: 'generation_start', 
+    format: parameters.Format,
+    isVideoGeneration,
+    hasLuma: !!falApiKey,
+    hasRunway: !!runwayApiKey,
+    hasOpenAI: !!openAIApiKey,
+    parameters: {
+      Format: parameters.Format,
+      Scale: parameters.Scale,
+      Length: parameters.Length,
+      uploadedImage: !!parameters.uploadedImage
+    }
+  });
+
     const isVideoGeneration = parameters.Format === 'Video';
 
     if (isVideoGeneration) {
@@ -1288,8 +1304,19 @@ async function generateVideo(prompt: string, parameters: any) {
     }
   }
 
-  // 4. FINAL FALLBACK: Static Image with Motion Hints
+  // 4. FINAL FALLBACK: Static Image with Motion Hints (ONLY if video was requested but failed)
   if (openAIApiKey) {
+    console.warn('[VIDEO-GEN]', { 
+      requestId, 
+      event: 'falling_back_to_static_image',
+      reason: 'all_video_methods_failed',
+      availableApis: { 
+        luma: !!falApiKey, 
+        runway: !!runwayApiKey, 
+        openai: !!openAIApiKey 
+      }
+    });
+    
     try {
       console.log('[VIDEO-GEN]', { requestId, event: 'trying_static_image_fallback' });
       
@@ -1305,8 +1332,13 @@ async function generateVideo(prompt: string, parameters: any) {
       return {
         ...imageResult,
         type: 'image', // Explicitly set as image since video generation failed
-        fallbackReason: 'video_generation_unavailable',
-        suggestedAction: 'retry_later_or_upgrade_api_keys'
+        fallbackReason: 'video_generation_failed',
+        suggestedAction: 'Check API keys: FAL_API_KEY and RUNWAY_API_KEY must be configured for video generation',
+        availableApis: { 
+          luma: !!falApiKey, 
+          runway: !!runwayApiKey, 
+          openai: !!openAIApiKey 
+        }
       };
     } catch (error) {
       console.error('[VIDEO-GEN]', { 
