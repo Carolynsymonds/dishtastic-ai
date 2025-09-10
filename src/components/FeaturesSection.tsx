@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from "react";
 import { Calendar, Shield, Smartphone } from "lucide-react";
 import { siteContent } from "@/config/site-content";
+import { createSafeInnerHTML } from "@/lib/sanitize";
 
 const iconMap = {
   Calendar,
@@ -56,7 +57,7 @@ const DynamicSvgIcon = memo(({ url, className = '', ...props }: DynamicSvgIconPr
   return (
     <div
       className={`text-primary ${className}`}
-      dangerouslySetInnerHTML={{ __html: svgContent }}
+      dangerouslySetInnerHTML={createSafeInnerHTML(svgContent, 'svg')}
       {...props}
     />
   );

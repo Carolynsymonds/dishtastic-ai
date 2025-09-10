@@ -15,6 +15,7 @@ import { siteContent } from "@/config/site-content";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
 import { toast } from "sonner";
 import { GenerationParameters } from "@/types/generation";
+import { createSafeInnerHTML } from "@/lib/sanitize";
 
 interface DynamicSvgIconProps {
   url: string;
@@ -68,7 +69,7 @@ const DynamicSvgIcon = memo(({
   return (
     <div 
       className={`text-primary ${className}`} 
-      dangerouslySetInnerHTML={{ __html: svgContent }} 
+      dangerouslySetInnerHTML={createSafeInnerHTML(svgContent, 'svg')} 
       {...props} 
     />
   );

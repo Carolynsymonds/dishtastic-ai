@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
+import { createSafeInnerHTML } from "@/lib/sanitize";
 
 
 const DynamicSvgIcon = ({ url, className = '', ...props }) => {
@@ -32,7 +33,7 @@ const DynamicSvgIcon = ({ url, className = '', ...props }) => {
   return (
     <div
       className={`text-primary ${className}`}
-      dangerouslySetInnerHTML={{ __html: svgContent }}
+      dangerouslySetInnerHTML={createSafeInnerHTML(svgContent, 'svg')}
       {...props}
     />
   );

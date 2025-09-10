@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { siteContent } from "@/config/site-content";
 import * as icons from 'lucide-react';
+import { createSafeInnerHTML } from "@/lib/sanitize";
 
 const DynamicSvgIcon = ({ url, className = '', ...props }) => {
   const [svgContent, setSvgContent] = useState('');
@@ -28,7 +29,7 @@ const DynamicSvgIcon = ({ url, className = '', ...props }) => {
   return (
     <div
       className={`text-primary ${className}`}
-      dangerouslySetInnerHTML={{ __html: svgContent }}
+      dangerouslySetInnerHTML={createSafeInnerHTML(svgContent, 'svg')}
       {...props}
     />
   );
