@@ -276,33 +276,6 @@ const VideoDisplay = () => {
               </div>
             </Card>
           </div>
-
-          {/* Generation Details */}
-          {(prompt || parameters) && (
-            <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Generation Details</h2>
-              <div className="space-y-4">
-                {prompt && (
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Prompt</label>
-                    <p className="mt-1 text-sm bg-muted p-3 rounded-md">{prompt}</p>
-                  </div>
-                )}
-                {parameters && (
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Parameters</label>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {Object.entries(parameters).map(([key, value]) => (
-                        <span key={key} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium">
-                          {key}: {String(value)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-          )}
         </div>
       </main>
     </div>
