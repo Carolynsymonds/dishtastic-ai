@@ -8,6 +8,7 @@ const corsHeaders = {
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const runwayApiKey = Deno.env.get('RUNWAY_API_KEY');
+const falApiKey = Deno.env.get('FAL_API_KEY');
 
 interface GenerationRequest {
   prompt: string;
@@ -244,7 +245,7 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
     const startedAt = Date.now();
     const { prompt, parameters }: GenerationRequest = await req.json();
-    console.log('[generate-content]', { requestId, event: 'request_received', hasOPENAI: !!openAIApiKey, hasRUNWAY: !!runwayApiKey, parameters, promptPreview: (prompt || '').slice(0, 120) });
+    console.log('[generate-content]', { requestId, event: 'request_received', hasOPENAI: !!openAIApiKey, hasRUNWAY: !!runwayApiKey, hasFAL: !!falApiKey, parameters, promptPreview: (prompt || '').slice(0, 120) });
 
     const isVideoGeneration = parameters.Format === 'Video';
 
@@ -715,9 +716,93 @@ async function generateImageWithPrompt(customPrompt: string, parameters: any) {
   }
 }
 
+async function generateVideoWithLuma(prompt: string, parameters: any) {
+  if (!falApiKey) {
+    throw new Error('Fal.ai API key not configured');
+  }
+
+  console.log('generateVideoWithLuma: starting video generation');
+
+  // Map scale to aspect ratio for Luma Dream Machine
+  const getAspectRatio = (scale: string) => {
+    switch (scale) {
+      case 'Portrait':
+      case '2:3': 
+      case '9:16': 
+        return '9:16';
+      case 'Landscape':
+      case '16:9': 
+        return '16:9';
+      case 'Square':
+      case '1:1': 
+      default: 
+        return '16:9'; // Default to landscape for better video quality
+    }
+  };
+
+  const aspectRatio = getAspectRatio(parameters.Scale || '16:9');
+  
+  // Create enhanced prompt for video generation
+  const enhancedPrompt = await enhancePromptWithAI(prompt, parameters);
+  const videoPrompt = enhancedPrompt.length > 500 ? enhancedPrompt.slice(0, 500) : enhancedPrompt;
+
+  console.log('generateVideoWithLuma: submitting request', { aspectRatio, promptLength: videoPrompt.length });
+
+  try {
+    const response = await fetch('https://queue.fal.ai/fal-ai/luma-dream-machine', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${falApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: videoPrompt,
+        aspect_ratio: aspectRatio,
+        loop: false,
+      }),
+    });
+
+    console.log('generateVideoWithLuma: fal.ai response', { status: response.status, statusText: response.statusText });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('generateVideoWithLuma: fal.ai error:', errorData);
+      throw new Error(`Luma Dream Machine error: ${errorData.error || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    console.log('generateVideoWithLuma: video generated successfully');
+
+    return {
+      type: 'video',
+      content: data.video.url,
+      format: 'mp4',
+      parameters,
+      prompt: enhancedPrompt,
+      duration: 5, // Luma default duration
+      taskId: data.request_id
+    };
+
+  } catch (error) {
+    console.error('generateVideoWithLuma: failed', error);
+    throw error;
+  }
+}
+
 async function generateVideo(prompt: string, parameters: any) {
+  // Try Luma Dream Machine first
+  if (falApiKey) {
+    try {
+      console.log('generateVideo: trying Luma Dream Machine first');
+      return await generateVideoWithLuma(prompt, parameters);
+    } catch (error) {
+      console.error('generateVideo: Luma failed, falling back to Runway', error);
+    }
+  }
+
+  // Fallback to Runway
   if (!runwayApiKey) {
-    throw new Error('Runway API key not configured');
+    throw new Error('No video generation API keys configured (Runway or Luma)');
   }
 
   // Map length to duration
