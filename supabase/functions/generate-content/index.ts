@@ -716,62 +716,118 @@ async function generateImageWithPrompt(customPrompt: string, parameters: any) {
   }
 }
 
-async function generateVideoWithLuma(prompt: string, parameters: any) {
+// ===== ENHANCED LUMA DREAM MACHINE INTEGRATION =====
+
+async function generateVideoWithLuma(prompt: string, parameters: any, generationMode: 'text-to-video' | 'image-to-video' = 'text-to-video', starterImageUrl?: string) {
+  const requestId = crypto.randomUUID();
+  const startTime = Date.now();
+  
+  console.log('[LUMA-VIDEO]', { 
+    requestId, 
+    event: 'generation_start', 
+    mode: generationMode,
+    hasStarterImage: !!starterImageUrl,
+    parameters,
+    promptPreview: prompt.slice(0, 100)
+  });
+
   if (!falApiKey) {
+    console.error('[LUMA-VIDEO]', { requestId, event: 'error', error: 'Fal.ai API key not configured' });
     throw new Error('Fal.ai API key not configured');
   }
 
-  console.log('generateVideoWithLuma: starting video generation');
+  // Enhanced parameter mapping with detailed logging
+  const aspectRatio = mapScaleToAspectRatio(parameters.Scale || '16:9');
+  const duration = mapLengthToDuration(parameters.Length || 'Medium');
+  const shouldLoop = shouldEnableLoop(parameters);
+  
+  console.log('[LUMA-VIDEO]', { 
+    requestId, 
+    event: 'parameters_mapped', 
+    aspectRatio, 
+    duration, 
+    shouldLoop,
+    originalScale: parameters.Scale,
+    originalLength: parameters.Length
+  });
 
-  // Map scale to aspect ratio for Luma Dream Machine
-  const getAspectRatio = (scale: string) => {
-    switch (scale) {
-      case 'Portrait':
-      case '2:3': 
-      case '9:16': 
-        return '9:16';
-      case 'Landscape':
-      case '16:9': 
-        return '16:9';
-      case 'Square':
-      case '1:1': 
-      default: 
-        return '16:9'; // Default to landscape for better video quality
-    }
+  // Enhanced prompt creation with Luma-specific optimizations
+  let enhancedPrompt: string;
+  try {
+    const promptStart = Date.now();
+    enhancedPrompt = await createLumaOptimizedPrompt(prompt, parameters, generationMode);
+    console.log('[LUMA-VIDEO]', { 
+      requestId, 
+      event: 'prompt_enhanced', 
+      ms: Date.now() - promptStart,
+      originalLength: prompt.length,
+      enhancedLength: enhancedPrompt.length
+    });
+  } catch (error) {
+    console.warn('[LUMA-VIDEO]', { requestId, event: 'prompt_enhancement_failed', fallback: 'basic_enhancement' });
+    enhancedPrompt = createBasicLumaPrompt(prompt, parameters, generationMode);
+  }
+
+  // Prepare API request body
+  const requestBody: any = {
+    prompt: enhancedPrompt,
+    aspect_ratio: aspectRatio,
+    loop: shouldLoop,
   };
 
-  const aspectRatio = getAspectRatio(parameters.Scale || '16:9');
-  
-  // Create enhanced prompt for video generation
-  const enhancedPrompt = await enhancePromptWithAI(prompt, parameters);
-  const videoPrompt = enhancedPrompt.length > 500 ? enhancedPrompt.slice(0, 500) : enhancedPrompt;
+  // Add starter image for image-to-video mode
+  if (generationMode === 'image-to-video' && starterImageUrl) {
+    requestBody.image_url = starterImageUrl;
+    console.log('[LUMA-VIDEO]', { requestId, event: 'image_to_video_mode', starterImageUrl: starterImageUrl.slice(0, 100) });
+  }
 
-  console.log('generateVideoWithLuma: submitting request', { aspectRatio, promptLength: videoPrompt.length });
+  console.log('[LUMA-VIDEO]', { 
+    requestId, 
+    event: 'api_request_start', 
+    endpoint: 'luma-dream-machine',
+    requestBodySize: JSON.stringify(requestBody).length
+  });
 
   try {
+    const apiCallStart = Date.now();
     const response = await fetch('https://queue.fal.ai/fal-ai/luma-dream-machine', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${falApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        prompt: videoPrompt,
-        aspect_ratio: aspectRatio,
-        loop: false,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
-    console.log('generateVideoWithLuma: fal.ai response', { status: response.status, statusText: response.statusText });
+    console.log('[LUMA-VIDEO]', { 
+      requestId, 
+      event: 'api_response', 
+      status: response.status, 
+      statusText: response.statusText,
+      ms: Date.now() - apiCallStart
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('generateVideoWithLuma: fal.ai error:', errorData);
-      throw new Error(`Luma Dream Machine error: ${errorData.error || 'Unknown error'}`);
+      console.error('[LUMA-VIDEO]', { 
+        requestId, 
+        event: 'api_error', 
+        status: response.status,
+        error: errorData
+      });
+      throw new Error(`Luma Dream Machine API error: ${errorData.error || errorData.detail || 'Unknown error'}`);
     }
 
     const data = await response.json();
-    console.log('generateVideoWithLuma: video generated successfully');
+    const totalTime = Date.now() - startTime;
+    
+    console.log('[LUMA-VIDEO]', { 
+      requestId, 
+      event: 'generation_success', 
+      totalMs: totalTime,
+      videoUrl: data.video?.url?.slice(0, 100),
+      hasTaskId: !!data.request_id
+    });
 
     return {
       type: 'video',
@@ -779,33 +835,499 @@ async function generateVideoWithLuma(prompt: string, parameters: any) {
       format: 'mp4',
       parameters,
       prompt: enhancedPrompt,
-      duration: 5, // Luma default duration
-      taskId: data.request_id
+      duration: duration,
+      taskId: data.request_id,
+      generationMode,
+      aspectRatio
     };
 
   } catch (error) {
-    console.error('generateVideoWithLuma: failed', error);
+    const totalTime = Date.now() - startTime;
+    console.error('[LUMA-VIDEO]', { 
+      requestId, 
+      event: 'generation_failed', 
+      error: (error as Error).message,
+      totalMs: totalTime
+    });
     throw error;
   }
 }
 
+async function generateImageToVideoWithLuma(prompt: string, parameters: any) {
+  const requestId = crypto.randomUUID();
+  console.log('[LUMA-I2V]', { requestId, event: 'start', prompt: prompt.slice(0, 100) });
+
+  try {
+    // First, generate a high-quality starter image
+    const imageStart = Date.now();
+    console.log('[LUMA-I2V]', { requestId, event: 'starter_image_generation_start' });
+    
+    const starterImagePrompt = createMotionOptimizedImagePrompt(prompt, parameters);
+    const starterImage = await generateImageWithPrompt(starterImagePrompt, parameters);
+    
+    console.log('[LUMA-I2V]', { 
+      requestId, 
+      event: 'starter_image_generated', 
+      ms: Date.now() - imageStart,
+      hasImage: !!starterImage
+    });
+
+    // Convert base64 to URL for Luma API
+    const imageUrl = `data:image/${starterImage.format};base64,${starterImage.content}`;
+    
+    // Generate video from the starter image
+    return await generateVideoWithLuma(prompt, parameters, 'image-to-video', imageUrl);
+    
+  } catch (error) {
+    console.error('[LUMA-I2V]', { requestId, event: 'failed', error: (error as Error).message });
+    throw new Error(`Image-to-video generation failed: ${(error as Error).message}`);
+  }
+}
+
+async function generateTextToImageWithLuma(prompt: string, parameters: any) {
+  const requestId = crypto.randomUUID();
+  console.log('[LUMA-T2I]', { requestId, event: 'start', prompt: prompt.slice(0, 100) });
+
+  if (!falApiKey) {
+    throw new Error('Fal.ai API key not configured');
+  }
+
+  try {
+    const enhancedPrompt = await createLumaOptimizedPrompt(prompt, parameters, 'text-to-image');
+    const aspectRatio = mapScaleToAspectRatio(parameters.Scale || '1:1');
+    
+    console.log('[LUMA-T2I]', { 
+      requestId, 
+      event: 'api_request', 
+      aspectRatio,
+      promptLength: enhancedPrompt.length
+    });
+
+    const response = await fetch('https://queue.fal.ai/fal-ai/luma-photon', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${falApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: enhancedPrompt,
+        aspect_ratio: aspectRatio,
+        num_images: 1,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('[LUMA-T2I]', { requestId, event: 'api_error', error: errorData });
+      throw new Error(`Luma Photon API error: ${errorData.error || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    console.log('[LUMA-T2I]', { requestId, event: 'success', hasImage: !!data.images?.[0]?.url });
+
+    return {
+      type: 'image',
+      content: data.images[0].url,
+      format: 'png',
+      parameters,
+      prompt: enhancedPrompt
+    };
+
+  } catch (error) {
+    console.error('[LUMA-T2I]', { requestId, event: 'failed', error: (error as Error).message });
+    throw error;
+  }
+}
+
+// ===== ENHANCED PARAMETER MAPPING =====
+
+function mapScaleToAspectRatio(scale: string): string {
+  const mapping: Record<string, string> = {
+    'Portrait': '9:16',
+    '2:3': '2:3', 
+    '9:16': '9:16',
+    'Landscape': '16:9',
+    '16:9': '16:9',
+    'Square': '1:1',
+    '1:1': '1:1',
+    '4:3': '4:3'
+  };
+  
+  const result = mapping[scale] || '16:9';
+  console.log('[PARAM-MAP]', { event: 'aspect_ratio_mapped', input: scale, output: result });
+  return result;
+}
+
+function mapLengthToDuration(length: string): number {
+  const mapping: Record<string, number> = {
+    'Short': 3,
+    'Medium': 5, 
+    'Long': 10
+  };
+  
+  const result = mapping[length] || 5;
+  console.log('[PARAM-MAP]', { event: 'duration_mapped', input: length, output: result });
+  return result;
+}
+
+function shouldEnableLoop(parameters: any): boolean {
+  const videoStyle = parameters['Video Style']?.toLowerCase() || '';
+  const shouldLoop = videoStyle.includes('loop') || videoStyle.includes('seamless');
+  console.log('[PARAM-MAP]', { event: 'loop_decision', videoStyle, shouldLoop });
+  return shouldLoop;
+}
+
+// ===== ENHANCED PROMPT OPTIMIZATION =====
+
+async function createLumaOptimizedPrompt(prompt: string, parameters: any, mode: 'text-to-video' | 'image-to-video' | 'text-to-image'): Promise<string> {
+  console.log('[PROMPT-OPT]', { event: 'optimization_start', mode, originalPrompt: prompt.slice(0, 100) });
+
+  if (!openAIApiKey) {
+    console.log('[PROMPT-OPT]', { event: 'no_openai_key', fallback: 'basic_prompt' });
+    return createBasicLumaPrompt(prompt, parameters, mode);
+  }
+
+  const systemPrompt = getLumaSystemPrompt(mode);
+  
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-5-2025-08-07',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Create optimized prompt for: ${prompt}\nParameters: ${JSON.stringify(parameters)}` }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('[PROMPT-OPT]', { event: 'openai_error', status: response.status });
+      return createBasicLumaPrompt(prompt, parameters, mode);
+    }
+
+    const data = await response.json();
+    const optimizedPrompt = data.choices[0].message.content.trim();
+    
+    console.log('[PROMPT-OPT]', { 
+      event: 'optimization_success', 
+      inputLength: prompt.length,
+      outputLength: optimizedPrompt.length
+    });
+    
+    return optimizedPrompt;
+    
+  } catch (error) {
+    console.error('[PROMPT-OPT]', { event: 'optimization_failed', error: (error as Error).message });
+    return createBasicLumaPrompt(prompt, parameters, mode);
+  }
+}
+
+function getLumaSystemPrompt(mode: string): string {
+  const basePrompt = `You are an expert at creating prompts for Luma Dream Machine AI video generation. Your goal is to create cinematic, detailed prompts that result in high-quality food videos.
+
+LUMA-SPECIFIC GUIDELINES:
+- Use dynamic motion keywords: "slow motion", "gentle movement", "smooth camera motion"  
+- Include lighting details: "warm golden lighting", "soft studio lighting", "natural window light"
+- Add texture descriptions: "crispy", "steaming", "bubbling", "sizzling"
+- Specify camera work: "close-up macro shot", "overhead view", "sweeping camera movement"
+- Include timing: "gradual transformation", "quick sizzle", "slow drizzle"
+
+AVOID:
+- Static descriptions
+- Overly complex scenarios
+- Multiple simultaneous actions
+- Abstract concepts`;
+
+  const modeSpecific = {
+    'text-to-video': '\nFOCUS: Create dynamic cooking action sequences with clear motion and progression.',
+    'image-to-video': '\nFOCUS: Describe how the static image should transform with realistic motion.',
+    'text-to-image': '\nFOCUS: Create detailed still-life food photography descriptions.'
+  };
+
+  return basePrompt + (modeSpecific[mode as keyof typeof modeSpecific] || '');
+}
+
+function createBasicLumaPrompt(prompt: string, parameters: any, mode: string): string {
+  const motionKeywords = mode === 'text-to-video' ? ', slow motion, smooth camera movement' : '';
+  const lighting = ', warm studio lighting, professional food photography';
+  const quality = ', high resolution, cinematic quality';
+  
+  return `${prompt}${motionKeywords}${lighting}${quality}`.slice(0, 500);
+}
+
+function createMotionOptimizedImagePrompt(prompt: string, parameters: any): string {
+  return `Professional food photography setup for video animation: ${prompt}. Perfect for motion generation, optimal ingredient placement, clear textures, studio lighting, ready for dynamic movement, high resolution commercial quality.`;
+}
+
+async function generateImageWithPrompt(prompt: string, parameters: any) {
+  console.log('[IMAGE-GEN]', { event: 'start', prompt: prompt.slice(0, 100) });
+  
+  // Use existing image generation logic
+  return await generateImage(prompt, parameters);
+}
+
 async function generateVideo(prompt: string, parameters: any) {
-  // Try Luma Dream Machine first
+  const requestId = crypto.randomUUID();
+  const startTime = Date.now();
+  
+  console.log('[VIDEO-GEN]', { 
+    requestId, 
+    event: 'generation_start', 
+    hasLuma: !!falApiKey,
+    hasRunway: !!runwayApiKey,
+    parameters,
+    promptPreview: prompt.slice(0, 100)
+  });
+
+  // ===== MULTI-API FALLBACK STRATEGY =====
+  
+  // 1. PRIMARY: Luma Dream Machine (Text-to-Video)
   if (falApiKey) {
     try {
-      console.log('generateVideo: trying Luma Dream Machine first');
-      return await generateVideoWithLuma(prompt, parameters);
+      console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_text_to_video' });
+      const result = await generateVideoWithLuma(prompt, parameters, 'text-to-video');
+      
+      console.log('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'luma_text_to_video_success', 
+        totalMs: Date.now() - startTime
+      });
+      
+      return result;
     } catch (error) {
-      console.error('generateVideo: Luma failed, falling back to Runway', error);
+      console.warn('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'luma_text_to_video_failed', 
+        error: (error as Error).message,
+        fallback: 'luma_image_to_video'
+      });
     }
   }
 
-  // Fallback to Runway
+  // 2. SECONDARY: Luma Dream Machine (Image-to-Video)
+  if (falApiKey) {
+    try {
+      console.log('[VIDEO-GEN]', { requestId, event: 'trying_luma_image_to_video' });
+      const result = await generateImageToVideoWithLuma(prompt, parameters);
+      
+      console.log('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'luma_image_to_video_success', 
+        totalMs: Date.now() - startTime
+      });
+      
+      return result;
+    } catch (error) {
+      console.warn('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'luma_image_to_video_failed', 
+        error: (error as Error).message,
+        fallback: 'runway_gen3'
+      });
+    }
+  }
+
+  // 3. TERTIARY: Runway Gen-3 Alpha (existing implementation)
+  if (runwayApiKey) {
+    try {
+      console.log('[VIDEO-GEN]', { requestId, event: 'trying_runway_gen3' });
+      const result = await generateVideoWithRunway(prompt, parameters);
+      
+      console.log('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'runway_gen3_success', 
+        totalMs: Date.now() - startTime
+      });
+      
+      return result;
+    } catch (error) {
+      console.warn('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'runway_gen3_failed', 
+        error: (error as Error).message,
+        fallback: 'static_image'
+      });
+    }
+  }
+
+  // 4. FINAL FALLBACK: Static Image with Motion Hints
+  if (openAIApiKey) {
+    try {
+      console.log('[VIDEO-GEN]', { requestId, event: 'trying_static_image_fallback' });
+      
+      const motionPrompt = `${prompt}. Professional food photography optimized for potential video animation, perfect composition for motion graphics, studio lighting, high resolution commercial quality.`;
+      const imageResult = await generateImage(motionPrompt, parameters);
+      
+      console.log('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'static_image_fallback_success', 
+        totalMs: Date.now() - startTime
+      });
+      
+      return {
+        ...imageResult,
+        type: 'image', // Explicitly set as image since video generation failed
+        fallbackReason: 'video_generation_unavailable',
+        suggestedAction: 'retry_later_or_upgrade_api_keys'
+      };
+    } catch (error) {
+      console.error('[VIDEO-GEN]', { 
+        requestId, 
+        event: 'all_fallbacks_failed', 
+        error: (error as Error).message,
+        totalMs: Date.now() - startTime
+      });
+    }
+  }
+
+  // If all methods fail
+  console.error('[VIDEO-GEN]', { 
+    requestId, 
+    event: 'complete_failure', 
+    availableApis: { luma: !!falApiKey, runway: !!runwayApiKey, openai: !!openAIApiKey },
+    totalMs: Date.now() - startTime
+  });
+  
+  throw new Error('All video generation methods failed. Please check API configurations and try again.');
+}
+
+async function generateVideoWithRunway(prompt: string, parameters: any) {
+  const requestId = crypto.randomUUID();
+  console.log('[RUNWAY]', { requestId, event: 'generation_start', prompt: prompt.slice(0, 100) });
+
   if (!runwayApiKey) {
-    throw new Error('No video generation API keys configured (Runway or Luma)');
+    throw new Error('Runway API key not configured');
   }
 
   // Map length to duration
+  const getDuration = (length: string) => {
+    switch (length) {
+      case 'Short': return 5;
+      case 'Medium': return 10;
+      case 'Long': return 15;
+      default: return 10;
+    }
+  };
+
+  const duration = getDuration(parameters.Length || 'Medium');
+  console.log('[RUNWAY]', { requestId, event: 'duration_mapped', duration, originalLength: parameters.Length });
+
+  // First, generate a starter image
+  try {
+    const imagePrompt = createMotionImagePrompt(prompt, parameters);
+    const starterImage = await generateImageWithPrompt(imagePrompt, parameters);
+    
+    console.log('[RUNWAY]', { requestId, event: 'starter_image_generated', hasImage: !!starterImage });
+
+    // Create video generation task
+    const taskResponse = await fetch('https://api.dev.runwayml.com/v1/image_to_video', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${runwayApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        promptImage: `data:image/${starterImage.format};base64,${starterImage.content}`,
+        model: 'gen3a_turbo',
+        promptText: prompt,
+        duration: duration,
+        ratio: parameters.Scale === '16:9' ? '1280:768' : '768:768',
+        seed: Math.floor(Math.random() * 1000000)
+      }),
+    });
+
+    if (!taskResponse.ok) {
+      const errorData = await taskResponse.json();
+      console.error('[RUNWAY]', { requestId, event: 'task_creation_failed', error: errorData });
+      
+      // Return the starter image as fallback
+      return {
+        type: 'image',
+        content: starterImage.content,
+        format: starterImage.format,
+        parameters,
+        prompt: imagePrompt,
+        fallbackReason: 'runway_task_creation_failed'
+      };
+    }
+
+    const taskData = await taskResponse.json();
+    const taskId = taskData.id;
+    
+    console.log('[RUNWAY]', { requestId, event: 'task_created', taskId });
+
+    // Poll for completion with timeout
+    const maxAttempts = 60; // 5 minutes max
+    let attempts = 0;
+
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+      attempts++;
+
+      try {
+        const statusResponse = await fetch(`https://api.dev.runwayml.com/v1/tasks/${taskId}`, {
+          headers: { 'Authorization': `Bearer ${runwayApiKey}` },
+        });
+
+        if (!statusResponse.ok) {
+          console.warn('[RUNWAY]', { requestId, event: 'status_check_failed', attempt: attempts });
+          continue;
+        }
+
+        const statusData = await statusResponse.json();
+        console.log('[RUNWAY]', { 
+          requestId, 
+          event: 'status_check', 
+          attempt: attempts, 
+          status: statusData.status,
+          progress: statusData.progress 
+        });
+
+        if (statusData.status === 'SUCCEEDED' && statusData.output?.[0]) {
+          console.log('[RUNWAY]', { requestId, event: 'generation_success', attempts });
+          return {
+            type: 'video',
+            content: statusData.output[0],
+            format: 'mp4',
+            parameters,
+            prompt: imagePrompt,
+            duration: duration,
+            taskId: taskId
+          };
+        }
+
+        if (statusData.status === 'FAILED') {
+          console.error('[RUNWAY]', { requestId, event: 'task_failed', attempts, error: statusData.failure_reason });
+          break;
+        }
+      } catch (pollError) {
+        console.warn('[RUNWAY]', { requestId, event: 'polling_error', attempt: attempts, error: (pollError as Error).message });
+      }
+    }
+
+    // Timeout or failure - return starter image
+    console.warn('[RUNWAY]', { requestId, event: 'generation_timeout', attempts });
+    return {
+      type: 'image',
+      content: starterImage.content,
+      format: starterImage.format,
+      parameters,
+      prompt: imagePrompt,
+      fallbackReason: 'runway_generation_timeout'
+    };
+
+  } catch (error) {
+    console.error('[RUNWAY]', { requestId, event: 'generation_failed', error: (error as Error).message });
+    throw error;
+  }
+}
   const getDuration = (length: string) => {
     switch (length) {
       case '1s': return 1;
