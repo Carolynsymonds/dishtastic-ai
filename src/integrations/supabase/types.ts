@@ -143,7 +143,7 @@ export type Database = {
           referrer_url: string | null
           status: string
           updated_at: string
-          user_id: string | null
+          user_id: string
           utm_campaign: string | null
           utm_content: string | null
           utm_medium: string | null
@@ -159,7 +159,7 @@ export type Database = {
           referrer_url?: string | null
           status?: string
           updated_at?: string
-          user_id?: string | null
+          user_id: string
           utm_campaign?: string | null
           utm_content?: string | null
           utm_medium?: string | null
@@ -175,7 +175,7 @@ export type Database = {
           referrer_url?: string | null
           status?: string
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
           utm_campaign?: string | null
           utm_content?: string | null
           utm_medium?: string | null
@@ -198,6 +198,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      menu_uploads: {
+        Row: {
+          analysis_results: Json | null
+          created_at: string
+          id: string
+          menu_data: Json
+          original_filename: string
+          processed_dishes: Json | null
+          processing_status: string
+          updated_at: string
+          user_email: string
+        }
+        Insert: {
+          analysis_results?: Json | null
+          created_at?: string
+          id?: string
+          menu_data: Json
+          original_filename: string
+          processed_dishes?: Json | null
+          processing_status?: string
+          updated_at?: string
+          user_email: string
+        }
+        Update: {
+          analysis_results?: Json | null
+          created_at?: string
+          id?: string
+          menu_data?: Json
+          original_filename?: string
+          processed_dishes?: Json | null
+          processing_status?: string
+          updated_at?: string
+          user_email?: string
+        }
+        Relationships: []
       }
       static_content: {
         Row: {

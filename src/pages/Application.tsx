@@ -11,10 +11,12 @@ import DashboardHeader from "@/components/DashboardHeader";
 import MetricCard from "@/components/MetricCard";
 import ProfitByMenuCategory from "@/components/ProfitByMenuCategory";
 import { OnboardingModal } from "@/components/OnboardingModal";
-import { supabase } from "@/integrations/supabase/client";
 import { siteContent } from "@/config/site-content";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navigate } from "react-router-dom";
 
 const Application = () => {
+  const { user, session, loading } = useAuth();
   
   const [contentData] = useState([
     { id: 1, name: "Margherita Pizza", images: 24, videos: 8, engagement: "12.4K", status: "trending" },
@@ -27,24 +29,30 @@ const Application = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
- useEffect(() => {
-    const checkUserAccess = () => {
-      // Get user ID from local storage
-      
-      const userId = localStorage.getItem('userId');
-      
-      if (!userId) {
-        console.log('No user ID found in localStorage, redirecting to home');
-        window.location.href = '/login';
-        return;
-      }
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-      // Show onboarding modal by default
+  // Redirect to login if not authenticated
+  if (!session || !user) {
+    console.log('[APP] No session found, redirecting to login');
+    return <Navigate to="/login" replace />;
+  }
+
+  useEffect(() => {
+    // Only show onboarding for authenticated users
+    if (session && user) {
       setShowOnboarding(true);
-    };
-
-    checkUserAccess();
-  }, []);
+    }
+  }, [session, user]);
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);

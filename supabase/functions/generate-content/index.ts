@@ -6,11 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const runwayApiKey = Deno.env.get('RUNWAY_API_KEY');
-const falApiKey = Deno.env.get('FAL_API_KEY');
-const lumaApiKey = Deno.env.get('LUMA_API_KEY');
-
+// Input validation schema
 interface GenerationRequest {
   prompt: string;
   parameters: {
@@ -21,6 +17,34 @@ interface GenerationRequest {
     Background?: string;
   };
 }
+
+function validateRequest(body: any): GenerationRequest {
+  if (!body || typeof body !== 'object') {
+    throw new Error('Request body must be a valid JSON object');
+  }
+
+  if (!body.prompt || typeof body.prompt !== 'string') {
+    throw new Error('Prompt is required and must be a string');
+  }
+
+  if (body.prompt.length > 2000) {
+    throw new Error('Prompt must be less than 2000 characters');
+  }
+
+  if (body.parameters && typeof body.parameters !== 'object') {
+    throw new Error('Parameters must be an object if provided');
+  }
+
+  return {
+    prompt: body.prompt.trim(),
+    parameters: body.parameters || {}
+  };
+}
+
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const runwayApiKey = Deno.env.get('RUNWAY_API_KEY');
+const falApiKey = Deno.env.get('FAL_API_KEY');
+const lumaApiKey = Deno.env.get('LUMA_API_KEY');
 
 interface DishInfo {
   name: string;
@@ -242,10 +266,34 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  console.log(`[GENERATE-CONTENT] ${req.method} request received`);
+
   try {
+    // Validate request method
+    if (req.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Parse and validate request body
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'Invalid JSON in request body' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const validatedInput = validateRequest(requestBody);
+    console.log(`[GENERATE-CONTENT] Processing request for prompt: ${validatedInput.prompt.substring(0, 50)}...`);
+
     const requestId = crypto.randomUUID();
     const startedAt = Date.now();
-    const { prompt, parameters }: GenerationRequest = await req.json();
+    const { prompt, parameters } = validatedInput;
     
     // First declare the variable
     const isVideoGeneration = parameters.Format === 'Video';

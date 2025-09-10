@@ -26,6 +26,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { useUtmTracking } from "./hooks/useUtmTracking";
 import { useGoogleAnalytics } from "./hooks/useGoogleAnalytics";
 import TopBanner from "./components/TopBanner";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -48,44 +49,46 @@ const ConditionalTopBanner = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <div>
-          <ConditionalTopBanner />
-          <UtmTracker />
-          <ScrollToTop />
-            <Routes>
-           <Route path="/" element={<Home />} />
-           <Route path="/free-plan" element={<Index />} />
-           <Route path="/pricing" element={<Pricing />} />
-           <Route path="/features" element={<Features />} />
-           <Route path="/contact" element={<Contact />} />
-           <Route path="/login" element={<Login />} />
-           <Route path="/signup" element={<Signup />} />
-           <Route path="/auth/callback" element={<AuthCallback />} />
-           <Route path="/app" element={<Application />} />
-           <Route path="/app/purchases" element={<PurchasesBySupplier />} />
-           <Route path="/app/inventory" element={<Inventory />} />
-            <Route path="/app/inventory/analytics" element={<InventoryAnalytics />} />
-             <Route path="/video" element={
-               <ErrorBoundary>
-                 <VideoDisplay />
-               </ErrorBoundary>
-             } />
-             <Route path="/generate" element={
-               <ErrorBoundary>
-                 <GenerateVideo />
-               </ErrorBoundary>
-             } />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-conditions" element={<TermsConditions />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-           <Route path="*" element={<NotFound />} />
-           </Routes>
-          <CookieConsent />
-        </div>
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <div>
+            <ConditionalTopBanner />
+            <UtmTracker />
+            <ScrollToTop />
+              <Routes>
+             <Route path="/" element={<Home />} />
+             <Route path="/free-plan" element={<Index />} />
+             <Route path="/pricing" element={<Pricing />} />
+             <Route path="/features" element={<Features />} />
+             <Route path="/contact" element={<Contact />} />
+             <Route path="/login" element={<Login />} />
+             <Route path="/signup" element={<Signup />} />
+             <Route path="/auth/callback" element={<AuthCallback />} />
+             <Route path="/app" element={<Application />} />
+             <Route path="/app/purchases" element={<PurchasesBySupplier />} />
+             <Route path="/app/inventory" element={<Inventory />} />
+              <Route path="/app/inventory/analytics" element={<InventoryAnalytics />} />
+               <Route path="/video" element={
+                 <ErrorBoundary>
+                   <VideoDisplay />
+                 </ErrorBoundary>
+               } />
+               <Route path="/generate" element={
+                 <ErrorBoundary>
+                   <GenerateVideo />
+                 </ErrorBoundary>
+               } />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-conditions" element={<TermsConditions />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+             <Route path="*" element={<NotFound />} />
+             </Routes>
+            <CookieConsent />
+          </div>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
