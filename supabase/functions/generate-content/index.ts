@@ -296,8 +296,8 @@ async function generateImage(prompt: string, parameters: any) {
 
   const dimensions = getDimensions(parameters.Scale || '1:1');
   console.log('generateImage: dimensions/scale/bg', { dimensions, scale: parameters.Scale || '1:1', background: parameters.Background || 'none' });
-  // Enhance prompt for food photography
-  const enhancedPrompt = `Professional food photography: ${prompt}. ${parameters.Background ? `Background: ${parameters.Background}.` : ''} Studio lighting, high resolution, appetizing presentation, commercial quality.`;
+  // Enhance prompt for restaurant marketing photography
+  const enhancedPrompt = `Restaurant marketing photography: ${prompt}. ${parameters.Background ? `Setting: ${parameters.Background}.` : ''} Professional restaurant lighting, premium presentation, appetite-inducing quality, social media ready.`;
   
   // Try gpt-image-1 first, fallback to dall-e-3 if org verification fails
   console.log('generateImage: trying gpt-image-1 first');
@@ -396,90 +396,92 @@ async function generateImageFallback(prompt: string, parameters: any) {
 async function enhancePromptWithAI(prompt: string, parameters: any): Promise<string> {
   if (!openAIApiKey) {
     console.log('OpenAI API key not available, using enhanced fallback');
-    return createTechniqueNarrative(prompt, parameters);
+    return createRestaurantMarketingPrompt(prompt, parameters);
   }
 
   try {
-const systemPrompt = `You are a master culinary cinematographer specializing in authentic, story-driven food videos. Create hyper-realistic video prompts that tell the cultural story of each dish through its signature cooking technique.
+const systemPrompt = `You are a master restaurant marketing videographer specializing in appetite-driven promotional content that sells dishes. Create hyper-realistic video prompts that showcase the final dish as an irresistible hero product that customers want to order immediately.
 
-STORYTELLING PRINCIPLES:
-- Focus on ONE authentic cooking technique that defines the dish
-- Tell the cultural story of how this dish comes alive
-- Show realistic cooking processes with proper timing
-- Use only authentic ingredients and traditional methods
-- Avoid any artificial, floating, or unrealistic elements
-- Create emotional connection through technique mastery
+RESTAURANT MARKETING OBJECTIVES:
+- Showcase the dish as the star product ready to be served
+- Create maximum appetite appeal and craving generation
+- Focus on the most photogenic moment of the finished dish
+- Highlight premium quality, freshness, and restaurant presentation
+- Make viewers want to order this dish right now
+- Generate content perfect for social media and marketing campaigns
 
-REALISM REQUIREMENTS:
-- Hands must move naturally and purposefully
-- Ingredients behave with realistic physics
-- Cooking surfaces, tools, and environment must be authentic
-- Steam, sizzling, and heat effects appear naturally
-- Timing matches real cooking processes
-- No CGI-like effects or impossible movements
+VISUAL MARKETING REQUIREMENTS:
+- Show perfectly plated, ready-to-eat final dish
+- Professional restaurant-quality presentation and lighting
+- Focus on steam, melted elements, and appetizing textures
+- Capture the "hero shot" angle that looks most delicious
+- Emphasize premium ingredients and careful plating
+- Create scroll-stopping, craving-inducing visuals
 
-DISH-SPECIFIC STORYTELLING:
-Identify the dish and focus on its signature moment:
+APPETITE-DRIVEN FOCUS:
+Identify the dish and showcase its most appetizing elements:
 
-PASTA: The precise technique (carbonara emulsion, cacio e pepe mantecatura, aglio e olio golden oil)
-ASIAN: Wok mastery, knife skills, or traditional preparation methods
-BAKING: Dough transformation, layering techniques, traditional shaping
-GRILLING: Heat control, timing, and authentic preparation
+PASTA: Perfectly twirled portions with melted cheese, steam, glossy sauce
+PIZZA: Melted cheese stretching, golden crust, fresh toppings glistening
+BURGERS: Juicy layers stacked high, melted cheese dripping, perfect assembly
+ASIAN: Beautiful plating with garnish, steam rising, vibrant colors
+DESSERTS: Perfect presentation with textures, glazes, and artistic plating
+GRILLED: Perfect grill marks, juices, optimal doneness showcase
 
-FORBIDDEN ELEMENTS:
-- Ingredients floating in air without support
-- Unrealistic gravity-defying movements  
-- Generic "food styling" without cultural context
-- Inauthentic ingredients for the specific dish
-- Artificial or CGI-like visual effects
-- Multiple dishes or unrelated objects in frame
+FORBIDDEN MARKETING ELEMENTS:
+- Raw ingredients or cooking process footage
+- Educational cooking technique demonstrations
+- Multiple dishes competing for attention
+- Messy or unprofessional presentation
+- Generic food styling without appetite appeal
+- Anything that doesn't directly sell the finished dish
 
 Schema (return JSON only):
 {
-  "story_framework": {
-    "dish_identity": "specific dish name and cultural origin",
-    "signature_technique": "the ONE defining cooking method",
-    "cultural_narrative": "how this technique tells the dish's cultural story",
-    "emotional_arc": "the transformation journey from ingredients to completed dish"
+  "marketing_framework": {
+    "dish_identity": "specific dish name and cuisine style",
+    "hero_moment": "the most appetizing visual moment of the finished dish",
+    "appetite_triggers": "specific elements that create craving (steam, melting, textures)",
+    "selling_proposition": "what makes this dish irresistible to order"
   },
-  "realistic_cinematography": {
-    "camera_behavior": "steady handheld | locked tripod | gentle tracking | intimate macro",
-    "lighting": "natural kitchen | warm cooking light | authentic restaurant | traditional preparation space",
-    "timing": "real cooking pace | slow technique focus | natural rhythm"
+  "restaurant_presentation": {
+    "plating_style": "professional | rustic elegant | modern artistic | traditional authentic",
+    "lighting": "warm restaurant | natural daylight | dramatic spotlight | cozy ambient",
+    "camera_angle": "hero overhead | intimate close-up | appetizing side angle | social media perfect"
   },
-  "authentic_elements": {
-    "cooking_surface": "traditional cookware and appropriate cooking surface",
-    "chef_hands": "realistic hand movements showing proper technique",
-    "ingredient_physics": "natural falling, mixing, and cooking behaviors",
-    "sound_design": "authentic cooking sounds - sizzling, chopping, mixing"
+  "appetite_elements": {
+    "premium_presentation": "perfectly plated dish on appropriate restaurant servingware",
+    "steam_effects": "natural steam rising from hot, fresh dish",
+    "texture_highlights": "melted cheese, glossy sauces, crispy elements, fresh garnish",
+    "color_vibrancy": "appetizing colors that pop and create craving"
   },
-  "technique_focus": {
-    "critical_moment": "the 2-3 second technique that defines this dish",
-    "ingredient_sequence": "realistic order of ingredient addition",
-    "tool_usage": "authentic cooking tools used properly",
-    "temperature_cues": "steam, color changes, texture transformation"
+  "marketing_focus": {
+    "hero_shot": "the 2-3 second moment that best sells this dish",
+    "appetite_sequence": "steam, texture, garnish, perfect presentation angle",
+    "serving_context": "restaurant table setting, appropriate ambiance",
+    "craving_cues": "visual elements that make viewers hungry immediately"
   },
-  "runway_prompt": "story-driven realistic cooking video description focusing on authentic technique"
+  "runway_prompt": "restaurant marketing video showcasing finished dish as irresistible hero product"
 }
 
 Instructions:
-- FIRST identify the specific dish and its ONE signature technique
-- Create a realistic narrative showing hands performing authentic technique
-- Focus on the cultural story behind the cooking method
-- runway_prompt must describe realistic cooking action with authentic timing
-- Remove any elements that could create floating or unrealistic visuals
-- Emphasize proper technique execution and cultural authenticity`;
+- FIRST identify the specific dish and its most appetizing presentation moment
+- Create a marketing narrative showcasing the finished dish as hero product
+- Focus on appetite appeal and craving generation, not cooking education
+- runway_prompt must describe the perfect finished dish ready to be served
+- Emphasize restaurant quality presentation and irresistible visual appeal
+- Make the viewer want to order this dish immediately`;
 
-    const userPrompt = `Create a realistic, story-driven video for: ${prompt}
+    const userPrompt = `Create an appetizing restaurant marketing video for: ${prompt}
     
 Parameters:
 - Format: ${parameters.Format || 'Video'}
 - Aspect Ratio: ${parameters.Scale || '16:9'} 
 - Duration: ${parameters.Length || '5s'}
-- Style Focus: ${parameters['Video Style'] || 'Signature Technique'}
-- Setting: ${parameters.Background || 'Professional Kitchen'}
+- Style Focus: ${parameters['Video Style'] || 'Hero Shot'}
+- Setting: ${parameters.Background || 'Restaurant Table'}
 
-Focus on authentic cooking technique and cultural storytelling. Make it look completely real with proper physics and timing.`;
+Focus on finished dish presentation that creates maximum appetite appeal and makes viewers want to order immediately. Show the dish as an irresistible hero product.`;
 
     console.log('Sending enhanced prompt request to OpenAI');
 
@@ -541,145 +543,142 @@ Focus on authentic cooking technique and cultural storytelling. Make it look com
   } catch (error) {
     console.error('Error enhancing prompt with AI:', error);
     // Fallback to enhanced motion-specific prompt
-    return createTechniqueNarrative(prompt, parameters);
+    return createRestaurantMarketingPrompt(prompt, parameters);
   }
 }
 
-function createTechniqueNarrative(prompt: string, parameters: any): string {
+function createRestaurantMarketingPrompt(prompt: string, parameters: any): string {
   const actionStyle = parameters['Video Style'];
   const background = parameters.Background;
   
-  // Parse dish to get technique information
+  // Parse dish to get presentation information
   const dishInfo = parseDishName(prompt);
   let dishSpecificContent = prompt;
   
   if (dishInfo) {
-    // Create realistic technique-focused description
-    const ingredientList = dishInfo.canonicalIngredients.slice(0, 3).join(', '); // Limit to core ingredients
-    dishSpecificContent = `${dishInfo.name}: authentic ${dishInfo.cuisine} preparation showcasing ${ingredientList}`;
+    // Create marketing-focused description
+    const keyIngredients = dishInfo.canonicalIngredients.slice(0, 3).join(', ');
+    dishSpecificContent = `${dishInfo.name}: Premium ${dishInfo.cuisine} ${dishInfo.type} featuring ${keyIngredients}`;
     
-    console.log(`Realistic technique for ${dishInfo.name}: ${dishInfo.signatureTechnique || 'traditional method'}`);
+    console.log(`Restaurant marketing for ${dishInfo.name}: showcasing finished presentation`);
   }
   
-  // Realistic story-driven narratives focusing on authentic technique
-  const getRealisticStory = (dishInfo: DishInfo | null, actionStyle: string): string => {
-    if (!dishInfo) return 'Professional chef hands performing authentic cooking technique with realistic timing and natural movements. Focus on proper tool usage and ingredient interaction with natural physics.';
+  // Marketing-focused narratives for finished dish presentation
+  const getMarketingStory = (dishInfo: DishInfo | null, actionStyle: string): string => {
+    if (!dishInfo) return 'Perfectly plated restaurant dish presented at its most appetizing moment. Professional presentation with steam rising, textures glistening, and premium quality evident in every detail.';
     
-    // Story-driven technique narratives with realism emphasis
-    const realisticNarratives: Record<string, string> = {
-      'Signature Technique': `${dishInfo.signatureTechnique || 'Traditional preparation'} - Professional chef hands demonstrating the authentic ${dishInfo.cuisine} technique. Each movement precise and purposeful, ingredients responding naturally to heat and handling. The camera captures the cultural mastery behind this time-honored cooking method.`,
+    // Restaurant marketing narratives focused on selling the dish
+    const marketingNarratives: Record<string, string> = {
+      'Hero Shot': `${dishInfo.name} presented as the ultimate hero dish - perfectly plated with restaurant-quality presentation. Steam gently rising from the hot, fresh ${dishInfo.cuisine} creation. Every element positioned to showcase premium quality and create immediate craving. The dish looks absolutely irresistible and ready to be served.`,
       
-      'Cultural Story': `${dishInfo.culturalContext || `Traditional ${dishInfo.cuisine} kitchen story`} - Experienced hands recreating generations of culinary wisdom. The scene tells the story of how ${dishInfo.name} comes alive through authentic technique, with realistic cooking timing and natural ingredient transformation.`,
+      'Appetite Builder': `Mouth-watering ${dishInfo.name} showcased at peak appetizing moment. Golden, glistening textures catch the light perfectly. Steam rises naturally from the hot, fresh dish while ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} display their premium quality. This is the shot that makes customers order immediately.`,
       
-      'Transformation Drama': `The pivotal moment when ${dishInfo.canonicalIngredients.slice(0, 2).join(' meets ')} through precise ${dishInfo.cuisine} technique. Professional hands guide the natural transformation with realistic timing - no artificial effects, just authentic cooking mastery creating ${dishInfo.name}.`,
+      'Social Media Perfect': `Instagram-worthy ${dishInfo.name} captured at its most photogenic angle. Professional restaurant plating with vibrant colors and perfect garnish placement. The finished ${dishInfo.cuisine} dish looks absolutely delicious and share-worthy - guaranteed to generate likes and cravings.`,
       
-      'Sensory Journey': `Experiencing authentic ${dishInfo.name} creation through sound, texture, and aroma. Professional technique creates natural steam, realistic sizzling, and proper color changes as ingredients transform through traditional ${dishInfo.cuisine} methods.`
+      'Craving Generator': `Irresistible ${dishInfo.name} presented in all its glory. Melted elements stretch perfectly, steam creates atmosphere, and every ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} element looks premium and fresh. The kind of presentation that makes viewers immediately want to place an order.`
     };
     
-    // Enhanced legacy style mapping with realism focus
-    const realisticStyleMap: Record<string, string> = {
-      'Ingredient Drop': `Professional chef assembly of ${dishInfo.name}: expert hands guiding ingredients into proper position with natural timing and realistic physics. Each ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} element placed with traditional technique precision, creating authentic cooking motion without artificial floating or CGI effects.`,
+    // Enhanced style mapping for restaurant marketing
+    const marketingStyleMap: Record<string, string> = {
+      'Ingredient Drop': `Beautiful final presentation of ${dishInfo.name} with fresh garnish being delicately placed on top. Each ${dishInfo.canonicalIngredients.slice(-2).join(' and ')} element adds the perfect finishing touch to an already stunning restaurant-quality dish.`,
       
-      'Slow-Mo Pour': `The signature pouring technique for ${dishInfo.name} - liquid ingredients flowing naturally with proper viscosity and realistic behavior. Professional hands control the pour with authentic ${dishInfo.cuisine} technique, creating natural patterns and textures.`,
+      'Slow-Mo Pour': `Luxurious sauce or dressing being artistically drizzled over perfectly plated ${dishInfo.name}. The liquid flows with perfect viscosity, creating beautiful patterns that enhance the premium restaurant presentation.`,
       
-      'Steam Rising': `Natural steam formation from properly heated ${dishInfo.name} preparation. Authentic cooking temperature creates realistic vapor patterns, showing the energy and heat of traditional ${dishInfo.cuisine} technique with natural timing and dissipation.`,
+      'Steam Rising': `Hot, fresh ${dishInfo.name} with natural steam rising dramatically, showcasing how recently prepared and piping hot this restaurant-quality dish is. The steam creates an atmospheric effect that screams "order me now."`,
       
       'Cheese Pull': dishInfo.canonicalIngredients.some(ing => ing.includes('cheese')) ?
-        `Natural cheese stretch showcasing perfect ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} texture achieved through proper heating technique. Professional hands demonstrate authentic stretching motion with realistic cheese behavior and natural breaking point.` :
-        'Realistic melted element stretching with natural texture physics and authentic cooking technique.',
+        `Perfect cheese stretch from expertly prepared ${dishInfo.name}. The ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} melts beautifully, creating that satisfying stretch that makes every cheese lover's mouth water.` :
+        'Satisfying stretch of melted elements creating that perfect, crave-worthy texture.',
       
-      'Sizzle Effect': `Authentic sizzling sounds and visual effects from properly heated ${dishInfo.name} preparation. Natural oil behavior, realistic bubble formation, and genuine cooking reactions create the sensory experience of traditional ${dishInfo.cuisine} technique.`,
+      'Sizzle Effect': `${dishInfo.name} still gently sizzling from the kitchen, proving its fresh-from-the-grill quality. The authentic cooking sounds and visual effects demonstrate this is a premium, made-to-order restaurant dish.`,
       
-      'Garnish Drop': `Final traditional presentation touches for ${dishInfo.name} - professional hands adding authentic garnishes with precise placement technique. Each element added with cultural accuracy and realistic settling behavior.`,
+      'Garnish Drop': `Final artistic touches being added to restaurant-quality ${dishInfo.name}. Fresh garnish drops gracefully onto the perfectly plated dish, completing the premium presentation that customers pay top dollar for.`,
       
-      'Liquid Drizzle': `Traditional sauce or oil application for ${dishInfo.name} using authentic ${dishInfo.cuisine} technique. Natural liquid flow with proper viscosity, creating realistic patterns and absorption into ingredients.`,
+      'Liquid Drizzle': `Signature sauce artistically applied to ${dishInfo.name} in the restaurant's signature style. The drizzle pattern showcases culinary artistry and premium attention to detail.`,
       
-      'Whisk Action': `Professional whisking technique transforming ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} with authentic ${dishInfo.cuisine} method. Natural mixing motion creating realistic texture changes and proper ingredient integration.`
+      'Whisk Action': `Final texture perfection achieved in ${dishInfo.name} preparation. The smooth, creamy consistency of ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} demonstrates restaurant-quality technique and premium ingredients.`
     };
     
-    return realisticNarratives[actionStyle] || realisticStyleMap[actionStyle] || 
-           `${dishInfo.signatureTechnique || 'Authentic cooking technique'} - Professional demonstration with realistic timing, natural hand movements, and traditional ${dishInfo.cuisine} cultural precision.`;
+    return marketingNarratives[actionStyle] || marketingStyleMap[actionStyle] || 
+           `Premium ${dishInfo.name} showcased in restaurant-quality presentation that creates immediate appetite appeal and ordering desire.`;
   };
   
-  const realisticStory = getRealisticStory(dishInfo, actionStyle);
-  const culturalSetting = background ? `Set in an authentic ${background} that honors ${dishInfo?.cuisine || 'culinary'} tradition.` : '';
+  const marketingStory = getMarketingStory(dishInfo, actionStyle);
+  const restaurantSetting = background ? `Beautifully presented in an elegant ${background} setting that enhances the premium dining experience.` : '';
   
-  let finalPrompt = `Hyper-realistic culinary storytelling: ${dishSpecificContent}. ${culturalSetting} ${realisticStory} 
+  let finalPrompt = `Restaurant marketing hero shot: ${dishSpecificContent}. ${restaurantSetting} ${marketingStory} 
 
-TECHNICAL REQUIREMENTS: Professional cinematography with natural lighting. Steady camera work capturing authentic technique. All ingredients behave with realistic physics - no floating elements or artificial movements. Steam, heat effects, and cooking sounds occur naturally. Chef hands move with professional precision and cultural authenticity.
+MARKETING REQUIREMENTS: Professional restaurant presentation with premium lighting. Perfect plating that showcases quality and craftsmanship. All elements positioned for maximum appetite appeal. Steam, textures, and colors optimized to create immediate craving and ordering desire.
 
-FORBIDDEN: Artificial floating ingredients, CGI-like effects, unrealistic gravity, multiple unrelated dishes, inauthentic cooking methods, generic food styling without cultural context.`;
+FORBIDDEN: Raw ingredients, cooking process, messy presentation, educational content, anything that doesn't directly sell the finished dish as a premium restaurant product.`;
   
-  // Add authenticity notes and forbidden ingredient removal
+  // Add marketing enhancement notes and authenticity
   if (dishInfo) {
     if (dishInfo.forbiddenIngredients.length > 0) {
-      finalPrompt += ` EXCLUDE completely: ${dishInfo.forbiddenIngredients.join(', ')} - these are inauthentic for ${dishInfo.name}.`;
+      finalPrompt += ` NEVER SHOW: ${dishInfo.forbiddenIngredients.join(', ')} - these are not part of authentic ${dishInfo.name} presentation.`;
     }
     if (dishInfo.culturalContext) {
-      finalPrompt += ` Cultural authenticity: ${dishInfo.culturalContext}`;
+      finalPrompt += ` Premium quality: This ${dishInfo.culturalContext} represents restaurant excellence and artisanal preparation.`;
     }
   }
   
   return finalPrompt;
 }
 
-function createMotionImagePrompt(prompt: string, parameters: any): string {
+function createMarketingImagePrompt(prompt: string, parameters: any): string {
   const videoStyle = parameters['Video Style'];
   const background = parameters.Background;
   
-  // Parse dish to get specific ingredients
+  // Parse dish to get specific ingredients for marketing
   const dishInfo = parseDishName(prompt);
   let dishSpecificContent = prompt;
   
   if (dishInfo) {
-    // Create dish-specific description with canonical ingredients
-    const ingredientList = dishInfo.canonicalIngredients.join(', ');
-    dishSpecificContent = `${dishInfo.name}: ${dishInfo.cuisine} ${dishInfo.type} featuring ${ingredientList}`;
-    console.log(`Image prompt for ${dishInfo.name}: using [${ingredientList}]`);
+    // Create marketing-focused description with premium ingredients
+    const premiumIngredients = dishInfo.canonicalIngredients.join(', ');
+    dishSpecificContent = `${dishInfo.name}: Premium ${dishInfo.cuisine} ${dishInfo.type} featuring ${premiumIngredients}`;
+    console.log(`Marketing image for ${dishInfo.name}: showcasing [${premiumIngredients}]`);
   }
   
-  // Create assembly-ready image compositions for realistic motion generation
-  const getAssemblyImageSetup = (dishInfo: DishInfo | null): string => {
-    if (!dishInfo) return 'Fresh ingredients naturally positioned above the dish with perfect spacing for assembly motion';
+  // Create finished dish presentations optimized for restaurant marketing
+  const getMarketingImageSetup = (dishInfo: DishInfo | null): string => {
+    if (!dishInfo) return 'Beautifully plated restaurant dish presented at its most appetizing angle with perfect garnish and professional presentation';
     
-    const imageSetups: Record<string, string> = {
-      'Carbonara': 'Hot steaming pasta suspended above a bowl at varying heights, with freshly cracked eggs positioned to pour in golden streams, grated pecorino romano ready to rain down and melt on contact, crispy guanciale pieces arranged to bounce naturally into place, black peppercorns positioned for final sprinkling cascade - all arranged for sequential dropping with realistic cooking physics',
-      'Aglio e Olio': 'Al dente spaghetti hovering above a warm plate, with golden garlic-infused olive oil captured mid-drizzle trajectory, red pepper flakes positioned to scatter with natural bounce, fresh parsley leaves arranged to fall like confetti with authentic leaf physics',
-      'Cacio e Pepe': 'Hot spaghetti suspended over a warm bowl with visible steam rising, pecorino romano cheese positioned at perfect melting height for heat contact, black peppercorns arranged in natural scattering formation ready to bounce and settle authentically',
-      'Pad Thai': 'Rice noodles positioned above a sizzling hot wok, with tamarind sauce ready to splash down with realistic liquid physics, bean sprouts and shrimp arranged in natural dropping sequence, lime wedges positioned for dynamic juice spray finale',
-      'Ramen': 'Fresh ramen noodles suspended above steaming rich broth, with chashu pork slices ready to settle naturally, halved soft-boiled eggs positioned to drop with authentic weight, green onions and nori sheets arranged for graceful floating descent',
-      'Tacos': 'Warm tortillas laid flat with seasoned meat positioned for authentic gravity drop and natural spread, diced onions ready to scatter with realistic bounce physics, fresh cilantro arranged to fall like green confetti, lime juice captured in mid-spray droplets'
+    const marketingSetups: Record<string, string> = {
+      'Carbonara': 'Perfectly plated carbonara with steam gently rising, creamy sauce glistening under warm restaurant lighting, fresh cracked black pepper and grated pecorino romano artistically placed, golden pasta beautifully twirled in an elegant bowl - restaurant-quality presentation that screams premium dining',
+      'Aglio e Olio': 'Expertly plated spaghetti aglio e olio with golden olive oil creating an appetizing sheen, perfectly minced garlic visible throughout, red pepper flakes adding color contrast, fresh parsley garnish artistically scattered - simple elegance that showcases premium ingredients',
+      'Cacio e Pepe': 'Restaurant-quality cacio e pepe with perfectly melted pecorino creating a glossy, creamy coating, freshly cracked black pepper providing visual and aromatic appeal, pasta expertly twirled and presented in a warm ceramic bowl with gentle steam rising',
+      'Pad Thai': 'Vibrant pad thai beautifully arranged with colorful ingredients artfully distributed, fresh bean sprouts adding crisp texture, lime wedge positioned for perfect squeeze, shrimp and garnishes creating an appetizing color palette in authentic Thai restaurant style',
+      'Ramen': 'Stunning ramen presentation with perfectly arranged toppings - silky chashu slices, soft-boiled egg cut to show golden yolk, fresh green onions and nori creating visual interest, all floating in rich, steaming broth that looks absolutely irresistible',
+      'Tacos': 'Three perfectly assembled tacos showcased on authentic servingware, colorful fillings beautifully distributed, fresh cilantro and diced onions adding vibrant contrast, lime wedges positioned for optimal visual appeal - street food elevated to restaurant quality'
     };
     
-    return imageSetups[dishInfo.name] || `${dishInfo.canonicalIngredients.join(', ')} positioned in assembly formation above the dish, arranged to show proper cooking sequence and authentic ingredient layering`;
+    return marketingSetups[dishInfo.name] || `${dishInfo.canonicalIngredients.join(', ')} beautifully arranged and plated in restaurant-quality presentation, showcasing premium ingredients and professional culinary artistry`;
   };
 
-  // Create image prompts optimized for realistic motion generation
-  const motionSetups = {
-    'Ingredient Drop': `Dynamic chef assembly setup: ${getAssemblyImageSetup(dishInfo)}. Professional chef hands subtly visible, positioned to guide the authentic cooking process. Ingredients arranged at natural falling heights with realistic spacing for sequential dropping motion - heavier base ingredients positioned higher for impactful drops, delicate garnishes positioned for graceful cascading. The composition emphasizes realistic cooking physics and authentic ingredient interactions.`,
-    'Slow-Mo Pour': 'Liquid captured at the perfect pouring moment with realistic trajectory, positioned for smooth, natural flowing motion with authentic viscosity and stream patterns',
-    'Steam Rising': 'Freshly prepared hot dish with natural steam patterns beginning to rise, positioned to show authentic heat emanation and organic vapor movement',
+  // Create marketing image prompts optimized for appetite appeal
+  const marketingSetups = {
+    'Hero Shot': `Premium restaurant presentation: ${getMarketingImageSetup(dishInfo)}. Perfect plating with professional lighting that showcases every appetizing detail. The ultimate marketing shot that makes customers order immediately.`,
+    'Ingredient Drop': `Final garnish moment: ${getMarketingImageSetup(dishInfo)} with fresh herbs or premium toppings being delicately placed as the finishing touch. Restaurant-quality presentation showing attention to detail and culinary artistry.`,
+    'Slow-Mo Pour': `Luxurious sauce application: Perfectly plated dish ready for signature sauce drizzle, positioned for elegant pouring motion that enhances the premium presentation and appetite appeal.`,
+    'Steam Rising': `Hot, fresh presentation: ${getMarketingImageSetup(dishInfo)} with natural steam rising, proving the dish is served at perfect temperature and freshly prepared to order.`,
     'Cheese Pull': dishInfo?.canonicalIngredients.some(ing => ing.includes('cheese'))
-      ? `Perfectly melted ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} in natural stretch position with golden, elastic texture, arranged for authentic cheese-pulling motion that showcases realistic dairy physics`
-      : 'Perfectly melted cheese in natural stretch position with golden, elastic texture, arranged for authentic cheese-pulling motion that showcases realistic dairy physics',
-    'Sizzle Effect': 'Food positioned in hot cooking environment with natural heat effects and authentic bubbling patterns that suggest realistic cooking processes',
-    'Garnish Drop': dishInfo?.canonicalIngredients.slice(-2).join(' and ')
-      ? `${dishInfo.canonicalIngredients.slice(-2).join(' and ')} naturally positioned above the dish with perfect spacing for graceful falling motion and authentic scatter patterns`
-      : 'Fresh herbs or seasonings naturally positioned above the dish with perfect spacing for graceful falling motion and authentic scatter patterns',
-    'Liquid Drizzle': 'Sauce, honey, or oil positioned for natural drizzling motion with realistic viscosity patterns and authentic flow behavior',
-    'Whisk Action': dishInfo
-      ? `${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} arranged in natural mixing position with authentic textures that suggest realistic blending and fluid dynamics`
-      : 'Ingredients arranged in natural mixing position with authentic textures that suggest realistic blending and fluid dynamics'
+      ? `Perfect cheese moment: ${getMarketingImageSetup(dishInfo)} with melted ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} ready for that satisfying stretch that makes every cheese lover crave this dish`
+      : `Irresistible melted elements: Perfectly prepared dish with melted components ready for that satisfying stretch moment that creates immediate appetite appeal`,
+    'Sizzle Effect': `Fresh from kitchen: ${getMarketingImageSetup(dishInfo)} still gently sizzling, showcasing the made-to-order quality that premium restaurants are known for.`,
+    'Garnish Drop': `Finishing touches: ${getMarketingImageSetup(dishInfo)} ready for final artistic garnish placement that completes the premium restaurant presentation.`,
+    'Liquid Drizzle': `Signature finishing: Beautifully plated dish positioned for artistic sauce or oil application in the restaurant\'s signature style.`,
+    'Whisk Action': `Perfect texture achieved: ${getMarketingImageSetup(dishInfo)} showcasing the smooth, creamy perfection that demonstrates restaurant-quality preparation and premium ingredients.`
   };
   
-  const motionSetup = motionSetups[videoStyle as keyof typeof motionSetups] || 'Food beautifully arranged for natural, appetizing motion and authentic culinary behavior';
-  const backgroundEnhancement = background ? `Set in a stunning ${background} environment that enhances the food presentation.` : '';
+  const marketingSetup = marketingSetups[videoStyle as keyof typeof marketingSetups] || `Restaurant-quality presentation of ${dishSpecificContent} that creates immediate appetite appeal and ordering desire.`;
+  const backgroundEnhancement = background ? `Set in an elegant ${background} environment that enhances the premium dining experience and restaurant atmosphere.` : '';
   
-  let finalPrompt = `Professional food photography: ${dishSpecificContent}. ${backgroundEnhancement} ${motionSetup}. The composition emphasizes realistic food physics and natural culinary processes with perfect lighting that showcases authentic textures, vibrant colors, and appetizing details optimized for the most realistic motion generation.`;
+  let finalPrompt = `Restaurant marketing photography: ${dishSpecificContent}. ${backgroundEnhancement} ${marketingSetup}. Professional presentation with perfect lighting that showcases premium quality, vibrant colors, and appetizing textures optimized to create immediate craving and drive orders.`;
   
   // Add negative prompts for forbidden ingredients if we have dish info
   if (dishInfo && dishInfo.forbiddenIngredients.length > 0) {
-    finalPrompt += ` Avoid: ${dishInfo.forbiddenIngredients.join(', ')}.`;
+    finalPrompt += ` Never include: ${dishInfo.forbiddenIngredients.join(', ')}.`;
   }
   
   return finalPrompt;
@@ -1303,7 +1302,7 @@ async function generateVideoWithRunway(prompt: string, parameters: any) {
 
   // First, generate a starter image
   try {
-    const imagePrompt = createMotionImagePrompt(prompt, parameters);
+    const imagePrompt = createMarketingImagePrompt(prompt, parameters);
     const starterImage = await generateImageWithPrompt(imagePrompt, parameters);
     
     console.log('[RUNWAY]', { requestId, event: 'starter_image_generated', hasImage: !!starterImage });
