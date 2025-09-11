@@ -3,6 +3,7 @@ export interface GenerationParameters {
   Scale?: string;
   Length?: string;
   'Video Style'?: string;
+  Provider?: string; // Video provider: 'veo', 'luma', 'runway'
   Background?: string;
   uploadedImage?: string; // base64 encoded image data
 }
