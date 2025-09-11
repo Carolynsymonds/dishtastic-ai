@@ -52,6 +52,33 @@ export type Database = {
           },
         ]
       }
+      demo_dishes: {
+        Row: {
+          created_at: string
+          dish_name: string
+          id: string
+          is_demo: boolean
+          profit_range: string
+          public_analysis: Json
+        }
+        Insert: {
+          created_at?: string
+          dish_name: string
+          id?: string
+          is_demo?: boolean
+          profit_range: string
+          public_analysis: Json
+        }
+        Update: {
+          created_at?: string
+          dish_name?: string
+          id?: string
+          is_demo?: boolean
+          profit_range?: string
+          public_analysis?: Json
+        }
+        Relationships: []
+      }
       dish_analyses: {
         Row: {
           analysis_result: Json
@@ -246,6 +273,36 @@ export type Database = {
           processing_status?: string
           updated_at?: string
           user_email?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      report_requests: {
+        Row: {
+          created_at: string
+          dishes_data: Json
+          email: string
+          id: string
+          purpose: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dishes_data?: Json
+          email: string
+          id?: string
+          purpose?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dishes_data?: Json
+          email?: string
+          id?: string
+          purpose?: string
+          updated_at?: string
           user_id?: string | null
         }
         Relationships: []
@@ -513,17 +570,17 @@ export type Database = {
           created_at?: string | null
           dish_name?: string | null
           id?: string | null
-          is_demo?: never
-          profit_range?: never
-          public_analysis?: never
+          is_demo?: boolean | null
+          profit_range?: string | null
+          public_analysis?: Json | null
         }
         Update: {
           created_at?: string | null
           dish_name?: string | null
           id?: string | null
-          is_demo?: never
-          profit_range?: never
-          public_analysis?: never
+          is_demo?: boolean | null
+          profit_range?: string | null
+          public_analysis?: Json | null
         }
         Relationships: []
       }
@@ -564,6 +621,10 @@ export type Database = {
       cleanup_expired_verifications_secure: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      create_report_request: {
+        Args: { p_dishes_data: Json; p_purpose?: string }
+        Returns: string
       }
       get_landing_page_analytics: {
         Args: { days_back?: number; min_leads?: number }
