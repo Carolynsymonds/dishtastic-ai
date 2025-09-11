@@ -55,10 +55,13 @@ interface DishInfo {
   type: string;
   signatureTechnique?: string;
   culturalContext?: string;
+  visualSignature?: string;
+  heroIngredients?: string[];
+  textureKeywords?: string[];
 }
 
-// Enhanced dish database with signature techniques for personalized video generation  
-const DISH_DB: Record<string, DishInfo & { signatureTechnique: string; culturalContext: string }> = {
+// Enhanced dish database with signature techniques and visual focus for personalized video generation  
+const DISH_DB: Record<string, DishInfo & { signatureTechnique: string; culturalContext: string; visualSignature: string; heroIngredients: string[]; textureKeywords: string[] }> = {
   // Italian Pasta Dishes
   'carbonara': {
     name: 'Carbonara',
@@ -67,7 +70,10 @@ const DISH_DB: Record<string, DishInfo & { signatureTechnique: string; culturalC
     cuisine: 'Italian',
     type: 'pasta',
     signatureTechnique: 'The Emulsion Moment - Raw eggs meeting hot pasta to create silky carbonara sauce through precise temperature control',
-    culturalContext: 'Roman trattorias where shepherds created this dish using available ingredients'
+    culturalContext: 'Roman trattorias where shepherds created this dish using available ingredients',
+    visualSignature: 'Creamy golden pasta ribbons coated in silky egg sauce, black pepper specks, crispy guanciale pieces',
+    heroIngredients: ['silky egg sauce', 'crispy guanciale', 'al dente pasta'],
+    textureKeywords: ['silky', 'creamy', 'al dente', 'crispy', 'glossy']
   },
   'aglio e olio': {
     name: 'Aglio e Olio',
@@ -76,7 +82,10 @@ const DISH_DB: Record<string, DishInfo & { signatureTechnique: string; culturalC
     cuisine: 'Italian',
     type: 'pasta',
     signatureTechnique: 'The Golden Oil Dance - Garlic slowly transforming in olive oil, creating aromatic perfection without burning',
-    culturalContext: 'Neapolitan midnight dish made from pantry staples'
+    culturalContext: 'Neapolitan midnight dish made from pantry staples',
+    visualSignature: 'Golden spaghetti glistening with olive oil, golden garlic slivers, red pepper flakes, bright green parsley',
+    heroIngredients: ['golden garlic slivers', 'glistening olive oil', 'perfectly cooked spaghetti'],
+    textureKeywords: ['glistening', 'golden', 'aromatic', 'silky', 'al dente']
   },
   'cacio e pepe': {
     name: 'Cacio e Pepe',
@@ -114,7 +123,10 @@ const DISH_DB: Record<string, DishInfo & { signatureTechnique: string; culturalC
     cuisine: 'Thai',
     type: 'noodles',
     signatureTechnique: 'Wok Hei Fire Kiss - High-heat stir-frying imparting smoky essence and perfect texture',
-    culturalContext: 'Bangkok street vendors mastering the balance of sweet, sour, salty, and spicy'
+    culturalContext: 'Bangkok street vendors mastering the balance of sweet, sour, salty, and spicy',
+    visualSignature: 'Glossy rice noodles with caramelized edges, pink shrimp, golden tofu, fresh bean sprouts, lime wedge',
+    heroIngredients: ['glossy rice noodles', 'caramelized shrimp', 'golden scrambled eggs'],
+    textureKeywords: ['glossy', 'caramelized', 'smoky', 'tender', 'crisp']
   },
   'ramen': {
     name: 'Ramen',
@@ -163,7 +175,10 @@ const DISH_DB: Record<string, DishInfo & { signatureTechnique: string; culturalC
     cuisine: 'American',
     type: 'sandwich',
     signatureTechnique: 'The Maillard Sear - High-heat caramelization creating the perfect crust',
-    culturalContext: 'American diners where the perfect patty meets flame for that iconic sear'
+    culturalContext: 'American diners where the perfect patty meets flame for that iconic sear',
+    visualSignature: 'Juicy beef patty with perfect sear marks, melted cheese dripping, fresh lettuce, ripe tomato slices, toasted bun',
+    heroIngredients: ['seared beef patty', 'melted cheese', 'toasted brioche bun'],
+    textureKeywords: ['juicy', 'seared', 'melted', 'crispy', 'toasted']
   },
   'mac and cheese': {
     name: 'Mac and Cheese',
@@ -487,88 +502,82 @@ async function enhancePromptWithAI(prompt: string, parameters: any): Promise<str
   }
 
   try {
-const systemPrompt = `You are a master restaurant marketing videographer specializing in appetite-driven promotional content that sells dishes. Create hyper-realistic video prompts that showcase the final dish as an irresistible hero product that customers want to order immediately.
+const systemPrompt = `You are a master dish-focused video marketing specialist creating appetite-inducing content that showcases food as the hero. Your priority is making the DISH the absolute star, with everything else supporting its visual appeal.
 
-RESTAURANT MARKETING OBJECTIVES:
-- Showcase the dish as the star product ready to be served
-- Create maximum appetite appeal and craving generation
-- Focus on the most photogenic moment of the finished dish
-- Highlight premium quality, freshness, and restaurant presentation
-- Make viewers want to order this dish right now
-- Generate content perfect for social media and marketing campaigns
+DISH-FIRST MARKETING HIERARCHY:
+1. DISH DOMINANCE - The dish occupies 90% of visual focus and storytelling
+2. INGREDIENT HERO SHOTS - Each key ingredient gets its moment to shine  
+3. TEXTURE STORYTELLING - Show the dish's unique textures and transformations
+4. APPETITE TRIGGERS - Steam, sizzling, melting, perfect doneness
+5. MINIMAL BACKGROUND - Simple, non-competing environments that enhance the dish
 
-VISUAL MARKETING REQUIREMENTS:
-- Show perfectly plated, ready-to-eat final dish
-- Professional restaurant-quality presentation and lighting
-- Focus on steam, melted elements, and appetizing textures
-- Capture the "hero shot" angle that looks most delicious
-- Emphasize premium ingredients and careful plating
-- Create scroll-stopping, craving-inducing visuals
+DISH-CENTRIC REQUIREMENTS:
+- Lead with the dish name and its most appetizing characteristics
+- Prioritize ingredient close-ups and texture details over environment
+- Show the dish's signature technique or transformation moment
+- Focus on what makes this specific dish irresistible and unique
+- Eliminate competing visual elements that distract from the food
 
-APPETITE-DRIVEN FOCUS:
-Identify the dish and showcase its most appetizing elements:
+VISUAL COMPOSITION RULES:
+- 90% dish/ingredients, 10% context/background
+- Simple, neutral backgrounds (clean white plate, dark surface, natural wood)
+- Lighting that enhances food colors and textures
+- Camera angles that showcase the dish's most appetizing features
+- Steam, melted elements, and perfect doneness as focal points
 
-PASTA: Perfectly twirled portions with melted cheese, steam, glossy sauce
-PIZZA: Melted cheese stretching, golden crust, fresh toppings glistening
-BURGERS: Juicy layers stacked high, melted cheese dripping, perfect assembly
-ASIAN: Beautiful plating with garnish, steam rising, vibrant colors
-DESSERTS: Perfect presentation with textures, glazes, and artistic plating
-GRILLED: Perfect grill marks, juices, optimal doneness showcase
-
-FORBIDDEN MARKETING ELEMENTS:
-- Raw ingredients or cooking process footage
-- Educational cooking technique demonstrations
+FORBIDDEN ELEMENTS:
+- Busy backgrounds that compete with the dish
+- Excessive props or elaborate table settings
 - Multiple dishes competing for attention
-- Messy or unprofessional presentation
-- Generic food styling without appetite appeal
-- Anything that doesn't directly sell the finished dish
+- Generic cooking without dish-specific focus
+- Environments that overshadow the food's visual appeal
 
 Schema (return JSON only):
 {
-  "marketing_framework": {
-    "dish_identity": "specific dish name and cuisine style",
-    "hero_moment": "the most appetizing visual moment of the finished dish",
-    "appetite_triggers": "specific elements that create craving (steam, melting, textures)",
-    "selling_proposition": "what makes this dish irresistible to order"
+  "dish_focus": {
+    "dish_identity": "specific dish name with key visual characteristics",
+    "hero_ingredients": "2-3 most visually appealing ingredients that define this dish",
+    "signature_moment": "the dish's most appetizing visual transformation or perfect state",
+    "texture_story": "specific textures that make this dish irresistible (creamy, crispy, melted, etc.)"
   },
-  "restaurant_presentation": {
-    "plating_style": "professional | rustic elegant | modern artistic | traditional authentic",
-    "lighting": "warm restaurant | natural daylight | dramatic spotlight | cozy ambient",
-    "camera_angle": "hero overhead | intimate close-up | appetizing side angle | social media perfect"
+  "visual_hierarchy": {
+    "primary_focus": "dish and its key ingredients (90% of visual weight)",
+    "secondary_elements": "minimal supporting context (10% of visual weight)",
+    "background": "simple, non-competing surface that enhances dish colors",
+    "lighting": "focused on highlighting dish textures and colors"
   },
-  "appetite_elements": {
-    "premium_presentation": "perfectly plated dish on appropriate restaurant servingware",
-    "steam_effects": "natural steam rising from hot, fresh dish",
-    "texture_highlights": "melted cheese, glossy sauces, crispy elements, fresh garnish",
-    "color_vibrancy": "appetizing colors that pop and create craving"
+  "appetite_triggers": {
+    "steam_effects": "natural steam or heat indicators from the dish",
+    "perfect_doneness": "visual cues showing the dish at its optimal state",
+    "key_textures": "melted, crispy, glossy, or other appetite-inducing textures",
+    "color_vibrancy": "the dish's most appetizing color elements"
   },
-  "marketing_focus": {
-    "hero_shot": "the 2-3 second moment that best sells this dish",
-    "appetite_sequence": "steam, texture, garnish, perfect presentation angle",
-    "serving_context": "restaurant table setting, appropriate ambiance",
-    "craving_cues": "visual elements that make viewers hungry immediately"
+  "dish_story": {
+    "transformation": "how ingredients become this perfect dish",
+    "signature_technique": "what makes this dish preparation special",
+    "final_presentation": "the dish at its most irresistible moment"
   },
-  "runway_prompt": "restaurant marketing video showcasing finished dish as irresistible hero product"
+  "runway_prompt": "dish-focused video showcasing [dish name] as the undisputed hero with minimal distracting elements"
 }
 
 Instructions:
-- FIRST identify the specific dish and its most appetizing presentation moment
-- Create a marketing narrative showcasing the finished dish as hero product
-- Focus on appetite appeal and craving generation, not cooking education
-- runway_prompt must describe the perfect finished dish ready to be served
-- Emphasize restaurant quality presentation and irresistible visual appeal
-- Make the viewer want to order this dish immediately`;
+- Start every description with the dish name and its visual signature
+- Prioritize dish-specific details over generic food styling
+- Make the dish 90% of the visual story, background 10%
+- Focus on what makes THIS dish unique and appetizing
+- runway_prompt must lead with the dish and its hero ingredients
+- Eliminate any elements that don't directly enhance the dish's appeal`;
 
-    const userPrompt = `Create an appetizing restaurant marketing video for: ${prompt}
+    const userPrompt = `Create a dish-focused marketing video for: ${prompt}
     
 Parameters:
 - Format: ${parameters.Format || 'Video'}
 - Aspect Ratio: ${parameters.Scale || '16:9'} 
 - Duration: ${parameters.Length || '5s'}
 - Style Focus: ${parameters['Video Style'] || 'Hero Shot'}
-- Setting: ${parameters.Background || 'Restaurant Table'}
+- Background: ${parameters.Background || 'Simple Clean Surface'}
 
-Focus on finished dish presentation that creates maximum appetite appeal and makes viewers want to order immediately. Show the dish as an irresistible hero product.`;
+CRITICAL: Make the dish the absolute hero (90% visual focus). Background should be minimal and non-competing. Focus on the dish's unique characteristics and what makes it irresistible. Lead with the dish name and prioritize its signature ingredients and textures.`;
 
     console.log('Sending enhanced prompt request to OpenAI');
 
@@ -638,74 +647,62 @@ function createRestaurantMarketingPrompt(prompt: string, parameters: any): strin
   const actionStyle = parameters['Video Style'];
   const background = parameters.Background;
   
-  // Parse dish to get presentation information
+  // Parse dish to get enhanced presentation information
   const dishInfo = parseDishName(prompt);
   let dishSpecificContent = prompt;
   
   if (dishInfo) {
-    // Create marketing-focused description
-    const keyIngredients = dishInfo.canonicalIngredients.slice(0, 3).join(', ');
-    dishSpecificContent = `${dishInfo.name}: Premium ${dishInfo.cuisine} ${dishInfo.type} featuring ${keyIngredients}`;
+    // Start with dish name and visual signature for immediate focus
+    const visualSig = dishInfo.visualSignature || `beautifully prepared ${dishInfo.name}`;
+    const heroIngredients = dishInfo.heroIngredients?.slice(0, 2).join(' and ') || dishInfo.canonicalIngredients.slice(0, 2).join(' and ');
+    const keyTextures = dishInfo.textureKeywords?.slice(0, 2).join(', ') || 'perfect textures';
     
-    console.log(`Restaurant marketing for ${dishInfo.name}: showcasing finished presentation`);
+    dishSpecificContent = `${dishInfo.name}. ${visualSig} with ${keyTextures}`;
+    console.log(`Dish-focused marketing for ${dishInfo.name}: ${heroIngredients} as heroes`);
   }
   
-  // Marketing-focused narratives for finished dish presentation
-  const getMarketingStory = (dishInfo: DishInfo | null, actionStyle: string): string => {
-    if (!dishInfo) return 'Perfectly plated restaurant dish presented at its most appetizing moment. Professional presentation with steam rising, textures glistening, and premium quality evident in every detail.';
+  // Dish-focused narratives that prioritize the food over environment
+  const getDishFocusedStory = (dishInfo: DishInfo | null, actionStyle: string): string => {
+    if (!dishInfo) return 'Perfectly presented dish as the undisputed hero, clean simple background, focused lighting that makes the food irresistible.';
     
-    // Restaurant marketing narratives focused on selling the dish
-    const marketingNarratives: Record<string, string> = {
-      'Hero Shot': `${dishInfo.name} presented as the ultimate hero dish - perfectly plated with restaurant-quality presentation. Steam gently rising from the hot, fresh ${dishInfo.cuisine} creation. Every element positioned to showcase premium quality and create immediate craving. The dish looks absolutely irresistible and ready to be served.`,
+    // Dish-hero marketing narratives
+    const dishHeroNarratives: Record<string, string> = {
+      'Hero Shot': `${dishInfo.name} dominates the frame as the absolute hero. ${dishInfo.visualSignature || 'Perfect presentation'} on a clean, simple surface. Every texture and color optimized to create instant craving. Background stays minimal so the dish commands complete attention.`,
       
-      'Appetite Builder': `Mouth-watering ${dishInfo.name} showcased at peak appetizing moment. Golden, glistening textures catch the light perfectly. Steam rises naturally from the hot, fresh dish while ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} display their premium quality. This is the shot that makes customers order immediately.`,
+      'Ingredient Drop': `${dishInfo.name} as the star while ${dishInfo.heroIngredients?.[0] || 'signature ingredient'} adds the final perfect touch. The dish remains the focus, simple background, clean presentation that showcases food artistry.`,
       
-      'Social Media Perfect': `Instagram-worthy ${dishInfo.name} captured at its most photogenic angle. Professional restaurant plating with vibrant colors and perfect garnish placement. The finished ${dishInfo.cuisine} dish looks absolutely delicious and share-worthy - guaranteed to generate likes and cravings.`,
-      
-      'Craving Generator': `Irresistible ${dishInfo.name} presented in all its glory. Melted elements stretch perfectly, steam creates atmosphere, and every ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} element looks premium and fresh. The kind of presentation that makes viewers immediately want to place an order.`
-    };
-    
-    // Enhanced style mapping for restaurant marketing
-    const marketingStyleMap: Record<string, string> = {
-      'Ingredient Drop': `Beautiful final presentation of ${dishInfo.name} with fresh garnish being delicately placed on top. Each ${dishInfo.canonicalIngredients.slice(-2).join(' and ')} element adds the perfect finishing touch to an already stunning restaurant-quality dish.`,
-      
-      'Slow-Mo Pour': `Luxurious sauce or dressing being artistically drizzled over perfectly plated ${dishInfo.name}. The liquid flows with perfect viscosity, creating beautiful patterns that enhance the premium restaurant presentation.`,
-      
-      'Steam Rising': `Hot, fresh ${dishInfo.name} with natural steam rising dramatically, showcasing how recently prepared and piping hot this restaurant-quality dish is. The steam creates an atmospheric effect that screams "order me now."`,
+      'Steam Rising': `${dishInfo.name} center stage with natural steam creating appetite appeal. ${dishInfo.textureKeywords?.join(', ') || 'Perfect textures'} highlighted against a clean, non-competing background. The dish tells its own delicious story.`,
       
       'Cheese Pull': dishInfo.canonicalIngredients.some(ing => ing.includes('cheese')) ?
-        `Perfect cheese stretch from expertly prepared ${dishInfo.name}. The ${dishInfo.canonicalIngredients.find(ing => ing.includes('cheese'))} melts beautifully, creating that satisfying stretch that makes every cheese lover's mouth water.` :
-        'Satisfying stretch of melted elements creating that perfect, crave-worthy texture.',
-      
-      'Sizzle Effect': `${dishInfo.name} still gently sizzling from the kitchen, proving its fresh-from-the-grill quality. The authentic cooking sounds and visual effects demonstrate this is a premium, made-to-order restaurant dish.`,
-      
-      'Garnish Drop': `Final artistic touches being added to restaurant-quality ${dishInfo.name}. Fresh garnish drops gracefully onto the perfectly plated dish, completing the premium presentation that customers pay top dollar for.`,
-      
-      'Liquid Drizzle': `Signature sauce artistically applied to ${dishInfo.name} in the restaurant's signature style. The drizzle pattern showcases culinary artistry and premium attention to detail.`,
-      
-      'Whisk Action': `Final texture perfection achieved in ${dishInfo.name} preparation. The smooth, creamy consistency of ${dishInfo.canonicalIngredients.slice(0, 2).join(' and ')} demonstrates restaurant-quality technique and premium ingredients.`
+        `${dishInfo.name} featured prominently with melted cheese creating that perfect stretch. Simple background lets the dish be the hero, focused lighting on the food's irresistible textures.` :
+        `${dishInfo.name} showcasing its signature stretch and textures as the undisputed hero.`,
     };
     
-    return marketingNarratives[actionStyle] || marketingStyleMap[actionStyle] || 
-           `Premium ${dishInfo.name} showcased in restaurant-quality presentation that creates immediate appetite appeal and ordering desire.`;
+    return dishHeroNarratives[actionStyle] || 
+           `${dishInfo.name} as the hero dish, ${dishInfo.visualSignature || 'perfectly presented'}, clean minimal background, dish dominates 90% of visual focus.`;
   };
   
-  const marketingStory = getMarketingStory(dishInfo, actionStyle);
-  const restaurantSetting = background ? `Beautifully presented in an elegant ${background} setting that enhances the premium dining experience.` : '';
+  const dishStory = getDishFocusedStory(dishInfo, actionStyle);
   
-  let finalPrompt = `Restaurant marketing hero shot: ${dishSpecificContent}. ${restaurantSetting} ${marketingStory} 
-
-MARKETING REQUIREMENTS: Professional restaurant presentation with premium lighting. Perfect plating that showcases quality and craftsmanship. All elements positioned for maximum appetite appeal. Steam, textures, and colors optimized to create immediate craving and ordering desire.
-
-FORBIDDEN: Raw ingredients, cooking process, messy presentation, educational content, anything that doesn't directly sell the finished dish as a premium restaurant product.`;
+  // Simple background that enhances the dish rather than competing
+  const simpleBackground = background === 'Chef\'s Pass' ? 
+    'Clean professional surface that enhances the dish colors.' : 
+    'Simple neutral background that makes the dish pop.';
   
-  // Add marketing enhancement notes and authenticity
+  let finalPrompt = `${dishSpecificContent} ${dishStory} ${simpleBackground}
+
+DISH-FIRST REQUIREMENTS: The dish is the absolute hero occupying 90% of visual focus. Lighting highlights food textures and colors. Background stays simple and non-competing. Every element serves to make the dish more appetizing.
+
+FORBIDDEN: Busy backgrounds, excessive props, multiple dishes, anything that distracts from the hero dish. Keep it clean and dish-focused.`;
+  
+  // Add dish-specific enhancements
   if (dishInfo) {
-    if (dishInfo.forbiddenIngredients.length > 0) {
-      finalPrompt += ` NEVER SHOW: ${dishInfo.forbiddenIngredients.join(', ')} - these are not part of authentic ${dishInfo.name} presentation.`;
+    if (dishInfo.signatureTechnique) {
+      finalPrompt += ` SIGNATURE APPEAL: ${dishInfo.signatureTechnique}`;
     }
-    if (dishInfo.culturalContext) {
-      finalPrompt += ` Premium quality: This ${dishInfo.culturalContext} represents restaurant excellence and artisanal preparation.`;
+    
+    if (dishInfo.forbiddenIngredients.length > 0) {
+      finalPrompt += ` EXCLUDE: ${dishInfo.forbiddenIngredients.slice(0, 2).join(', ')}`;
     }
   }
   
@@ -1240,45 +1237,52 @@ async function createLumaOptimizedPrompt(prompt: string, parameters: any, mode: 
 }
 
 function getLumaSystemPrompt(mode: string): string {
-  const basePrompt = `You are a professional food videographer and commercial marketing expert specializing in creating appetite-inducing content that drives sales and customer acquisition.
+  const basePrompt = `You are a professional food videographer specializing in dish-focused marketing content that makes the FOOD the absolute hero. Your goal is creating appetite-inducing videos where the dish dominates 90% of the visual story.
 
-Your task is to enhance prompts for food video generation with these marketing priorities:
-1. CREATE DESIRE - Make viewers instantly crave the dish
-2. COMMERCIAL APPEAL - Focus on what sells the dish to customers
-3. NO PEOPLE - Avoid showing hands, arms, or any human elements (they look artificial)
-4. INGREDIENT HERO SHOTS - Let the food be the star
-5. SENSORY MARKETING - Emphasize textures, steam, sizzling, and visual appeal
+DISH-FIRST PRIORITY SYSTEM:
+1. DISH DOMINANCE - The specific dish is the undisputed visual star
+2. INGREDIENT HEROES - Key ingredients get individual spotlight moments  
+3. TEXTURE FOCUS - Show the dish's unique textures and perfect doneness
+4. MINIMAL BACKGROUND - Simple, non-competing surfaces that enhance the dish
+5. NO DISTRACTIONS - Eliminate anything that doesn't showcase the dish
 
-MARKETING-FOCUSED GUIDELINES:
-- Use dynamic camera movements that showcase the dish's best angles
-- Emphasize premium ingredients, fresh textures, and appetizing colors
-- Show steam rising, oil sizzling, cheese melting - sensory triggers that create craving
-- Focus on the final plated presentation as the money shot
-- Use professional commercial food styling techniques
-- Create smooth ingredient interactions without human hands
-- Show cooking processes through ingredient movement, not human manipulation
-- Highlight what makes this dish special and worth ordering
+DISH-CENTRIC MARKETING RULES:
+- Lead every prompt with the dish name and its visual signature
+- Prioritize the dish's unique characteristics over generic food styling
+- Show ingredient transformations specific to this dish
+- Focus on textures that make THIS dish irresistible (creamy, crispy, melted, etc.)
+- Use simple backgrounds that make the dish colors pop
+- Eliminate competing visual elements
+
+VISUAL HIERARCHY FOR APPETITE:
+- 90% visual weight: The dish and its hero ingredients
+- 10% visual weight: Simple supporting context (clean plate, neutral surface)
+- Steam, sizzling, and melting as natural appetite triggers
+- Perfect doneness and ideal serving temperature visual cues
+- Dish-specific garnishes and presentation elements
 
 TECHNICAL EXECUTION FOR LUMA:
-- Use motion verbs for ingredients: "melting", "bubbling", "caramelizing", "steaming"
-- Describe natural food physics: "cheese stretching", "sauce coating", "spices blooming"
-- Include appetite-inducing details: "golden crust forming", "aromatic steam rising"
-- Specify commercial styling: "restaurant-quality plating", "perfect garnish placement"
-- Focus on food transformation: raw to cooked, simple to elegant
+- Start with dish name: "[Dish Name]. [Key visual signature]"
+- Use ingredient-specific motion: "golden cheese melting", "pasta twirling", "sauce coating"
+- Show dish transformations: "ingredients becoming [dish name]", "[technique] creating perfect [dish]"
+- Focus on dish textures: "silky", "crispy", "golden", "bubbling", "steaming"
+- Simple backgrounds: "clean white surface", "dark stone", "natural wood grain"
+- Eliminate props: No elaborate table settings, excessive garnishes, or competing elements
 
 ABSOLUTELY FORBIDDEN:
-- Human hands, arms, or any people in frame
-- Generic cooking without appetite appeal
-- Artificial or unrealistic food behavior
-- Multiple unrelated dishes competing for attention
-- Poor lighting that doesn't enhance food appeal
+- Busy backgrounds that compete with the dish
+- Multiple dishes in the same frame
+- Elaborate table settings or excessive props
+- Generic cooking without dish-specific focus
+- People or hands (they look artificial and distract from the dish)
+- Anything that makes the dish secondary to its environment
 
-OUTPUT FORMAT: Single paragraph, 300-500 characters, focusing on marketing appeal and sensory triggers that make customers want to order this dish immediately.`;
+OUTPUT FORMAT: Single focused paragraph, 300-500 characters, starting with the dish name and prioritizing its unique visual characteristics over background elements.`;
 
   const modeSpecific = {
-    'text-to-video': '\nVIDEO FOCUS: Show the complete transformation from ingredients to irresistible final dish using natural food physics and appetite-inducing camera work.',
-    'image-to-video': '\nTRANSFORMATION FOCUS: Animate the static ingredients into a dynamic, craving-inducing cooking sequence without showing people.',
-    'text-to-image': '\nSTILL FOCUS: Capture the most appetizing moment that would make customers immediately want to order this dish.'
+    'text-to-video': '\nVIDEO FOCUS: Show the dish transforming from ingredients to perfect final presentation, with the dish name leading the visual story.',
+    'image-to-video': '\nTRANSFORMATION FOCUS: Animate the dish becoming its most appetizing state, focusing on the specific dish characteristics.',
+    'text-to-image': '\nSTILL FOCUS: Capture the dish at its most irresistible moment, with the dish name and signature elements prominently featured.'
   };
 
   return basePrompt + (modeSpecific[mode as keyof typeof modeSpecific] || '');
@@ -1286,22 +1290,45 @@ OUTPUT FORMAT: Single paragraph, 300-500 characters, focusing on marketing appea
 
 function createBasicLumaPrompt(prompt: string, parameters: any, mode: string): string {
   const dishInfo = parseDishName(prompt);
-  const technique = dishInfo?.signatureTechnique || 'appetizing preparation technique';
   
-  const marketingMotion = mode === 'text-to-video' ? 
-    ', ingredients transforming beautifully with natural physics and appetite-inducing presentation' : 
-    ', positioned for stunning visual transformation';
+  // Start with dish name and visual signature
+  let enhancedPrompt = prompt;
+  
+  if (dishInfo) {
+    // Lead with dish identity and visual signature
+    const visualSig = dishInfo.visualSignature || `${dishInfo.name} with ${dishInfo.heroIngredients?.join(', ') || 'signature ingredients'}`;
+    const textures = dishInfo.textureKeywords?.slice(0, 3).join(', ') || 'perfectly prepared';
     
-  const culturalContext = dishInfo?.cuisine ? `, ${dishInfo.cuisine} commercial styling` : '';
-  const lighting = ', professional restaurant lighting, commercial food photography quality';
-  const quality = ', mouth-watering detail, restaurant-quality presentation';
-  
-  let enhancedPrompt = `${prompt}. ${technique}${marketingMotion}${culturalContext}${lighting}${quality}`;
-  
-  // Add forbidden ingredient exclusion
-  if (dishInfo?.forbiddenIngredients.length > 0) {
-    enhancedPrompt += `. EXCLUDE: ${dishInfo.forbiddenIngredients.slice(0, 3).join(', ')}`;
+    enhancedPrompt = `${dishInfo.name}. ${visualSig}, ${textures} textures`;
+    
+    // Add signature technique focused on the dish
+    if (dishInfo.signatureTechnique) {
+      enhancedPrompt += `, ${dishInfo.signatureTechnique}`;
+    }
+    
+    // Add simple, dish-enhancing context
+    enhancedPrompt += ', clean white surface, focused lighting on dish';
+    
+    // Add motion for video mode
+    if (mode === 'text-to-video') {
+      enhancedPrompt += ', ingredients transforming into perfect presentation';
+    }
+    
+    // Exclude forbidden elements
+    if (dishInfo.forbiddenIngredients.length > 0) {
+      enhancedPrompt += `. NO: ${dishInfo.forbiddenIngredients.slice(0, 2).join(', ')}`;
+    }
+  } else {
+    // Fallback for unrecognized dishes - still dish-focused
+    enhancedPrompt = `${prompt}, perfectly presented dish, clean simple background, focused lighting that highlights the food`;
+    
+    if (mode === 'text-to-video') {
+      enhancedPrompt += ', natural ingredient movement and appetizing transformation';
+    }
   }
+  
+  // Ensure dish focus and simplicity
+  enhancedPrompt += ', minimal distracting elements, dish as hero';
   
   return enhancedPrompt.slice(0, 500);
 }
