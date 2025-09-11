@@ -307,6 +307,39 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          created_at: string
+          event_details: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       static_content: {
         Row: {
           content_type: string
@@ -586,6 +619,15 @@ export type Database = {
       }
     }
     Functions: {
+      check_enhanced_rate_limit: {
+        Args: {
+          p_identifier: string
+          p_max_attempts?: number
+          p_operation?: string
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
       check_verification_rate_limit: {
         Args: { p_email: string; p_ip_address?: string }
         Returns: boolean
@@ -641,6 +683,36 @@ export type Database = {
           signups: number
         }[]
       }
+      get_public_static_content: {
+        Args: { p_content_type?: string; p_site_id?: string }
+        Returns: {
+          content_type: string
+          created_at: string
+          id: string
+          last_updated: string | null
+          sections: Json
+          site_id: string
+          title: string
+          updated_at: string
+        }[]
+      }
+      get_verification_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          access_count: number | null
+          created_at: string
+          dishes_data: Json
+          domain_hash: string | null
+          email: string
+          email_hash: string | null
+          expires_at: string
+          id: string
+          last_accessed_at: string | null
+          updated_at: string
+          verification_token: string
+          verified_at: string | null
+        }[]
+      }
       log_security_event: {
         Args: { event_data?: Json; event_type: string }
         Returns: undefined
@@ -672,8 +744,21 @@ export type Database = {
         }
         Returns: string
       }
+      process_contact_submission_secure: {
+        Args: {
+          p_email: string
+          p_landing_page_id?: string
+          p_message?: string
+          p_subject?: string
+        }
+        Returns: string
+      }
       validate_email_domain: {
         Args: { email_address: string }
+        Returns: boolean
+      }
+      validate_verification_access: {
+        Args: { p_email?: string; p_token: string }
         Returns: boolean
       }
     }

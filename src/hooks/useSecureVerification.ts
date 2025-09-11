@@ -33,32 +33,47 @@ export const useSecureVerification = (): UseSecureVerificationResult => {
     setError(null);
 
     try {
-      // Monitor the access attempt
-      const accessAllowed = await securityMonitor.monitorVerificationAccess(token);
-      if (!accessAllowed) {
-        setError('Too many verification attempts. Please try again later.');
-        toast.error('Rate limit exceeded. Please wait before trying again.');
+      // Use secure function for verification access with enhanced monitoring
+      const { data, error: rpcError } = await supabase.rpc('get_verification_by_token', {
+        p_token: token
+      });
+
+      if (rpcError) {
+        if (rpcError.message?.includes('Rate limit exceeded')) {
+          setError('Too many verification attempts. Please try again later.');
+          toast.error('Rate limit exceeded. Please wait before trying again.');
+        } else {
+          setError('Verification not found or expired');
+        }
         return false;
       }
 
-      const { data, error: supabaseError } = await supabase
-        .from('dish_analysis_verifications')
-        .select('email, dishes_data, verified_at, expires_at')
-        .eq('verification_token', token)
-        .single();
-
-      if (supabaseError || !data) {
+      if (!data || data.length === 0) {
         setError('Verification not found or expired');
         return false;
       }
 
-      // Check if expired
-      if (new Date(data.expires_at) < new Date()) {
+      const verification = data[0];
+
+      // Additional client-side validation
+      if (new Date(verification.expires_at) < new Date()) {
         setError('Verification link has expired');
         return false;
       }
 
-      setVerification(data);
+      setVerification(verification);
+      
+      // Log successful access
+      securityMonitor.logEvent({
+        type: 'verification_access',
+        details: {
+          success: true,
+          action: 'verification_loaded',
+          secureFunction: true,
+          hasData: !!verification.dishes_data
+        }
+      });
+
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch verification';
@@ -68,7 +83,8 @@ export const useSecureVerification = (): UseSecureVerificationResult => {
         details: {
           success: false,
           error: errorMessage,
-          tokenProvided: !!token
+          tokenProvided: !!token,
+          secureFunction: true
         }
       });
       return false;
@@ -92,10 +108,23 @@ export const useSecureVerification = (): UseSecureVerificationResult => {
     setError(null);
 
     try {
+      // Use secure validation function first
+      const { data: isValid, error: validationError } = await supabase.rpc('validate_verification_access', {
+        p_token: token,
+        p_email: verification.email
+      });
+
+      if (validationError || !isValid) {
+        setError('Verification validation failed');
+        return false;
+      }
+
+      // Proceed with verification update
       const { error: updateError } = await supabase
         .from('dish_analysis_verifications')
         .update({ verified_at: new Date().toISOString() })
-        .eq('verification_token', token);
+        .eq('verification_token', token)
+        .eq('verified_at', null); // Only update if not already verified
 
       if (updateError) {
         setError('Failed to verify email');
@@ -113,7 +142,8 @@ export const useSecureVerification = (): UseSecureVerificationResult => {
         details: {
           success: true,
           action: 'email_verified',
-          email: verification.email.substring(0, 3) + '***'
+          email: verification.email.substring(0, 3) + '***',
+          secureFunction: true
         }
       });
 

@@ -139,11 +139,103 @@ class SecurityMonitorEnhanced {
     // Monitor for XSS attempts
     this.monitorXSSAttempts();
     
+    // Initialize global security policies  
+    this.initializeSecurityPolicies();
+
+    // Enhanced security event monitoring
+    this.initializeAdvancedMonitoring();
+    
     // Periodic cleanup
     setInterval(() => {
       this.cleanupRateLimits();
       secureStorage.clearExpired();
     }, 60000); // Every minute
+  }
+
+  private initializeSecurityPolicies(): void {
+    // Set up Content Security Policy violation reporting
+    document.addEventListener('securitypolicyviolation', (event) => {
+      this.logViolation('csp_violation', {
+        violatedDirective: event.violatedDirective,
+        blockedURI: event.blockedURI,
+        documentURI: event.documentURI,
+        effectiveDirective: event.effectiveDirective
+      });
+    });
+
+    // Monitor for suspicious user agent patterns
+    if (this.isSuspiciousUserAgent(navigator.userAgent)) {
+      this.logViolation('suspicious_user_agent', {
+        userAgent: navigator.userAgent.substring(0, 50) // Truncate for privacy
+      });
+    }
+  }
+
+  private isSuspiciousUserAgent(userAgent: string): boolean {
+    const suspiciousPatterns = [
+      /bot/i, /crawler/i, /spider/i, /scraper/i,
+      /curl/i, /wget/i, /python/i, /php/i
+    ];
+    return suspiciousPatterns.some(pattern => pattern.test(userAgent));
+  }
+
+  private initializeAdvancedMonitoring(): void {
+    // Monitor for excessive API calls to sensitive endpoints
+    const originalFetch = window.fetch;
+    let apiCallCount = 0;
+    let resetTime = Date.now() + 60000; // Reset every minute
+
+    window.fetch = async (...args: Parameters<typeof fetch>) => {
+      const url = args[0].toString();
+      
+      // Reset counter if time window passed
+      if (Date.now() > resetTime) {
+        apiCallCount = 0;
+        resetTime = Date.now() + 60000;
+      }
+
+      // Monitor sensitive endpoint access
+      if (url.includes('dish_analysis_verifications') || 
+          url.includes('rpc/get_verification') ||
+          url.includes('rpc/validate_verification')) {
+        apiCallCount++;
+        
+        if (apiCallCount > 10) { // Max 10 verification calls per minute
+          this.logViolation('excessive_verification_calls', {
+            count: apiCallCount,
+            url: url.substring(0, 100),
+            timeWindow: '1min'
+          });
+        }
+      }
+
+      return originalFetch.apply(window, args);
+    };
+
+    // Monitor for form manipulation attempts
+    document.addEventListener('input', (event) => {
+      const target = event.target as HTMLInputElement;
+      if (target?.type === 'hidden') {
+        this.logViolation('hidden_field_manipulation', {
+          fieldName: target.name,
+          value: target.value?.substring(0, 20)
+        });
+      }
+    });
+
+    // Monitor for clipboard access attempts (potential data exfiltration)
+    document.addEventListener('copy', () => {
+      this.logViolation('clipboard_access', { action: 'copy' });
+    });
+
+    // Monitor for suspicious localStorage access patterns
+    const originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(key: string, value: string) {
+      if (key.includes('token') || key.includes('password') || key.includes('secret')) {
+        securityMonitor.logViolation('sensitive_localstorage', { key: key.substring(0, 10) });
+      }
+      return originalSetItem.call(this, key, value);
+    };
   }
 
   private monitorDOMManipulation(): void {

@@ -99,23 +99,29 @@ class SecurityMonitor {
     return true;
   }
 
-  // Verification access monitoring
+  // Enhanced verification access monitoring using secure functions
   async monitorVerificationAccess(token: string, email?: string): Promise<boolean> {
     const startTime = performance.now();
     
     try {
-      // Check rate limiting
+      // Check rate limiting with enhanced tracking
       const ipKey = `verification_${this.getClientFingerprint()}`;
-      if (!this.checkRateLimit(ipKey, 10, 60000)) { // 10 attempts per minute
+      if (!this.checkRateLimit(ipKey, 5, 60000)) { // 5 attempts per minute (stricter)
+        this.logEvent({
+          type: 'suspicious_activity',
+          details: {
+            reason: 'verification_rate_limit_exceeded',
+            attempts: 5
+          }
+        });
         return false;
       }
 
-      // Query with the token
-      const { data, error } = await supabase
-        .from('dish_analysis_verifications')
-        .select('email, expires_at, verified_at')
-        .eq('verification_token', token)
-        .single();
+      // Use secure function for validation
+      const { data: isValid, error } = await supabase.rpc('validate_verification_access', {
+        p_token: token,
+        p_email: email || null
+      });
 
       const responseTime = performance.now() - startTime;
 
@@ -126,7 +132,8 @@ class SecurityMonitor {
             success: false,
             error: error.message,
             responseTime,
-            hasValidToken: !!token
+            hasValidToken: !!token,
+            secureFunction: true
           }
         });
         return false;
@@ -137,20 +144,21 @@ class SecurityMonitor {
         details: {
           success: true,
           responseTime,
-          emailMatch: email ? data.email === email : null,
-          isExpired: new Date(data.expires_at) < new Date(),
-          isAlreadyVerified: !!data.verified_at
+          isValid: !!isValid,
+          hasEmail: !!email,
+          secureFunction: true
         }
       });
 
-      return true;
+      return !!isValid;
     } catch (error) {
       this.logEvent({
         type: 'verification_access',
         details: {
           success: false,
           error: error instanceof Error ? error.message : 'Unknown error',
-          responseTime: performance.now() - startTime
+          responseTime: performance.now() - startTime,
+          secureFunction: true
         }
       });
       return false;
