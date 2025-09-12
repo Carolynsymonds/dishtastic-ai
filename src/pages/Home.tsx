@@ -474,7 +474,7 @@ const Home = () => {
           </div>
           
           {/* Second Row */}
-          <div className="flex gap-0.5 w-full max-w-full px-4">
+          <div className="flex gap-0.5 w-full max-w-full px-4 opacity-60">
             <img 
               src="/lovable-uploads/006ae285-acc6-42fb-a3e2-b2415ed1da30.png" 
               alt="Fine dining steak showcase" 
@@ -516,7 +516,7 @@ const Home = () => {
                     value={textareaValue}
                     onChange={(e) => setTextareaValue(e.target.value)}
                     placeholder="Describe the food or recipe you want to generate..."
-                    className="w-full min-h-[140px] pl-14 pr-12 py-4 pb-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                    className="w-full min-h-[140px] pl-12 pr-12 py-4 pb-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                     rows={5}
                   />
                   
