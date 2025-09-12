@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HeroBanner from "@/components/HeroBanner";
 import { Badge } from "@/components/ui/badge";
-import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown, ArrowUp } from "lucide-react";
+import { Check, Calendar, Shield, Smartphone, Plus, Video, Image, Maximize2, Clock, Camera, MapPin, ChevronDown, ArrowUp, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,6 +16,8 @@ import { useUtmTracking } from "@/hooks/useUtmTracking";
 import { toast } from "sonner";
 import { GenerationParameters } from "@/types/generation";
 import { createSafeInnerHTML } from "@/lib/sanitize";
+import { useIsMobile, useIsMobileOrTablet } from "@/hooks/use-mobile";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface DynamicSvgIconProps {
   url: string;
@@ -77,10 +79,13 @@ const DynamicSvgIcon = memo(({
 const Home = () => {
   const navigate = useNavigate();
   const { navigateWithUtm } = useUtmTracking();
+  const isMobile = useIsMobile();
+  const isMobileOrTablet = useIsMobileOrTablet();
   
   const [textareaValue, setTextareaValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [mobileOptionsOpen, setMobileOptionsOpen] = useState(false);
   const [generationParameters, setGenerationParameters] = useState<GenerationParameters>({
     Format: 'Video',
     Scale: 'Portrait',
@@ -208,6 +213,57 @@ const Home = () => {
       ]
     }
   ];
+
+  // Essential chips for tablet view (Format, Scale, Length)
+  const essentialChips = quickReplies.filter(reply => 
+    ['Format', 'Scale', 'Length'].includes(reply.category)
+  );
+
+  // Mobile Options Dialog Component
+  const MobileOptionsDialog = () => (
+    <Dialog open={mobileOptionsOpen} onOpenChange={setMobileOptionsOpen}>
+      <DialogTrigger asChild>
+        <button className="flex items-center gap-1.5 px-2 py-1 text-[10px] rounded-md bg-muted hover:bg-muted/80 text-foreground border border-border shadow-sm">
+          <Settings className="w-3 h-3" />
+          <span>Options</span>
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Generation Options</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          {quickReplies.map((category) => (
+            <div key={category.category} className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                {category.icon}
+                <span>{category.category}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {category.chips.map((chip) => (
+                  <button
+                    key={chip.text}
+                    onClick={() => {
+                      handleChipClick(chip.text, category.category);
+                    }}
+                    className={`flex items-center gap-2 px-2 py-2 rounded-md text-xs text-left transition-colors ${
+                      generationParameters[category.category] === chip.text
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted hover:bg-muted/80'
+                    }`}
+                  >
+                    {chip.icon}
+                    <span className="truncate">{chip.text}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   // Get features from site content - taking first 3 from the features section
   const features = siteContent.features.items.map(item => {
     const iconMap = {
@@ -330,13 +386,58 @@ const Home = () => {
                     <ArrowUp className="w-5 h-5" />
                   </button>
                   
-                  {/* Quick Reply Chips inside textarea */}
-                  <div className="absolute bottom-6 left-3 right-3 flex flex-wrap gap-2">
-                      {quickReplies.map((category) => (
+                  {/* Quick Reply Chips inside textarea - Responsive */}
+                  <div className="absolute bottom-6 left-3 right-3 flex flex-wrap gap-1">
+                    {isMobile ? (
+                      // Mobile: Single Options button
+                      <MobileOptionsDialog />
+                    ) : isMobileOrTablet ? (
+                      // Tablet: Essential chips only (Format, Scale, Length) - smaller
+                      essentialChips.map((category) => (
                         <div key={category.category} className="relative">
                           <button
                             onClick={() => toggleDropdown(category.category)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md whitespace-nowrap transition-colors border shadow-sm ${
+                            className={`flex items-center gap-1 px-2 py-1 text-[10px] rounded-md whitespace-nowrap transition-colors border shadow-sm ${
+                              generationParameters[category.category] 
+                                ? 'bg-primary text-primary-foreground border-primary' 
+                                : 'bg-muted hover:bg-muted/80 text-foreground border-border'
+                            }`}
+                          >
+                            {category.icon}
+                            <span>{generationParameters[category.category] || category.category}</span>
+                            <ChevronDown className="w-2.5 h-2.5" />
+                          </button>
+                          
+                          {/* Dropdown menu */}
+                          {activeDropdown === category.category && (
+                            <div className="absolute bottom-full mb-2 left-0 bg-background border border-border rounded-lg shadow-lg z-50 min-w-[180px] max-h-40 overflow-y-auto">
+                              <div className="p-2 space-y-1">
+                                {category.chips.map((chip) => (
+                                  <button
+                                    key={chip.text}
+                                    onClick={() => handleChipClick(chip.text, category.category)}
+                                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-left transition-colors ${
+                                      generationParameters[category.category] === chip.text
+                                        ? 'bg-primary text-primary-foreground'
+                                        : 'hover:bg-muted'
+                                    }`}
+                                  >
+                                    {chip.icon}
+                                    <span>{chip.text}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      // Desktop: All chips but smaller
+                      quickReplies.map((category) => (
+                        <div key={category.category} className="relative">
+                          <button
+                            onClick={() => toggleDropdown(category.category)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md whitespace-nowrap transition-colors border shadow-sm ${
                               generationParameters[category.category] 
                                 ? 'bg-primary text-primary-foreground border-primary' 
                                 : 'bg-muted hover:bg-muted/80 text-foreground border-border'
@@ -369,8 +470,9 @@ const Home = () => {
                             </div>
                           )}
                         </div>
-                      ))}
-                    </div>
+                      ))
+                    )}
+                  </div>
                     
                     <input
                       id="image-upload"
