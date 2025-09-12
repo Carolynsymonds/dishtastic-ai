@@ -13,6 +13,7 @@ import FeatureIntroSection from "@/components/FeatureIntroSection";
 import SplitScreenSection from "@/components/SplitScreenSection";
 import { siteContent } from "@/config/site-content";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
+import { useIsMobileOrTablet } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { GenerationParameters } from "@/types/generation";
 import { createSafeInnerHTML } from "@/lib/sanitize";
@@ -77,6 +78,7 @@ const DynamicSvgIcon = memo(({
 const Home = () => {
   const navigate = useNavigate();
   const { navigateWithUtm } = useUtmTracking();
+  const isMobileOrTablet = useIsMobileOrTablet();
   
   const [textareaValue, setTextareaValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -330,47 +332,49 @@ const Home = () => {
                     <ArrowUp className="w-5 h-5" />
                   </button>
                   
-                  {/* Quick Reply Chips inside textarea */}
-                  <div className="absolute bottom-6 left-3 right-3 flex flex-wrap gap-2">
-                      {quickReplies.map((category) => (
-                        <div key={category.category} className="relative">
-                          <button
-                            onClick={() => toggleDropdown(category.category)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md whitespace-nowrap transition-colors border shadow-sm ${
-                              generationParameters[category.category] 
-                                ? 'bg-primary text-primary-foreground border-primary' 
-                                : 'bg-muted hover:bg-muted/80 text-foreground border-border'
-                            }`}
-                          >
-                            {category.icon}
-                            <span>{generationParameters[category.category] || category.category}</span>
-                            <ChevronDown className="w-3 h-3" />
-                          </button>
-                          
-                          {/* Dropdown menu */}
-                          {activeDropdown === category.category && (
-                            <div className="absolute bottom-full mb-2 left-0 bg-background border border-border rounded-lg shadow-lg z-50 min-w-[200px] max-h-48 overflow-y-auto">
-                              <div className="p-2 space-y-1">
-                                {category.chips.map((chip) => (
-                                  <button
-                                    key={chip.text}
-                                    onClick={() => handleChipClick(chip.text, category.category)}
-                                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-left transition-colors ${
-                                      generationParameters[category.category] === chip.text
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'hover:bg-muted'
-                                    }`}
-                                  >
-                                    {chip.icon}
-                                    <span>{chip.text}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                   {/* Quick Reply Chips inside textarea - Hidden on mobile/tablet */}
+                   {!isMobileOrTablet && (
+                     <div className="absolute bottom-6 left-3 right-3 flex flex-wrap gap-2">
+                       {quickReplies.map((category) => (
+                         <div key={category.category} className="relative">
+                           <button
+                             onClick={() => toggleDropdown(category.category)}
+                             className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md whitespace-nowrap transition-colors border shadow-sm ${
+                               generationParameters[category.category] 
+                                 ? 'bg-primary text-primary-foreground border-primary' 
+                                 : 'bg-muted hover:bg-muted/80 text-foreground border-border'
+                             }`}
+                           >
+                             {category.icon}
+                             <span>{generationParameters[category.category] || category.category}</span>
+                             <ChevronDown className="w-3 h-3" />
+                           </button>
+                           
+                           {/* Dropdown menu */}
+                           {activeDropdown === category.category && (
+                             <div className="absolute bottom-full mb-2 left-0 bg-background border border-border rounded-lg shadow-lg z-50 min-w-[200px] max-h-48 overflow-y-auto">
+                               <div className="p-2 space-y-1">
+                                 {category.chips.map((chip) => (
+                                   <button
+                                     key={chip.text}
+                                     onClick={() => handleChipClick(chip.text, category.category)}
+                                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-left transition-colors ${
+                                       generationParameters[category.category] === chip.text
+                                         ? 'bg-primary text-primary-foreground'
+                                         : 'hover:bg-muted'
+                                     }`}
+                                   >
+                                     {chip.icon}
+                                     <span>{chip.text}</span>
+                                   </button>
+                                 ))}
+                               </div>
+                             </div>
+                           )}
+                         </div>
+                       ))}
+                     </div>
+                   )}
                     
                     <input
                       id="image-upload"
