@@ -506,7 +506,7 @@ const Home = () => {
             
             {/* Chat Box */}
             <div className="max-w-5xl mx-auto mt-8">
-              <div className="space-y-4 p-6 bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-lg">
+              <div>
                 {/* Mobile-only headline inside chat box */}
                 <h2 className="md:hidden text-xl font-semibold text-foreground text-center mb-4">
                   Generate Stunning Food ...
@@ -520,14 +520,6 @@ const Home = () => {
                     rows={5}
                   />
                   
-                  {/* Add image button */}
-                  <button
-                    onClick={() => document.getElementById('image-upload')?.click()}
-                    className="absolute top-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
-                    title="Add image"
-                  >
-                    <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
-                  </button>
                   
                   {/* Send button */}
                   <button
