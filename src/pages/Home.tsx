@@ -450,7 +450,7 @@ const Home = () => {
         {/* Background Images - Two Rows */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pt-2 md:pt-24" style={{ gap: '5px' }}>
           {/* First Row */}
-          <div className="flex gap-0.5 w-full max-w-full px-4 opacity-60">
+          <div className="flex gap-0.5 w-full max-w-full px-4">
             <img 
               src="/lovable-uploads/ac8c5174-2398-43ea-8ede-9298108eb6cc.png" 
               alt="Wood-fired pizza showcase" 
