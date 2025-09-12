@@ -214,13 +214,8 @@ const Home = () => {
     }
   ];
 
-  // Essential chips for tablet view (Format, Scale, Length)
-  const essentialChips = quickReplies.filter(reply => 
-    ['Format', 'Scale', 'Length'].includes(reply.category)
-  );
-
-  // Mobile Options Dialog Component
-  const MobileOptionsDialog = () => (
+  // Unified Options Dialog Component for all screen sizes
+  const OptionsDialog = () => (
     <Dialog open={mobileOptionsOpen} onOpenChange={setMobileOptionsOpen}>
       <DialogTrigger asChild>
         <button className="flex items-center gap-1.5 px-2 py-1 text-[10px] rounded-md bg-muted hover:bg-muted/80 text-foreground border border-border shadow-sm">
@@ -228,7 +223,7 @@ const Home = () => {
           <span>Options</span>
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-sm">
+      <DialogContent className={`${isMobile ? 'max-w-sm' : isMobileOrTablet ? 'max-w-md' : 'max-w-lg'}`}>
         <DialogHeader>
           <DialogTitle>Generation Options</DialogTitle>
         </DialogHeader>
@@ -239,7 +234,7 @@ const Home = () => {
                 {category.icon}
                 <span>{category.category}</span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className={`grid gap-2 ${isMobile ? 'grid-cols-2' : isMobileOrTablet ? 'grid-cols-3' : 'grid-cols-4'}`}>
                 {category.chips.map((chip) => (
                   <button
                     key={chip.text}
@@ -388,90 +383,7 @@ const Home = () => {
                   
                   {/* Quick Reply Chips inside textarea - Responsive */}
                   <div className="absolute bottom-6 left-3 right-3 flex flex-wrap gap-1">
-                    {isMobile ? (
-                      // Mobile: Single Options button
-                      <MobileOptionsDialog />
-                    ) : isMobileOrTablet ? (
-                      // Tablet: Essential chips only (Format, Scale, Length) - smaller
-                      essentialChips.map((category) => (
-                        <div key={category.category} className="relative">
-                          <button
-                            onClick={() => toggleDropdown(category.category)}
-                            className={`flex items-center gap-1 px-2 py-1 text-[10px] rounded-md whitespace-nowrap transition-colors border shadow-sm ${
-                              generationParameters[category.category] 
-                                ? 'bg-primary text-primary-foreground border-primary' 
-                                : 'bg-muted hover:bg-muted/80 text-foreground border-border'
-                            }`}
-                          >
-                            {category.icon}
-                            <span>{generationParameters[category.category] || category.category}</span>
-                            <ChevronDown className="w-2.5 h-2.5" />
-                          </button>
-                          
-                          {/* Dropdown menu */}
-                          {activeDropdown === category.category && (
-                            <div className="absolute bottom-full mb-2 left-0 bg-background border border-border rounded-lg shadow-lg z-50 min-w-[180px] max-h-40 overflow-y-auto">
-                              <div className="p-2 space-y-1">
-                                {category.chips.map((chip) => (
-                                  <button
-                                    key={chip.text}
-                                    onClick={() => handleChipClick(chip.text, category.category)}
-                                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-left transition-colors ${
-                                      generationParameters[category.category] === chip.text
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'hover:bg-muted'
-                                    }`}
-                                  >
-                                    {chip.icon}
-                                    <span>{chip.text}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      // Desktop: All chips but smaller
-                      quickReplies.map((category) => (
-                        <div key={category.category} className="relative">
-                          <button
-                            onClick={() => toggleDropdown(category.category)}
-                            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md whitespace-nowrap transition-colors border shadow-sm ${
-                              generationParameters[category.category] 
-                                ? 'bg-primary text-primary-foreground border-primary' 
-                                : 'bg-muted hover:bg-muted/80 text-foreground border-border'
-                            }`}
-                          >
-                            {category.icon}
-                            <span>{generationParameters[category.category] || category.category}</span>
-                            <ChevronDown className="w-3 h-3" />
-                          </button>
-                          
-                          {/* Dropdown menu */}
-                          {activeDropdown === category.category && (
-                            <div className="absolute bottom-full mb-2 left-0 bg-background border border-border rounded-lg shadow-lg z-50 min-w-[200px] max-h-48 overflow-y-auto">
-                              <div className="p-2 space-y-1">
-                                {category.chips.map((chip) => (
-                                  <button
-                                    key={chip.text}
-                                    onClick={() => handleChipClick(chip.text, category.category)}
-                                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-left transition-colors ${
-                                      generationParameters[category.category] === chip.text
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'hover:bg-muted'
-                                    }`}
-                                  >
-                                    {chip.icon}
-                                    <span>{chip.text}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    )}
+                    <OptionsDialog />
                   </div>
                     
                     <input
