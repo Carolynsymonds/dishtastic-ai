@@ -347,13 +347,16 @@ const Home = () => {
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center justify-center min-h-[80vh]">
           <div className="space-y-6">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
-              <span className="md:hidden">Generate Stunning Food...</span>
-              <span className="hidden md:inline">Generate Stunning Food Images or Videos in Seconds</span>
+              Generate Stunning Food Images or Videos in Seconds
             </h1>
             
             {/* Chat Box */}
             <div className="max-w-5xl mx-auto mt-8">
               <div className="space-y-4 p-6 bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-lg">
+                {/* Mobile-only headline inside chat box */}
+                <h2 className="md:hidden text-xl font-semibold text-foreground text-center mb-4">
+                  Generate Stunning Food Images or Videos in Seconds
+                </h2>
                 <div className="relative">
                   <textarea
                     value={textareaValue}
