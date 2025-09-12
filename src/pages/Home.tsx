@@ -445,6 +445,160 @@ const Home = () => {
           
         </div>
       </section>
+      {/* Hero Section V2 */}
+      <section className="relative min-h-[110vh] bg-white flex items-center justify-center px-8 md:px-[125px] py-5 overflow-visible">
+        {/* Background Images - Two Rows */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pt-2 md:pt-24" style={{ gap: '5px' }}>
+          {/* First Row */}
+          <div className="flex gap-0.5 w-full max-w-full px-4 opacity-60">
+            <img 
+              src="/lovable-uploads/ac8c5174-2398-43ea-8ede-9298108eb6cc.png" 
+              alt="Wood-fired pizza showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
+            />
+            <img 
+              src="/lovable-uploads/414772d4-1bcb-4d32-a2a1-79efdc45cdca.png" 
+              alt="Lobster roll showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
+            />
+            <img 
+              src="/lovable-uploads/3019963f-d795-4f70-a8a6-9e8a0f85c0ef.png" 
+              alt="Ramen preparation showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
+            />
+            <img 
+              src="/lovable-uploads/9b776cf4-fad8-4955-a4a2-ccbbd1ce7a96.png" 
+              alt="Poke bowl preparation showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
+            />
+          </div>
+          
+          {/* Second Row */}
+          <div className="flex gap-0.5 w-full max-w-full px-4 opacity-60">
+            <img 
+              src="/lovable-uploads/006ae285-acc6-42fb-a3e2-b2415ed1da30.png" 
+              alt="Fine dining steak showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
+            />
+            <img 
+              src="/lovable-uploads/a8ad989d-7ec6-494d-83c6-f74aab6a0170.png" 
+              alt="Artisan cookies bakery showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
+            />
+            <img 
+              src="/lovable-uploads/26136666-4fcb-49fd-b5a9-13b1af964c5d.png" 
+              alt="Glazed chicken wings showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
+            />
+            <img 
+              src="/lovable-uploads/cba94c88-cf1f-4568-bbdf-43bec434925e.png" 
+              alt="Street taco showcase" 
+              className="flex-1 h-56 md:h-72 lg:h-80 xl:h-96 object-cover"
+            />
+          </div>
+        </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center justify-center min-h-[80vh]">
+          <div className="space-y-6">
+            <h1 className="hidden md:block text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
+              Create AI Food Videos & Images in 1-click
+            </h1>
+            
+            {/* Chat Box */}
+            <div className="max-w-5xl mx-auto mt-8">
+              <div className="space-y-4 p-6 bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-lg">
+                {/* Mobile-only headline inside chat box */}
+                <h2 className="md:hidden text-xl font-semibold text-foreground text-center mb-4">
+                  Generate Stunning Food ...
+                </h2>
+                <div className="relative">
+                  <textarea
+                    value={textareaValue}
+                    onChange={(e) => setTextareaValue(e.target.value)}
+                    placeholder="Describe the food or recipe you want to generate..."
+                    className="w-full min-h-[140px] pl-14 pr-12 py-4 pb-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                    rows={5}
+                  />
+                  
+                  {/* Add image button */}
+                  <button
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    className="absolute top-4 left-4 p-2 hover:bg-muted rounded-lg transition-colors"
+                    title="Add image"
+                  >
+                    <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+                  </button>
+                  
+                  {/* Send button */}
+                  <button
+                    onClick={handleGenerate}
+                    disabled={!textareaValue.trim()}
+                    className="absolute bottom-8 right-4 p-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Generate"
+                  >
+                    <ArrowUp className="w-5 h-5" />
+                  </button>
+                  
+                  {/* Quick Reply Chips inside textarea - Responsive */}
+                  <div className="absolute bottom-6 left-3 right-3 flex flex-wrap gap-1">
+                    <OptionsDialog />
+                  </div>
+                    
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files && files.length > 0) {
+                          const file = files[0];
+                          // Check file size (max 10MB)
+                          if (file.size > 10 * 1024 * 1024) {
+                            toast.error("Image must be smaller than 10MB");
+                            return;
+                          }
+                          
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            const result = event.target?.result as string;
+                            setUploadedImages([result]);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    
+                    {/* Image preview */}
+                    {uploadedImages.length > 0 && (
+                      <div className="absolute top-12 left-3 right-3">
+                        <div className="bg-muted p-2 rounded-lg flex items-center gap-2">
+                          <img 
+                            src={uploadedImages[0]} 
+                            alt="Uploaded dish"
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <span className="text-sm text-muted-foreground flex-1">
+                            {uploadedImages.length > 0 && 'Image uploaded - will use Image-to-Video'}
+                          </span>
+                          <button
+                            onClick={() => setUploadedImages([])}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                </div>
+              </div>
+            </div>
+            
+          </div>
+
+          
+        </div>
+      </section>
 
       <FeaturesSection />
 
