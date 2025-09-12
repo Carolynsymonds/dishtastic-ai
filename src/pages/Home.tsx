@@ -347,7 +347,7 @@ const Home = () => {
         <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center justify-center min-h-[80vh]">
           <div className="space-y-6">
             <h1 className="hidden md:block text-4xl md:text-6xl font-bold text-foreground leading-tight tracking-tight px-0">
-              Generate Stunning Food Images or Videos in Seconds
+              Create AI Food Videos & Images in 1-click
             </h1>
             
             {/* Chat Box */}
