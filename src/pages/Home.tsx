@@ -474,7 +474,7 @@ const Home = () => {
           </div>
           
           {/* Second Row */}
-          <div className="flex gap-0.5 w-full max-w-full px-4 opacity-60">
+          <div className="flex gap-0.5 w-full max-w-full px-4">
             <img 
               src="/lovable-uploads/006ae285-acc6-42fb-a3e2-b2415ed1da30.png" 
               alt="Fine dining steak showcase" 
