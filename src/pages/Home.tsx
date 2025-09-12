@@ -355,7 +355,7 @@ const Home = () => {
               <div className="space-y-4 p-6 bg-background/95 backdrop-blur-sm border border-border rounded-xl shadow-lg">
                 {/* Mobile-only headline inside chat box */}
                 <h2 className="md:hidden text-xl font-semibold text-foreground text-center mb-4">
-                  Generate Stunning Food Images or Videos in Seconds
+                  Generate Stunning Food ...
                 </h2>
                 <div className="relative">
                   <textarea
