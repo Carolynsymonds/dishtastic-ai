@@ -192,8 +192,8 @@ const VideoDisplay = () => {
 
             {/* Box 2 - Locked Variant */}
             <Card className="overflow-hidden relative opacity-75 bg-black border-gray-800">
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700">
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center pointer-events-none">
+                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700 pointer-events-auto">
                   <Lock className="w-8 h-8 mx-auto mb-3 text-gray-300" />
                   <h3 className="font-semibold mb-2 text-white">Premium Variant</h3>
                   <p className="text-sm text-gray-300 mb-3">Cinematic Style</p>
@@ -202,8 +202,40 @@ const VideoDisplay = () => {
                   </Button>
                 </div>
               </div>
-              <div className="min-h-[300px] bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center">
-                <div className="text-6xl opacity-20">🎬</div>
+              <div className="min-h-[300px] relative opacity-50">
+                {type === 'video' ? (
+                  <video 
+                    src={mediaUrl} 
+                    controls 
+                    loop
+                    autoPlay
+                    muted
+                    playsInline
+                    className="w-full h-auto min-h-[300px] bg-black"
+                    poster="/placeholder.svg"
+                    onLoadedData={(e) => {
+                      const video = e.target as HTMLVideoElement;
+                      video.currentTime = 2; // Start at 2 seconds
+                    }}
+                    onError={() => {
+                      console.error('[VIDEO-DISPLAY] Background video load error');
+                    }}
+                    onLoadStart={() => console.log('[VIDEO-DISPLAY] Background video load start')}
+                    onCanPlay={() => console.log('[VIDEO-DISPLAY] Background video can play')}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img
+                    src={mediaUrl}
+                    alt="Generated content"
+                    className="w-full h-auto min-h-[300px] object-cover bg-black"
+                    onError={() => {
+                      console.error('[VIDEO-DISPLAY] Background image load error');
+                    }}
+                    onLoad={() => console.log('[VIDEO-DISPLAY] Background image loaded successfully')}
+                  />
+                )}
               </div>
               <div className="p-4 bg-gray-800">
                 <span className="text-sm font-medium text-gray-400">Style: Cinematic</span>
@@ -212,8 +244,8 @@ const VideoDisplay = () => {
 
             {/* Box 3 - Locked Variant */}
             <Card className="overflow-hidden relative opacity-75 bg-black border-gray-800">
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700">
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center pointer-events-none">
+                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700 pointer-events-auto">
                   <Lock className="w-8 h-8 mx-auto mb-3 text-gray-300" />
                   <h3 className="font-semibold mb-2 text-white">Premium Variant</h3>
                   <p className="text-sm text-gray-300 mb-3">Artistic Style</p>
@@ -222,8 +254,40 @@ const VideoDisplay = () => {
                   </Button>
                 </div>
               </div>
-              <div className="min-h-[300px] bg-gradient-to-br from-blue-900 to-teal-900 flex items-center justify-center">
-                <div className="text-6xl opacity-20">🎨</div>
+              <div className="min-h-[300px] relative opacity-50">
+                {type === 'video' ? (
+                  <video 
+                    src={mediaUrl} 
+                    controls 
+                    loop
+                    autoPlay
+                    muted
+                    playsInline
+                    className="w-full h-auto min-h-[300px] bg-black"
+                    poster="/placeholder.svg"
+                    onLoadedData={(e) => {
+                      const video = e.target as HTMLVideoElement;
+                      video.currentTime = 4; // Start at 4 seconds
+                    }}
+                    onError={() => {
+                      console.error('[VIDEO-DISPLAY] Background video load error');
+                    }}
+                    onLoadStart={() => console.log('[VIDEO-DISPLAY] Background video load start')}
+                    onCanPlay={() => console.log('[VIDEO-DISPLAY] Background video can play')}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img
+                    src={mediaUrl}
+                    alt="Generated content"
+                    className="w-full h-auto min-h-[300px] object-cover bg-black"
+                    onError={() => {
+                      console.error('[VIDEO-DISPLAY] Background image load error');
+                    }}
+                    onLoad={() => console.log('[VIDEO-DISPLAY] Background image loaded successfully')}
+                  />
+                )}
               </div>
               <div className="p-4 bg-gray-800">
                 <span className="text-sm font-medium text-gray-400">Style: Artistic</span>
@@ -232,8 +296,8 @@ const VideoDisplay = () => {
 
             {/* Box 4 - Locked Variant */}
             <Card className="overflow-hidden relative opacity-75 bg-black border-gray-800">
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700">
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center pointer-events-none">
+                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700 pointer-events-auto">
                   <Lock className="w-8 h-8 mx-auto mb-3 text-gray-300" />
                   <h3 className="font-semibold mb-2 text-white">Premium Variant</h3>
                   <p className="text-sm text-gray-300 mb-3">Professional Style</p>
@@ -242,8 +306,40 @@ const VideoDisplay = () => {
                   </Button>
                 </div>
               </div>
-              <div className="min-h-[300px] bg-gradient-to-br from-amber-900 to-orange-900 flex items-center justify-center">
-                <div className="text-6xl opacity-20">💼</div>
+              <div className="min-h-[300px] relative opacity-50">
+                {type === 'video' ? (
+                  <video 
+                    src={mediaUrl} 
+                    controls 
+                    loop
+                    autoPlay
+                    muted
+                    playsInline
+                    className="w-full h-auto min-h-[300px] bg-black"
+                    poster="/placeholder.svg"
+                    onLoadedData={(e) => {
+                      const video = e.target as HTMLVideoElement;
+                      video.currentTime = 6; // Start at 6 seconds
+                    }}
+                    onError={() => {
+                      console.error('[VIDEO-DISPLAY] Background video load error');
+                    }}
+                    onLoadStart={() => console.log('[VIDEO-DISPLAY] Background video load start')}
+                    onCanPlay={() => console.log('[VIDEO-DISPLAY] Background video can play')}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img
+                    src={mediaUrl}
+                    alt="Generated content"
+                    className="w-full h-auto min-h-[300px] object-cover bg-black"
+                    onError={() => {
+                      console.error('[VIDEO-DISPLAY] Background image load error');
+                    }}
+                    onLoad={() => console.log('[VIDEO-DISPLAY] Background image loaded successfully')}
+                  />
+                )}
               </div>
               <div className="p-4 bg-gray-800">
                 <span className="text-sm font-medium text-gray-400">Style: Professional</span>
