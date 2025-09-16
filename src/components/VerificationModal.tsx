@@ -42,6 +42,20 @@ export const VerificationModal = ({ isOpen, onClose, dishesData, purpose = 'unlo
         setIsLoading(true);
 
         try {
+            // Save email subscription
+            const { error: subscriptionError } = await supabase
+                .from('email_subscriptions')
+                .insert({
+                    email: email.trim(),
+                    source: 'verification_modal',
+                    user_id: null // Will be linked if user signs up later
+                });
+
+            if (subscriptionError && subscriptionError.code !== '23505') { // Ignore unique constraint violations
+                console.error('Error saving email subscription:', subscriptionError);
+            }
+
+            // Save report request
             const { data, error } = await supabase
                 .from('report_requests')
                 .insert({
