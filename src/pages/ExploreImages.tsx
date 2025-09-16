@@ -260,7 +260,7 @@ const ExploreImages = () => {
         {/* Hero Section - Full Screen Video */}
         <div className="relative h-screen overflow-hidden">
             <img
-              src="/lovable-uploads/image1-pizza.png"
+              src="/lovable-uploads/pizza_converted.webp"
               alt="Udon - Ramen & Noodles"
               className="w-full h-full object-cover"
             />
