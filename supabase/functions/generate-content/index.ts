@@ -390,18 +390,25 @@ async function generateImage(prompt: string, parameters: any) {
   const getDimensionsAndAspectRatio = (scale: string) => {
     switch (scale) {
       case 'Portrait':
-      case '2:3': return { width: 1024, height: 1536, aspectRatio: "3:4" };
+        return { width: 1024, height: 1536, aspectRatio: "3:4" }; // Portrait: 3:4 aspect ratio
       case 'Landscape':
-      case '16:9': return { width: 1792, height: 1024, aspectRatio: "16:9" }; // Optimal landscape for food photography
+        return { width: 1792, height: 1024, aspectRatio: "16:9" }; // Landscape: 16:9 aspect ratio (optimal for food photography)
       case 'Square':
-      case '1:1':
-      default: return { width: 1024, height: 1024, aspectRatio: "1:1" };
+        return { width: 1024, height: 1024, aspectRatio: "1:1" }; // Square: 1:1 aspect ratio
+      case '2:3': // Legacy support
+        return { width: 1024, height: 1536, aspectRatio: "3:4" };
+      case '16:9': // Legacy support
+        return { width: 1792, height: 1024, aspectRatio: "16:9" };
+      case '1:1': // Legacy support
+        return { width: 1024, height: 1024, aspectRatio: "1:1" };
+      default:
+        return { width: 1792, height: 1024, aspectRatio: "16:9" }; // Default to landscape for images
     }
   };
 
-  const { width, height, aspectRatio } = getDimensionsAndAspectRatio(parameters.Scale || '1:1');
+  const { width, height, aspectRatio } = getDimensionsAndAspectRatio(parameters.Scale || 'Landscape');
   console.log('generateImage: prompt', { prompt });
-  console.log('generateImage: Using dimensions and aspect ratio for Google AI Studio:', { width, height, aspectRatio, scale: parameters.Scale || '1:1' });
+  console.log('generateImage: Using dimensions and aspect ratio for Google AI Studio:', { width, height, aspectRatio, scale: parameters.Scale || 'Landscape' });
   
 
   // Enhanced marketing photography prompt
@@ -779,17 +786,24 @@ async function generateImageWithPrompt(customPrompt: string, parameters: any) {
   const getDimensionsAndAspectRatio = (scale: string) => {
     switch (scale) {
       case 'Portrait':
-      case '2:3': return { width: 1024, height: 1536, aspectRatio: "3:4" };
+        return { width: 1024, height: 1536, aspectRatio: "3:4" }; // Portrait: 3:4 aspect ratio
       case 'Landscape':
-      case '16:9': return { width: 1792, height: 1024, aspectRatio: "16:9" }; // Optimal landscape for food photography
+        return { width: 1792, height: 1024, aspectRatio: "16:9" }; // Landscape: 16:9 aspect ratio (optimal for food photography)
       case 'Square':
-      case '1:1':
-      default: return { width: 1024, height: 1024, aspectRatio: "1:1" };
+        return { width: 1024, height: 1024, aspectRatio: "1:1" }; // Square: 1:1 aspect ratio
+      case '2:3': // Legacy support
+        return { width: 1024, height: 1536, aspectRatio: "3:4" };
+      case '16:9': // Legacy support
+        return { width: 1792, height: 1024, aspectRatio: "16:9" };
+      case '1:1': // Legacy support
+        return { width: 1024, height: 1024, aspectRatio: "1:1" };
+      default:
+        return { width: 1792, height: 1024, aspectRatio: "16:9" }; // Default to landscape for images
     }
   };
 
-  const { width, height, aspectRatio } = getDimensionsAndAspectRatio(parameters.Scale || '1:1');
-  console.log('generateImageWithPrompt: Using dimensions and aspect ratio for Google AI Studio:', { width, height, aspectRatio, scale: parameters.Scale || '1:1' });
+  const { width, height, aspectRatio } = getDimensionsAndAspectRatio(parameters.Scale || 'Landscape');
+  console.log('generateImageWithPrompt: Using dimensions and aspect ratio for Google AI Studio:', { width, height, aspectRatio, scale: parameters.Scale || 'Landscape' });
   
   console.log('generateImageWithPrompt: using Google AI Studio Imagen 4.0');
   try {

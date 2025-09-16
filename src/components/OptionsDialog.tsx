@@ -26,7 +26,7 @@ interface OptionsDialogProps {
 
 export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
   const [config, setConfig] = useState<VideoConfig>({
-    scale: "Portrait",
+    scale: "Landscape",
     length: 5,
     videoStyle: "realistic",
     background: "natural"
