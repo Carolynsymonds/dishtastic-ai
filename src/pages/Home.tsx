@@ -55,47 +55,6 @@ const HomeExplore = () => {
     };
   }, [isLoading, generationStartTime]);
 
-  const handleLoginClick = () => {
-    try {
-      // GA4 recommended event
-      window.gtag?.('event', 'login', {
-        method: 'home_explore_page',
-        button_id: 'login-btn',
-        button_text: 'Log in',
-        page_location: window.location.href,
-      });
-    } catch (e) {
-      // no-op if gtag not available
-    }
-
-    // Navigate to login page
-    navigateWithUtm('/login');
-  };
-
-  const handleChipClick = useCallback((chipText: string, category: string) => {
-    setGenerationParameters(prev => ({
-      ...prev,
-      [category]: chipText
-    }));
-    setActiveDropdown(null); // Close dropdown after selection
-  }, []);
-
-  const handleSignupClick = () => {
-    try {
-      // GA4 recommended event
-      window.gtag?.('event', 'sign_up', {
-        method: 'home_explore_page',
-        button_id: 'signup-btn',
-        button_text: 'Try for free',
-        page_location: window.location.href,
-      });
-    } catch (e) {
-      // no-op if gtag not available
-    }
-
-    // Navigate to signup page
-    navigateWithUtm('/signup');
-  };
 
   // Type Selector Component
   const TypeSelector = () => (
@@ -287,9 +246,9 @@ const HomeExplore = () => {
 
           {/* Optional: Overlay content on video */}
           <div className="absolute inset-0 bg-black bg-opacity-10 flex flex-col items-center justify-center">
-          <div className="space-y-6 max-w-[731px] text-center">
-          <h1 className="block text-center text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight px-0">
-              Create Stunning Food Insta Reels
+            <div className="space-y-6 max-w-[731px] text-center">
+              <h1 className="block text-center text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight px-0">
+                Create Stunning Food Insta Reels
               </h1>
 
               {/* Chat Box */}
@@ -317,15 +276,47 @@ const HomeExplore = () => {
                     onClick={isLoading ? handleCancelGeneration : handleGenerate}
                     disabled={!textareaValue.trim() && !isLoading}
                     className={`absolute bottom-6 md:bottom-8 right-3 md:right-4 transition-all duration-200 ${isLoading
-                        ? "px-3 py-1.5 md:px-4 md:py-2 bg-white hover:bg-gray-100 text-black rounded-full shadow-lg border border-gray-200 cursor-pointer"
-                        : "p-2 md:p-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
+                      ? "px-3 py-1.5 md:px-4 md:py-2 bg-white hover:bg-gray-100 text-black rounded-full shadow-lg border border-gray-200 cursor-pointer"
+                      : "p-2 md:p-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     title={isLoading ? "Cancel generation" : "Generate"}
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2 md:gap-3">
-                        <div className="w-5 h-5 md:w-6 md:h-6 bg-black rounded-full flex items-center justify-center">
-                          <Square className="w-2.5 h-2.5 md:w-3 md:h-3 text-white fill-current" />
+                        <div className="relative w-5 h-5 md:w-6 md:h-6">
+                          {/* Progress Ring */}
+                          <svg className="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 100 100">
+                            {/* Track */}
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="42"
+                              stroke="currentColor"
+                              strokeWidth="8"
+                              fill="none"
+                              className="text-gray-300 opacity-20"
+                            />
+                            {/* Progress */}
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="42"
+                              stroke="currentColor"
+                              strokeWidth="8"
+                              fill="none"
+                              strokeLinecap="round"
+                              transform="rotate(-90 50 50)"
+                              className="text-black"
+                              style={{
+                                strokeDasharray: '264px',
+                                strokeDashoffset: `${264 * (1 - Math.min(generationTime / 30, 1))}px`
+                              }}
+                            />
+                          </svg>
+                          {/* Stop Button */}
+                          {/* <div className="absolute inset-0 bg-black rounded-full flex items-center justify-center">
+                            <Square className="w-2.5 h-2.5 md:w-3 md:h-3 text-white fill-current" />
+                          </div> */}
                         </div>
                         <span className="text-xs md:text-sm text-foreground">Running {generationTime.toFixed(1)}s</span>
                       </div>
@@ -517,7 +508,7 @@ const HomeExplore = () => {
 
           {/* Right Panel - Additional Food */}
           <div className="flex-1 relative overflow-hidden">
-          <video
+            <video
               className="w-full h-full object-cover"
               autoPlay
               muted

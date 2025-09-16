@@ -284,27 +284,32 @@ const ExploreImages = () => {
                       <div className="flex items-center gap-2 md:gap-3">
                         <div className="relative w-5 h-5 md:w-6 md:h-6">
                           {/* Progress Ring */}
-                          <svg className="w-5 h-5 md:w-6 md:h-6 transform -rotate-90" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 100 100">
+                            {/* Track */}
                             <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
+                              cx="50"
+                              cy="50"
+                              r="42"
                               stroke="currentColor"
-                              strokeWidth="2"
+                              strokeWidth="8"
                               fill="none"
-                              className="text-gray-300 opacity-30"
+                              className="text-gray-300 opacity-20"
                             />
+                            {/* Progress */}
                             <circle
-                              cx="12"
-                              cy="12"
-                              r="10"
+                              cx="50"
+                              cy="50"
+                              r="42"
                               stroke="currentColor"
-                              strokeWidth="2"
+                              strokeWidth="8"
                               fill="none"
-                              strokeDasharray={`${2 * Math.PI * 10}`}
-                              strokeDashoffset={`${2 * Math.PI * 10 * (1 - Math.min(generationTime / 30, 1))}`}
-                              className="text-black transition-all duration-100"
                               strokeLinecap="round"
+                              transform="rotate(-90 50 50)"
+                              className="text-black"
+                              style={{
+                                strokeDasharray: '264px',
+                                strokeDashoffset: `${264 * (1 - Math.min(generationTime / 30, 1))}px`
+                              }}
                             />
                           </svg>
                           {/* Stop Button */}
@@ -508,7 +513,8 @@ const ExploreImages = () => {
           {/* Left Panel - Soba */}
           <div className="flex-1 relative overflow-hidden">
             <img
-              src="/lovable-uploads/9b776cf4-fad8-4955-a4a2-ccbbd1ce7a96.png"
+                            src="/lovable-uploads/avocado.webp"
+
               alt="Soba - Ramen & Noodles"
               className="w-full h-full object-cover"
             />

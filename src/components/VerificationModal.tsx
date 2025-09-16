@@ -152,7 +152,7 @@ export const VerificationModal = ({ isOpen, onClose, dishesData, purpose = 'unlo
                             >
                                 {isLoading
                                     ? "Submitting..."
-                                    : (purpose === 'download-report' ? "Get Report" : "Unlock")
+                                    : (purpose === 'download-report' ? "Download" : "Unlock")
                                 }
                             </Button>
                         </div>
