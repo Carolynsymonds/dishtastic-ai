@@ -55,10 +55,8 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] bg-background border border-input text-foreground">
         <DialogHeader>
-          <DialogTitle className="text-foreground">Video Configuration</DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Configure your video generation settings
-          </DialogDescription>
+          <DialogTitle className="text-foreground">Configuration</DialogTitle>
+          
         </DialogHeader>
         
         <div className="space-y-6 py-4">

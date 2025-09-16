@@ -176,14 +176,13 @@ const VideoDisplay = () => {
                   onLoad={() => console.log('[VIDEO-DISPLAY] Image loaded successfully')}
                 />
               )}
-              <div className="p-4 bg-gray-800">
+              <div className="p-4 bg-black">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-300">Style: Original</span>
                   <div className="flex gap-2">
                    
                     <Button variant="ghost" size="sm" className="text-white hover:bg-gray-800 border-0" onClick={handleDownload}>
                       <Download className="w-4 h-4 mr-1" />
-                      Download
+                      
                     </Button>
                   </div>
                 </div>

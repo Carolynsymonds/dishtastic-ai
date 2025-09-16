@@ -29,10 +29,11 @@ const ExploreImages = () => {
   const [mobileOptionsOpen, setMobileOptionsOpen] = useState(false);
   const [generationStartTime, setGenerationStartTime] = useState<number | null>(null);
   const [generationTime, setGenerationTime] = useState(0);
+  const [apiProgress, setApiProgress] = useState(0);
   const [generatedContent, setGeneratedContent] = useState<any>(null);
   const [generationParameters, setGenerationParameters] = useState<GenerationParameters>({
-    Format: 'Video',
-    Scale: 'Portrait',
+    Format: 'Image',
+    Scale: 'Landscape',
     Length: '5s',
     'Video Style': 'Ingredient Drop',
     Background: "Chef's Pass"
@@ -42,6 +43,14 @@ const ExploreImages = () => {
 
   // Type selector state (Image or Video)
   const [generationType, setGenerationType] = useState<"image" | "video">("image");
+
+  // Update scale based on generation type
+  useEffect(() => {
+    setGenerationParameters(prev => ({
+      ...prev,
+      Scale: generationType === "image" ? "Landscape" : "Portrait"
+    }));
+  }, [generationType]);
 
   // Timer effect for generation time tracking
   useEffect(() => {
@@ -144,6 +153,7 @@ const ExploreImages = () => {
     setIsLoading(true);
     setGenerationStartTime(Date.now());
     setGenerationTime(0);
+    setApiProgress(0);
 
     // Include uploaded image in parameters
     const parametersWithImage = {
@@ -162,12 +172,24 @@ const ExploreImages = () => {
         parameters: parametersWithImage
       });
 
+      // Simulate progress updates during API call
+      const progressInterval = setInterval(() => {
+        setApiProgress(prev => {
+          const newProgress = prev + Math.random() * 15; // Random progress increments
+          return Math.min(newProgress, 90); // Cap at 90% until completion
+        });
+      }, 500);
+
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
           prompt: textareaValue,
           parameters: parametersWithImage
         }
       });
+
+      // Clear progress interval and set to 100% on completion
+      clearInterval(progressInterval);
+      setApiProgress(100);
 
       if (error) {
         console.error('[GENERATION] Edge function error:', error);
@@ -248,7 +270,7 @@ const ExploreImages = () => {
           <div className="space-y-6 max-w-[731px] text-center">
 
             <h1 className="block text-center text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight px-0">
-            Create Food Images for Doordash
+            Create Mouth-Watering DoorDash Images
               </h1>
               {/* Chat Box */}
               <div className="w-full px-4 md:max-w-5xl md:mx-auto md:px-0 pt-12 pb-3">
@@ -308,14 +330,10 @@ const ExploreImages = () => {
                               className="text-black"
                               style={{
                                 strokeDasharray: '264px',
-                                strokeDashoffset: `${264 * (1 - Math.min(generationTime / 30, 1))}px`
+                                strokeDashoffset: `${264 * (1 - apiProgress / 100)}px`
                               }}
                             />
                           </svg>
-                          {/* Stop Button */}
-                          <div className="absolute inset-0 bg-black rounded-full flex items-center justify-center">
-                            <Square className="w-2.5 h-2.5 md:w-3 md:h-3 text-white fill-current" />
-                          </div>
                         </div>
                         <span className="text-xs md:text-sm text-foreground">Running {generationTime.toFixed(1)}s</span>
                       </div>

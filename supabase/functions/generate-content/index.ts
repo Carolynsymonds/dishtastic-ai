@@ -45,7 +45,7 @@ const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const runwayApiKey = Deno.env.get('RUNWAY_API_KEY');
 const falApiKey = Deno.env.get('FAL_API_KEY');
 const lumaApiKey = Deno.env.get('LUMA_API_KEY');
-const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+const geminiApiKey = "AIzaSyDIBdPag5MJxyfmB7q5iM9CSdaKRJkHBfg";
 
 interface DishInfo {
   name: string;
@@ -382,118 +382,120 @@ serve(async (req) => {
 });
 
 async function generateImage(prompt: string, parameters: any) {
-  if (!openAIApiKey) {
-    throw new Error('OpenAI API key not configured');
+  if (!geminiApiKey) {
+    throw new Error('Google AI Studio API key not configured');
   }
 
-  // Map scale to image dimensions
-  const getDimensions = (scale: string) => {
+  // Map scale to image dimensions and aspect ratio for Google AI Studio Imagen 4.0
+  const getDimensionsAndAspectRatio = (scale: string) => {
     switch (scale) {
-      case '2:3': return { width: 1024, height: 1536 };
-      case '16:9': return { width: 1792, height: 1024 };
+      case 'Portrait':
+      case '2:3': return { width: 1024, height: 1536, aspectRatio: "3:4" };
+      case 'Landscape':
+      case '16:9': return { width: 1792, height: 1024, aspectRatio: "16:9" }; // Optimal landscape for food photography
+      case 'Square':
       case '1:1':
-      default: return { width: 1024, height: 1024 };
+      default: return { width: 1024, height: 1024, aspectRatio: "1:1" };
     }
   };
 
-  const dimensions = getDimensions(parameters.Scale || '1:1');
-  console.log('generateImage: dimensions/scale/bg', { dimensions, scale: parameters.Scale || '1:1', background: parameters.Background || 'none' });
-  // Enhance prompt for restaurant marketing photography
-  const enhancedPrompt = `Restaurant marketing photography: ${prompt}. ${parameters.Background ? `Setting: ${parameters.Background}.` : ''} Professional restaurant lighting, premium presentation, appetite-inducing quality, social media ready.`;
+  const { width, height, aspectRatio } = getDimensionsAndAspectRatio(parameters.Scale || '1:1');
+  console.log('generateImage: prompt', { prompt });
+  console.log('generateImage: Using dimensions and aspect ratio for Google AI Studio:', { width, height, aspectRatio, scale: parameters.Scale || '1:1' });
   
-  // Try gpt-image-1 first, fallback to dall-e-3 if org verification fails
-  console.log('generateImage: trying gpt-image-1 first');
+
+  // Enhanced marketing photography prompt
+  const enhancedPrompt = `A photo of a restaurant marketing photography of ${prompt}. on a white dish. Make it look perfect and incredibly fresh as though it was just prepared.`
+  // Debug log
+  console.log('generateImage: using Google AI Studio Imagen 4.0', { enhancedPrompt });
+
   try {
-    const response = await fetch('https://api.openai.com/v1/images/generations', {
+    // Use the correct Google AI Studio endpoint for Imagen 4.0
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'x-goog-api-key': geminiApiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-image-1',
-        prompt: enhancedPrompt,
-        n: 1,
-        size: `${dimensions.width}x${dimensions.height}`,
-        quality: 'high',
-        output_format: 'png',
+        instances: [
+          {
+            prompt: enhancedPrompt
+          }
+        ],
+        parameters: {
+          sampleCount: 1,
+          aspectRatio: aspectRatio,
+          dimension: {
+            width: width,
+            height: height
+          }
+        }
       }),
     });
-    console.log('generateImage: gpt-image-1 response', { status: response.status, statusText: response.statusText });
+    
+    console.log('generateImage: Google AI Studio response', { status: response.status, statusText: response.statusText });
+    
+    // Get response text first to debug
+    const responseText = await response.text();
+    console.log('generateImage: Raw response text:', responseText.substring(0, 500));
     
     if (response.ok) {
-      const data = await response.json();
-      console.log('generateImage: gpt-image-1 success');
+      if (!responseText) {
+        throw new Error('Google AI Studio returned empty response');
+      }
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('generateImage: JSON parse error:', parseError);
+        console.error('generateImage: Response text:', responseText);
+        throw new Error('Invalid JSON response from Google AI Studio');
+      }
+      
+      console.log('generateImage: Google AI Studio success, data structure:', Object.keys(data));
+      
+      // Check if the response has the expected structure for Imagen 4.0
+      if (!data.predictions || !Array.isArray(data.predictions) || data.predictions.length === 0) {
+        console.error('generateImage: Unexpected response structure:', data);
+        throw new Error('Google AI Studio returned unexpected response format');
+      }
+      
+      // Extract base64 image from response (Imagen 4.0 format)
+      const prediction = data.predictions[0];
+      const imageData = prediction.bytesBase64Encoded;
+      
+      if (!imageData) {
+        console.error('generateImage: No image data in response:', prediction);
+        throw new Error('Google AI Studio returned no image data');
+      }
+      
       return {
         type: 'image',
-        content: data.data[0].b64_json,
+        content: imageData,
         format: 'png',
         parameters,
         prompt: enhancedPrompt
       };
     } else {
-      const errorData = await response.json();
-      console.log('generateImage: gpt-image-1 failed, checking if org verification issue');
-      
-      // Check if it's an organization verification error
-      if (errorData.error?.message?.includes('organization must be verified')) {
-        console.log('generateImage: org verification issue detected, falling back to dall-e-3');
-        // Fall back to dall-e-3
-        return await generateImageFallback(enhancedPrompt, parameters);
-      } else {
-        console.error('generateImage: gpt-image-1 failed with other error:', errorData);
-        throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+      let errorData;
+      try {
+        errorData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('generateImage: Error response parse failed:', parseError);
+        console.error('generateImage: Error response text:', responseText);
+        throw new Error(`Google AI Studio API error (${response.status}): ${responseText}`);
       }
+      console.error('generateImage: Google AI Studio failed:', errorData);
+      throw new Error(`Google AI Studio API error: ${errorData.error?.message || 'Unknown error'}`);
     }
   } catch (error) {
-    console.error('generateImage: gpt-image-1 request failed:', error);
-    console.log('generateImage: falling back to dall-e-3');
-    return await generateImageFallback(enhancedPrompt, parameters);
+    console.error('generateImage: Google AI Studio request failed:', error);
+    throw error;
   }
 }
 
-async function generateImageFallback(prompt: string, parameters: any) {
-  console.log('generateImageFallback: using dall-e-3');
-
-  // DALL-E-3 only supports 1024x1024, 1792x1024, 1024x1792
-  const scale = parameters.Scale || '1:1';
-  const size = scale === '2:3' ? '1024x1792' : scale === '16:9' ? '1792x1024' : '1024x1024';
-  console.log('generateImageFallback: resolved size for dall-e-3', { scale, size });
-
-  const response = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openAIApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'dall-e-3',
-      prompt: prompt,
-      n: 1,
-      size,
-      quality: 'hd',
-      response_format: 'b64_json',
-    }),
-  });
-  
-  console.log('generateImageFallback: dall-e-3 response', { status: response.status, statusText: response.statusText });
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error('generateImageFallback: dall-e-3 failed:', errorData);
-    throw new Error(`DALL-E-3 API error: ${errorData.error?.message || 'Unknown error'}`);
-  }
-
-  const data = await response.json();
-  console.log('generateImageFallback: dall-e-3 success');
-
-  return {
-    type: 'image',
-    content: data.data[0].b64_json,
-    format: 'png',
-    parameters,
-    prompt: prompt
-  };
-}
 
 async function enhancePromptWithAI(prompt: string, parameters: any): Promise<string> {
   if (!openAIApiKey) {
@@ -769,55 +771,110 @@ function createMarketingImagePrompt(prompt: string, parameters: any): string {
 }
 
 async function generateImageWithPrompt(customPrompt: string, parameters: any) {
-  if (!openAIApiKey) {
-    throw new Error('OpenAI API key not configured');
+  if (!geminiApiKey) {
+    throw new Error('Google AI Studio API key not configured');
   }
 
-  // Map scale to image dimensions
-  const getDimensions = (scale: string) => {
+  // Map scale to image dimensions and aspect ratio for Google AI Studio Imagen 4.0
+  const getDimensionsAndAspectRatio = (scale: string) => {
     switch (scale) {
-      case '2:3': return { width: 1024, height: 1536 };
-      case '16:9': return { width: 1792, height: 1024 };
+      case 'Portrait':
+      case '2:3': return { width: 1024, height: 1536, aspectRatio: "3:4" };
+      case 'Landscape':
+      case '16:9': return { width: 1792, height: 1024, aspectRatio: "16:9" }; // Optimal landscape for food photography
+      case 'Square':
       case '1:1':
-      default: return { width: 1024, height: 1024 };
+      default: return { width: 1024, height: 1024, aspectRatio: "1:1" };
     }
   };
 
-  const dimensions = getDimensions(parameters.Scale || '1:1');
+  const { width, height, aspectRatio } = getDimensionsAndAspectRatio(parameters.Scale || '1:1');
+  console.log('generateImageWithPrompt: Using dimensions and aspect ratio for Google AI Studio:', { width, height, aspectRatio, scale: parameters.Scale || '1:1' });
   
-  // Try gpt-image-1 first, fallback to dall-e-3 if org verification fails
+  console.log('generateImageWithPrompt: using Google AI Studio Imagen 4.0');
   try {
-    const response = await fetch('https://api.openai.com/v1/images/generations', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'x-goog-api-key': geminiApiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-image-1',
-        prompt: customPrompt,
-        n: 1,
-        size: `${dimensions.width}x${dimensions.height}`,
-        quality: 'high',
-        output_format: 'png',
+        instances: [
+          {
+            prompt: customPrompt
+          }
+        ],
+        parameters: {
+          sampleCount: 1,
+          aspectRatio: aspectRatio,
+          dimension: {
+            width: width,
+            height: height
+          }
+        }
       }),
     });
     
+    console.log('generateImageWithPrompt: Google AI Studio response', { status: response.status, statusText: response.statusText });
+    
+    // Get response text first to debug
+    const responseText = await response.text();
+    console.log('generateImageWithPrompt: Raw response text:', responseText.substring(0, 500));
+    
     if (response.ok) {
-      const data = await response.json();
+      if (!responseText) {
+        throw new Error('Google AI Studio returned empty response');
+      }
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('generateImageWithPrompt: JSON parse error:', parseError);
+        console.error('generateImageWithPrompt: Response text:', responseText);
+        throw new Error('Invalid JSON response from Google AI Studio');
+      }
+      
+      console.log('generateImageWithPrompt: Google AI Studio success, data structure:', Object.keys(data));
+      
+      // Check if the response has the expected structure for Imagen 4.0
+      if (!data.predictions || !Array.isArray(data.predictions) || data.predictions.length === 0) {
+        console.error('generateImageWithPrompt: Unexpected response structure:', data);
+        throw new Error('Google AI Studio returned unexpected response format');
+      }
+      
+      // Extract base64 image from response (Imagen 4.0 format)
+      const prediction = data.predictions[0];
+      const imageData = prediction.bytesBase64Encoded;
+      
+      if (!imageData) {
+        console.error('generateImageWithPrompt: No image data in response:', prediction);
+        throw new Error('Google AI Studio returned no image data');
+      }
+      
       return {
         type: 'image',
-        content: data.data[0].b64_json,
+        content: imageData,
         format: 'png',
         parameters,
         prompt: customPrompt
       };
     } else {
-      // Fall back to dall-e-3
-      return await generateImageFallback(customPrompt, parameters);
+      let errorData;
+      try {
+        errorData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('generateImageWithPrompt: Error response parse failed:', parseError);
+        console.error('generateImageWithPrompt: Error response text:', responseText);
+        throw new Error(`Google AI Studio API error (${response.status}): ${responseText}`);
+      }
+      console.error('generateImageWithPrompt: Google AI Studio failed:', errorData);
+      throw new Error(`Google AI Studio API error: ${errorData.error?.message || 'Unknown error'}`);
     }
   } catch (error) {
-    return await generateImageFallback(customPrompt, parameters);
+    console.error('generateImageWithPrompt: Google AI Studio request failed:', error);
+    throw error;
   }
 }
 
