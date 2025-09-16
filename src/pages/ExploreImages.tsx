@@ -154,18 +154,30 @@ const ExploreImages = () => {
 
     // Store dish prompt in database
     try {
+      console.log('[PROMPT_SAVE] Attempting to save prompt to database');
       const { data: userData } = await supabase.auth.getUser();
+      console.log('[PROMPT_SAVE] User data:', userData.user?.id ? 'authenticated' : 'anonymous');
       
-      await supabase.from('dish_prompts').insert({
+      const insertData = {
         user_id: userData.user?.id || null,
         prompt: textareaValue.trim(),
         generation_type: generationType,
         parameters: parametersWithImage,
         user_ip: null, // Could be added later if needed
         user_agent: navigator.userAgent
-      });
+      };
+      
+      console.log('[PROMPT_SAVE] Insert data:', insertData);
+      
+      const { data, error } = await supabase.from('dish_prompts').insert(insertData);
+      
+      if (error) {
+        console.error('[PROMPT_SAVE] Database error:', error);
+      } else {
+        console.log('[PROMPT_SAVE] Successfully saved prompt:', data);
+      }
     } catch (promptError) {
-      console.error('Failed to save prompt:', promptError);
+      console.error('[PROMPT_SAVE] Failed to save prompt:', promptError);
       // Continue with generation even if saving prompt fails
     }
 
