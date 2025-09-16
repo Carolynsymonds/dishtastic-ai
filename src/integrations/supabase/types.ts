@@ -154,6 +154,39 @@ export type Database = {
         }
         Relationships: []
       }
+      dish_prompts: {
+        Row: {
+          created_at: string
+          generation_type: string
+          id: string
+          parameters: Json | null
+          prompt: string
+          user_agent: string | null
+          user_id: string | null
+          user_ip: string | null
+        }
+        Insert: {
+          created_at?: string
+          generation_type: string
+          id?: string
+          parameters?: Json | null
+          prompt: string
+          user_agent?: string | null
+          user_id?: string | null
+          user_ip?: string | null
+        }
+        Update: {
+          created_at?: string
+          generation_type?: string
+          id?: string
+          parameters?: Json | null
+          prompt?: string
+          user_agent?: string | null
+          user_id?: string | null
+          user_ip?: string | null
+        }
+        Relationships: []
+      }
       landing_pages: {
         Row: {
           created_at: string

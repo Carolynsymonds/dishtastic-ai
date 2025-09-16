@@ -152,6 +152,23 @@ const ExploreImages = () => {
       uploadedImage: uploadedImages.length > 0 ? uploadedImages[0] : undefined
     };
 
+    // Store dish prompt in database
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      
+      await supabase.from('dish_prompts').insert({
+        user_id: userData.user?.id || null,
+        prompt: textareaValue.trim(),
+        generation_type: generationType,
+        parameters: parametersWithImage,
+        user_ip: null, // Could be added later if needed
+        user_agent: navigator.userAgent
+      });
+    } catch (promptError) {
+      console.error('Failed to save prompt:', promptError);
+      // Continue with generation even if saving prompt fails
+    }
+
     try {
       const isVideo = parametersWithImage.Format === 'Video';
       toast.info(isVideo ? "Generating video... This may take up to 2 minutes" : "Generating image...");
