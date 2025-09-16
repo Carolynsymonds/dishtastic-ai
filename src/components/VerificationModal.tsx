@@ -73,7 +73,7 @@ export const VerificationModal = ({ isOpen, onClose, dishesData, purpose = 'unlo
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-md bg-gray-900 border-gray-700">
+            <DialogContent className="sm:max-w-md bg-black border-gray-800">
                 <DialogHeader className="text-center">
                     <div className="mx-auto w-32 h-32 flex items-center justify-center">
                         {emailSent ? (
@@ -84,7 +84,7 @@ export const VerificationModal = ({ isOpen, onClose, dishesData, purpose = 'unlo
                             />
                         ) : (
                             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                                <Lock className="w-5 h-5 text-primary" />
+                                <Lock className="w-5 h-5 text-white" />
                             </div>
                         )}
                     </div>
@@ -134,7 +134,7 @@ export const VerificationModal = ({ isOpen, onClose, dishesData, purpose = 'unlo
                             <Button
                                 onClick={handleSendVerification}
                                 disabled={isLoading}
-                                className="flex-1 bg-primary hover:bg-primary/90"
+                                className="flex-1 bg-white text-black hover:bg-gray-200"
                             >
                                 {isLoading
                                     ? "Submitting..."
