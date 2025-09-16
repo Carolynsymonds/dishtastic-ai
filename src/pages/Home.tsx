@@ -338,7 +338,7 @@ const HomeExplore = () => {
                   {/* Quick Reply Chips inside textarea - Responsive */}
                   <div className="absolute bottom-4 md:bottom-6 left-3 right-3 flex flex-wrap gap-1">
                     <TypeSelector />
-                    <OptionsDialog />
+                    <OptionsDialog generationType={generationType} />
                   </div>
 
                   <input

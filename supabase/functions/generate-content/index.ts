@@ -412,7 +412,7 @@ async function generateImage(prompt: string, parameters: any) {
   
 
   // Enhanced marketing photography prompt
-  const enhancedPrompt = `A photo of a restaurant marketing photography of ${prompt}. on a white dish. Make it look perfect and incredibly fresh as though it was just prepared.`
+  const enhancedPrompt = `A photo of a restaurant marketing photography of ${prompt}. On a fancy white dish. Make it look perfect and incredibly fresh as though it was just prepared.`
   // Debug log
   console.log('generateImage: using Google AI Studio Imagen 4.0', { enhancedPrompt });
 

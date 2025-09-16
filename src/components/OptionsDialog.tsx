@@ -22,9 +22,10 @@ interface VideoConfig {
 
 interface OptionsDialogProps {
   onConfigChange?: (config: VideoConfig) => void;
+  generationType?: "image" | "video";
 }
 
-export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
+export default function OptionsDialog({ onConfigChange, generationType = "video" }: OptionsDialogProps) {
   const [config, setConfig] = useState<VideoConfig>({
     scale: "Landscape",
     length: 5,
@@ -96,59 +97,61 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
             </div>
           </div>
 
-          {/* Length Configuration */}
-          <div className="space-y-3">
-            <Label className="text-foreground font-medium">
-              Length
-            </Label>
-            <div className="flex gap-2 flex-wrap">
-              <Button
-                variant={config.length === 1 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleConfigChange('length', 1)}
-                className={`flex items-center gap-2 ${config.length === 1 ? "bg-black text-white hover:bg-gray-800" : ""}`}
-              >
-                <Clock className="w-4 h-4" />
-                1s
-              </Button>
-              <Button
-                variant={config.length === 2 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleConfigChange('length', 2)}
-                className={`flex items-center gap-2 ${config.length === 2 ? "bg-black text-white hover:bg-gray-800" : ""}`}
-              >
-                <Clock className="w-4 h-4" />
-                2s
-              </Button>
-              <Button
-                variant={config.length === 5 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleConfigChange('length', 5)}
-                className={`flex items-center gap-2 ${config.length === 5 ? "bg-black text-white hover:bg-gray-800" : ""}`}
-              >
-                <Clock className="w-4 h-4" />
-                5s
-              </Button>
-              <Button
-                variant={config.length === 10 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleConfigChange('length', 10)}
-                className={`flex items-center gap-2 ${config.length === 10 ? "bg-black text-white hover:bg-gray-800" : ""}`}
-              >
-                <Clock className="w-4 h-4" />
-                10s
-              </Button>
-              <Button
-                variant={config.length === 15 ? "default" : "outline"}
-                size="sm"
-                onClick={() => handleConfigChange('length', 15)}
-                className={`flex items-center gap-2 ${config.length === 15 ? "bg-black text-white hover:bg-gray-800" : ""}`}
-              >
-                <Clock className="w-4 h-4" />
-                15s
-              </Button>
+          {/* Length Configuration - Only show for video generation */}
+          {generationType === "video" && (
+            <div className="space-y-3">
+              <Label className="text-foreground font-medium">
+                Length
+              </Label>
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant={config.length === 1 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleConfigChange('length', 1)}
+                  className={`flex items-center gap-2 ${config.length === 1 ? "bg-black text-white hover:bg-gray-800" : ""}`}
+                >
+                  <Clock className="w-4 h-4" />
+                  1s
+                </Button>
+                <Button
+                  variant={config.length === 2 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleConfigChange('length', 2)}
+                  className={`flex items-center gap-2 ${config.length === 2 ? "bg-black text-white hover:bg-gray-800" : ""}`}
+                >
+                  <Clock className="w-4 h-4" />
+                  2s
+                </Button>
+                <Button
+                  variant={config.length === 5 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleConfigChange('length', 5)}
+                  className={`flex items-center gap-2 ${config.length === 5 ? "bg-black text-white hover:bg-gray-800" : ""}`}
+                >
+                  <Clock className="w-4 h-4" />
+                  5s
+                </Button>
+                <Button
+                  variant={config.length === 10 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleConfigChange('length', 10)}
+                  className={`flex items-center gap-2 ${config.length === 10 ? "bg-black text-white hover:bg-gray-800" : ""}`}
+                >
+                  <Clock className="w-4 h-4" />
+                  10s
+                </Button>
+                <Button
+                  variant={config.length === 15 ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleConfigChange('length', 15)}
+                  className={`flex items-center gap-2 ${config.length === 15 ? "bg-black text-white hover:bg-gray-800" : ""}`}
+                >
+                  <Clock className="w-4 h-4" />
+                  15s
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Video Style Configuration */}
           <div className="space-y-3">

@@ -8,21 +8,21 @@ interface PromptSuggestionsProps {
 }
 
 const PROMPT_SUGGESTIONS = [
+  "Margherita pizza with fresh mozzarella and basil",
+  "Chocolate lava cake with vanilla ice cream",
+  "Ramen bowl with soft-boiled egg and nori",
+  "Grilled salmon with lemon herb butter",
+  "Chicken curry with aromatic spices and rice",
   "A gourmet burger with crispy bacon and melted cheese",
   "Fresh sushi rolls with wasabi and pickled ginger",
   "Homemade pasta with rich tomato sauce and basil",
-  "Grilled salmon with lemon herb butter",
-  "Chocolate lava cake with vanilla ice cream",
-  "Margherita pizza with fresh mozzarella and basil",
   "Caesar salad with crispy croutons and parmesan",
   "Beef stir-fry with colorful vegetables",
   "Apple pie with cinnamon and caramel drizzle",
   "Fish tacos with cabbage slaw and lime",
-  "Ramen bowl with soft-boiled egg and nori",
   "Tiramisu with coffee and mascarpone layers",
   "BBQ ribs with smoky sauce and coleslaw",
   "Caprese salad with tomatoes and mozzarella",
-  "Chicken curry with aromatic spices and rice",
   "Banana bread with walnuts and chocolate chips"
 ];
 
