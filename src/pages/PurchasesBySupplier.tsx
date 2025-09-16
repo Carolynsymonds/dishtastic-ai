@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import Header from "@/components/Header";
+import ExploreHeader from "@/components/ExploreHeader";
 import { Calendar, Download, Filter } from "lucide-react";
 
 const PurchasesBySupplier = () => {
@@ -103,7 +103,7 @@ const PurchasesBySupplier = () => {
 
   return (
     <>
-      <Header />
+      <ExploreHeader />
       <div className="min-h-screen bg-background pt-20">
         <div className="container mx-auto px-4 py-8">
           {/* Page Header */}

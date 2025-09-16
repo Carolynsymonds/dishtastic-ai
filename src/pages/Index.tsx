@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import ExploreHeader from "@/components/ExploreHeader";
 import HeadlineSection from "@/components/HeadlineSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import TeamRolesSection from "@/components/TeamRolesSection";
@@ -14,7 +14,7 @@ const Index = () => {
   return (
     <div className="bg-white min-h-screen">
       <SecurityStatusBanner />
-      <Header />
+      <ExploreHeader />
       <HeadlineSection />
       <FeaturesSection />
       <TeamRolesSection />

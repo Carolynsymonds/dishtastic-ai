@@ -25,15 +25,15 @@ const CookieConsent = () => {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-gray-800 shadow-lg">
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex-1">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-300">
               We use cookies to enhance your experience and analyze site usage. By continuing to use our website, you consent to our use of cookies.{" "}
               <a 
                 href="/privacy-policy" 
-                className="text-primary hover:underline"
+                className="text-white hover:underline"
               >
                 Learn more
               </a>
@@ -44,14 +44,14 @@ const CookieConsent = () => {
               variant="outline" 
               size="sm" 
               onClick={handleReject}
-              className="text-sm"
+              className="text-sm bg-transparent border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
             >
               Reject
             </Button>
             <Button 
               size="sm" 
               onClick={handleAccept}
-              className="text-sm"
+              className="text-sm bg-white text-black hover:bg-gray-200"
             >
               Accept
             </Button>

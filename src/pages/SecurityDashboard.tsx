@@ -7,9 +7,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Shield, AlertTriangle, CheckCircle, Activity, Eye, Lock, Database, Users } from "lucide-react";
 import { securityMonitor } from "@/lib/security-monitor";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/Header";
+import ExploreHeader from "@/components/ExploreHeader";
 import Footer from "@/components/Footer";
-import TopBanner from "@/components/TopBanner";
 import { SecurityAlert } from "@/components/SecurityAlert";
 
 interface SecurityMetrics {
@@ -114,8 +113,7 @@ const SecurityDashboard = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
-        <TopBanner />
-        <Header />
+        <ExploreHeader />
         
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-32">
           <div className="max-w-4xl mx-auto text-center">
@@ -136,8 +134,7 @@ const SecurityDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
-      <TopBanner />
-      <Header />
+      <ExploreHeader />
       
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-32">
         <div className="max-w-7xl mx-auto">

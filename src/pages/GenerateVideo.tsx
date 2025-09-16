@@ -5,9 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/Header";
+import ExploreHeader from "@/components/ExploreHeader";
 import Footer from "@/components/Footer";
-import TopBanner from "@/components/TopBanner";
 
 const GenerateVideo = () => {
   const [searchParams] = useSearchParams();
@@ -121,8 +120,7 @@ const GenerateVideo = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
-      <TopBanner />
-      <Header />
+      <ExploreHeader />
       
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-32">
         <div className="max-w-4xl mx-auto">

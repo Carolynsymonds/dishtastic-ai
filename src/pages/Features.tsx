@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Check } from "lucide-react";
-import Header from "@/components/Header";
+import ExploreHeader from "@/components/ExploreHeader";
 import Footer from "@/components/Footer";
 import { siteContent } from "@/config/site-content";
 
@@ -12,7 +12,7 @@ import BenefitsSection from "@/components/BenefitsSection";
 const Features = () => {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <ExploreHeader />
       
       {/* Hero Section */}
       <section className="min-h-[80vh] bg-white flex flex-col justify-between md:px-[125px] md:py-16 p-6 gap-10">

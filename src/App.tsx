@@ -20,13 +20,16 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import VideoDisplay from "./pages/VideoDisplay";
 import GenerateVideo from "./pages/GenerateVideo";
+import Explore from "./pages/Explore";
+import ExploreImages from "./pages/ExploreImages";
+import ExploreVideos from "./pages/ExploreVideos";
+import HomeOriginal from "./pages/HomeOriginal";
 import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import CookieConsent from "./components/CookieConsent";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { useUtmTracking } from "./hooks/useUtmTracking";
 import { useGoogleAnalytics } from "./hooks/useGoogleAnalytics";
-import TopBanner from "./components/TopBanner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { initSecurity } from "./lib/security";
 
@@ -35,7 +38,7 @@ const queryClient = new QueryClient();
 const UtmTracker = () => {
   useUtmTracking(); // Initialize UTM tracking
   useGoogleAnalytics(); // Initialize Google Analytics
-  
+
   // Initialize security monitoring only once
   useEffect(() => {
     try {
@@ -44,19 +47,10 @@ const UtmTracker = () => {
       console.error('Security initialization failed:', error);
     }
   }, []); // Empty dependency array ensures this runs only once
-  
+
   return null;
 };
 
-const ConditionalTopBanner = () => {
-  const location = useLocation();
-  const hideBannerRoutes = ['/signup', '/app'];
-  const shouldHideBanner = hideBannerRoutes.some(route => 
-    location.pathname === route || location.pathname.startsWith('/app/')
-  );
-  
-  return shouldHideBanner ? null : <TopBanner />;
-};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -66,37 +60,40 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <div>
-            <ConditionalTopBanner />
             <UtmTracker />
             <ScrollToTop />
-              <Routes>
-             <Route path="/" element={<Home />} />
-             <Route path="/free-plan" element={<Index />} />
-             <Route path="/pricing" element={<Pricing />} />
-             <Route path="/features" element={<Features />} />
-             <Route path="/contact" element={<Contact />} />
-             <Route path="/login" element={<Login />} />
-             <Route path="/signup" element={<Signup />} />
-             <Route path="/auth/callback" element={<AuthCallback />} />
-             <Route path="/app" element={<Application />} />
-             <Route path="/app/purchases" element={<PurchasesBySupplier />} />
-             <Route path="/app/inventory" element={<Inventory />} />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/home-original" element={<HomeOriginal />} />
+              <Route path="/free-plan" element={<Index />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/features" element={<Features />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/explore/images" element={<ExploreImages />} />
+              <Route path="/explore/videos" element={<Home />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/app" element={<Application />} />
+              <Route path="/app/purchases" element={<PurchasesBySupplier />} />
+              <Route path="/app/inventory" element={<Inventory />} />
               <Route path="/app/inventory/analytics" element={<InventoryAnalytics />} />
-               <Route path="/video" element={
-                 <ErrorBoundary>
-                   <VideoDisplay />
-                 </ErrorBoundary>
-               } />
-               <Route path="/generate" element={
-                 <ErrorBoundary>
-                   <GenerateVideo />
-                 </ErrorBoundary>
-               } />
+              <Route path="/video" element={
+                <ErrorBoundary>
+                  <VideoDisplay />
+                </ErrorBoundary>
+              } />
+              <Route path="/generate" element={
+                <ErrorBoundary>
+                  <GenerateVideo />
+                </ErrorBoundary>
+              } />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-conditions" element={<TermsConditions />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-             <Route path="*" element={<NotFound />} />
-             </Routes>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
             <CookieConsent />
           </div>
         </BrowserRouter>

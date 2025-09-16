@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useStaticContent } from "@/hooks/useStaticContent";
 import { supabase } from "@/integrations/supabase/client";
 import { siteContent } from "@/config/site-content";
-import Header from "@/components/Header";
+import ExploreHeader from "@/components/ExploreHeader";
 import Footer from "@/components/Footer";
 import ContactMap from "@/components/ContactMap";
 
@@ -80,7 +80,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <ExploreHeader />
       <main className="container mx-auto px-4 py-24">
         <div className="text-center mb-8 mt-3">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-8 leading-tight">

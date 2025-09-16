@@ -40,13 +40,13 @@ const Header = () => {
 
   return (
     <header 
-      className={`fixed top-16 md:top-12 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-background/95 backdrop-blur-md shadow-sm border-b' 
-          : 'bg-transparent'
+          ? 'bg-black/95 backdrop-blur-md shadow-sm border-b border-gray-800' 
+          : 'bg-black'
       }`}
     >
-      <div className="container mx-auto px-8 md:px-16 lg:px-24">
+      <div className="mx-auto px-3 md:px-6 lg:px-6">
         <div className="flex items-center h-16 justify-between">
           {/* Logo and Navigation */}
           <div className="flex items-center gap-8">
@@ -54,28 +54,28 @@ const Header = () => {
               <img 
                 src={siteContent.brand.logoUrl}  
                 alt={`${siteContent.brand.name} Logo`} 
-                className="h-16 w-auto hover:opacity-80 transition-opacity"
+                className="h-12 w-auto mr-3"
                 />
             </Link>
             
             {/* Navigation Menu */}
-            <nav className="hidden md:flex items-center gap-6">
+            <nav className="hidden md:flex gap-6">
               {/* Solution Link */}
                <Button 
-                 onClick={() => navigateWithUtm('/features')}
+                 onClick={() => navigateWithUtm('/explore/images')}
                  variant="ghost" 
-                 className="text-foreground font-sans text-sm"
+                 className="text-white font-normal hover:bg-transparent"
                >
-                 Features
+                 Images
                </Button>
 
               {/* Pricing Link */}
               <Button 
-                onClick={() => navigateWithUtm('/pricing')}
+                onClick={() => navigateWithUtm('/explore/videos')}
                 variant="ghost" 
-                className="text-foreground font-sans text-sm"
+                className="text-white font-normal hover:bg-transparent"
               >
-                Pricing
+                Videos
               </Button>
             </nav>
           </div>
@@ -83,10 +83,10 @@ const Header = () => {
           {/* Right Side - User Actions */}
           <div className="flex items-center gap-4">
             {/* Desktop Buttons - Side by side */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <Button 
                 onClick={handleSignupClick}
-                className="px-6 py-2 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+                className="px-6 py-2 text-sm font-semibold bg-white hover:bg-gray-100 text-black rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
               >
                 Try for free
               </Button>
@@ -94,7 +94,7 @@ const Header = () => {
               <Button 
                 onClick={() => navigateWithUtm('/login')}
                 variant="ghost"
-                className="px-6 py-2 text-sm font-medium text-foreground transition-colors"
+                className="px-6 py-2 text-sm font-medium text-white hover:text-gray-300 transition-colors"
               >
                 Log in
               </Button>
@@ -156,19 +156,19 @@ const Header = () => {
                   {/* Navigation Links */}
                   <div className="flex flex-col gap-3 pt-4 pl-2 pr-2">
                     <Button 
-                      onClick={() => navigateWithUtm('/features')}
+                      onClick={() => navigateWithUtm('/explore/images')}
                       variant="ghost" 
                       className="w-full justify-start text-foreground font-sans text-lg py-2 px-0 pl-0"
                     >
-                      Features
+                      Images
                     </Button>
                     
                     <Button 
-                      onClick={() => navigateWithUtm('/pricing')}
+                      onClick={() => navigateWithUtm('/explore/videos')}
                       variant="ghost" 
                       className="w-full justify-start text-foreground font-sans text-lg py-2 px-0 pl-0"
                     >
-                      Pricing
+                      Videos
                     </Button>
                     
                     <div className="border-t pt-3">

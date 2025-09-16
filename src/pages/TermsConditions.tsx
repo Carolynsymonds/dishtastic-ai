@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import ExploreHeader from "@/components/ExploreHeader";
 import Footer from "@/components/Footer";
 import { siteContent } from "@/config/site-content";
 import { staticContent } from "@/config/static-content";
@@ -6,7 +6,7 @@ import { staticContent } from "@/config/static-content";
 const TermsConditions = () => {
   return (
     <>
-      <Header />
+      <ExploreHeader />
       <div className="min-h-screen bg-white pt-32 px-4 py-12">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="space-y-4">
