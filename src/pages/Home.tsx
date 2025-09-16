@@ -21,7 +21,7 @@ const HomeExplore = () => {
   const { navigateWithUtm } = useUtmTracking();
   const isMobile = useIsMobile();
   const isMobileOrTablet = useIsMobileOrTablet();
-  
+
   const [textareaValue, setTextareaValue] = useState("");
   const textareaRef1 = useRef<HTMLTextAreaElement>(null);
   const textareaRef2 = useRef<HTMLTextAreaElement>(null);
@@ -101,10 +101,10 @@ const HomeExplore = () => {
   const TypeSelector = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-1.5 px-2 py-1 text-[10px] rounded-md bg-muted hover:bg-muted/80 text-foreground border border-border shadow-sm">
-          <Film className="w-3 h-3" />
+        <button className="flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2 py-0.5 md:py-1 text-[9px] md:text-[10px] rounded-md bg-muted hover:bg-muted/80 text-foreground border border-border shadow-sm">
+          <Film className="w-2.5 h-2.5 md:w-3 md:h-3" />
           <span>{generationType === "video" ? "Video" : "Image"}</span>
-          <ChevronDown className="w-3 h-3" />
+          <ChevronDown className="w-2.5 h-2.5 md:w-3 md:h-3" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48 bg-background border border-input text-foreground rounded-lg shadow-lg" align="start">
@@ -114,8 +114,8 @@ const HomeExplore = () => {
         <DropdownMenuItem
           onClick={() => setGenerationType("image")}
           className={`flex items-center gap-2 px-3 py-2 text-sm cursor-pointer ${generationType === "image"
-              ? "bg-accent text-accent-foreground"
-              : "hover:bg-accent hover:text-accent-foreground"
+            ? "bg-accent text-accent-foreground"
+            : "hover:bg-accent hover:text-accent-foreground"
             }`}
         >
           <Image className="w-4 h-4" />
@@ -127,8 +127,8 @@ const HomeExplore = () => {
         <DropdownMenuItem
           onClick={() => setGenerationType("video")}
           className={`flex items-center gap-2 px-3 py-2 text-sm cursor-pointer ${generationType === "video"
-              ? "bg-accent text-accent-foreground"
-              : "hover:bg-accent hover:text-accent-foreground"
+            ? "bg-accent text-accent-foreground"
+            : "hover:bg-accent hover:text-accent-foreground"
             }`}
         >
           <Video className="w-4 h-4" />
@@ -161,13 +161,13 @@ const HomeExplore = () => {
     try {
       const isVideo = parametersWithImage.Format === 'Video';
       toast.info(isVideo ? "Generating video... This may take up to 2 minutes" : "Generating image...");
-      
-      console.log('[GENERATION] Calling edge function', { 
-        isVideo, 
+
+      console.log('[GENERATION] Calling edge function', {
+        isVideo,
         promptLength: textareaValue.length,
         parameters: parametersWithImage
       });
-      
+
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
           prompt: textareaValue,
@@ -177,7 +177,7 @@ const HomeExplore = () => {
 
       if (error) {
         console.error('[GENERATION] Edge function error:', error);
-        
+
         // Provide more specific error messages
         if (error.message?.includes('non-2xx status code')) {
           toast.error('Generation service is currently unavailable. Please try again later.');
@@ -186,18 +186,18 @@ const HomeExplore = () => {
         } else {
           toast.error(`Generation failed: ${error.message}`);
         }
-        
+
         throw error;
       }
 
-      console.log('[GENERATION] Success', { 
-        type: data.type, 
-        format: data.format, 
+      console.log('[GENERATION] Success', {
+        type: data.type,
+        format: data.format,
         dataSize: data.content?.length || 0
       });
 
       toast.success(`${isVideo ? 'Video' : 'Image'} generated successfully!`);
-      
+
       // Store data in sessionStorage to avoid URL size limits
       const generationData = {
         url: data.type === 'video' ? data.content : `data:image/${data.format};base64,${data.content}`,
@@ -207,9 +207,9 @@ const HomeExplore = () => {
         parameters: data.parameters,
         generatedAt: new Date().toISOString()
       };
-      
+
       sessionStorage.setItem('generatedContent', JSON.stringify(generationData));
-      
+
       // Navigate to video display page
       setTimeout(() => {
         navigate('/video?id=' + Date.now());
@@ -217,12 +217,12 @@ const HomeExplore = () => {
 
     } catch (error: any) {
       console.error('[GENERATION] Error:', error);
-      
+
       // Reset loading state
       setIsLoading(false);
       setGenerationStartTime(null);
       setGenerationTime(0);
-      
+
       // Don't show duplicate error messages
       if (!error.message?.includes('Generation service')) {
         toast.error(error.message || 'Failed to generate content');
@@ -258,122 +258,121 @@ const HomeExplore = () => {
 
           {/* Optional: Overlay content on video */}
           <div className="absolute inset-0 bg-black bg-opacity-10 flex flex-col items-center justify-center">
-          <div className="space-y-6">
-              <h1 className="hidden md:block text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight px-0">
-                Create Stunning Food Reels
-            </h1>
-            
-            {/* Chat Box */}
-            <div className="max-w-5xl mx-auto pt-12 pb-3">
+          <div className="space-y-6 max-w-[731px] text-center">
+          <h1 className="block text-center text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight px-0">
+              Create Stunning Food Insta Reels
+              </h1>
+
+              {/* Chat Box */}
+              <div className="w-full px-4 md:max-w-5xl md:mx-auto md:px-0 pt-12 pb-3">
                 <div className="relative">
                   <textarea
                     ref={textareaRef2}
                     value={textareaValue}
                     onChange={(e) => setTextareaValue(e.target.value)}
                     placeholder="Describe the food or recipe you want to generate..."
-                    className="w-full min-h-[80px] h-[100px] pl-4 font-light pr-12 py-4 pb-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                    rows={5}
+                    className="w-full min-h-[70px] h-[85px] md:min-h-[80px] md:h-[100px] pl-3 md:pl-4 font-light pr-10 md:pr-12 py-3 md:py-4 pb-8 md:pb-12 border border-input bg-background rounded-lg text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none text-sm md:text-base"
+                    rows={4}
                   />
-                  
-                  <PromptSuggestions 
+
+                  <PromptSuggestions
                     onSelect={(prompt) => setTextareaValue(prompt)}
                     textareaRef={textareaRef2}
                     className="w-full"
                   />
-                  
-                
-                  
+
+
+
                   {/* Send button */}
                   <button
                     onClick={isLoading ? handleCancelGeneration : handleGenerate}
                     disabled={!textareaValue.trim() && !isLoading}
-                    className={`absolute bottom-8 right-4 transition-all duration-200 ${
-                      isLoading 
-                        ? "px-4 py-2 bg-white hover:bg-gray-100 text-black rounded-full shadow-lg border border-gray-200 cursor-pointer" 
-                        : "p-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    className={`absolute bottom-6 md:bottom-8 right-3 md:right-4 transition-all duration-200 ${isLoading
+                        ? "px-3 py-1.5 md:px-4 md:py-2 bg-white hover:bg-gray-100 text-black rounded-full shadow-lg border border-gray-200 cursor-pointer"
+                        : "p-2 md:p-3 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
                     title={isLoading ? "Cancel generation" : "Generate"}
                   >
                     {isLoading ? (
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
-                          <Square className="w-3 h-3 text-white fill-current" />
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <div className="w-5 h-5 md:w-6 md:h-6 bg-black rounded-full flex items-center justify-center">
+                          <Square className="w-2.5 h-2.5 md:w-3 md:h-3 text-white fill-current" />
                         </div>
-                        <span className="text-sm text-foreground">Running {generationTime.toFixed(1)}s</span>
+                        <span className="text-xs md:text-sm text-foreground">Running {generationTime.toFixed(1)}s</span>
                       </div>
                     ) : (
-                      <ArrowUp className="w-5 h-5" />
+                      <ArrowUp className="w-4 h-4 md:w-5 md:h-5" />
                     )}
                   </button>
-                  
+
                   {/* Quick Reply Chips inside textarea - Responsive */}
-                  <div className="absolute bottom-6 left-3 right-3 flex flex-wrap gap-1">
+                  <div className="absolute bottom-4 md:bottom-6 left-3 right-3 flex flex-wrap gap-1">
                     <TypeSelector />
                     <OptionsDialog />
                   </div>
-                    
-                    <input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const files = e.target.files;
-                        if (files && files.length > 0) {
-                          const file = files[0];
-                          // Check file size (max 10MB)
-                          if (file.size > 10 * 1024 * 1024) {
-                            toast.error("Image must be smaller than 10MB");
-                            return;
-                          }
-                          
-                          // Start loading
-                          setIsLoading(true);
-                          
-                          const reader = new FileReader();
-                          reader.onload = (event) => {
-                            const result = event.target?.result as string;
-                            setUploadedImages([result]);
-                            
-                            // Simulate processing time and stop loading
-                            setTimeout(() => {
-                              setIsLoading(false);
-                            }, 3000);
-                          };
-                          reader.readAsDataURL(file);
+
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (files && files.length > 0) {
+                        const file = files[0];
+                        // Check file size (max 10MB)
+                        if (file.size > 10 * 1024 * 1024) {
+                          toast.error("Image must be smaller than 10MB");
+                          return;
                         }
-                      }}
-                    />
-                    
-                    {/* Image preview */}
-                    {uploadedImages.length > 0 && (
-                      <div className="absolute top-12 left-3 right-3">
-                        <div className="bg-muted p-2 rounded-lg flex items-center gap-2">
-                          <img 
-                            src={uploadedImages[0]} 
-                            alt="Uploaded dish"
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <span className="text-sm text-muted-foreground flex-1">
-                            {uploadedImages.length > 0 && 'Image uploaded - will use Image-to-Video'}
-                          </span>
-                          <button
-                            onClick={() => setUploadedImages([])}
-                            className="text-muted-foreground hover:text-foreground"
-                          >
-                            ×
-                          </button>
-                        </div>
+
+                        // Start loading
+                        setIsLoading(true);
+
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const result = event.target?.result as string;
+                          setUploadedImages([result]);
+
+                          // Simulate processing time and stop loading
+                          setTimeout(() => {
+                            setIsLoading(false);
+                          }, 3000);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+
+                  {/* Image preview */}
+                  {uploadedImages.length > 0 && (
+                    <div className="absolute top-12 left-3 right-3">
+                      <div className="bg-muted p-2 rounded-lg flex items-center gap-2">
+                        <img
+                          src={uploadedImages[0]}
+                          alt="Uploaded dish"
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                        <span className="text-sm text-muted-foreground flex-1">
+                          {uploadedImages.length > 0 && 'Image uploaded - will use Image-to-Video'}
+                        </span>
+                        <button
+                          onClick={() => setUploadedImages([])}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          ×
+                        </button>
                       </div>
-                    )}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>            
+            </div>
           </div>
         </div>
 
         {/* Additional Images Section */}
-        <div className="flex h-screen">
+        <div className="flex flex-col md:flex-row h-screen">
           {/* Left Panel - More Seafood */}
           <div className="flex-1 relative overflow-hidden">
 
@@ -414,10 +413,10 @@ const HomeExplore = () => {
 
             </video>
           </div>
-      </div>
+        </div>
 
         {/* Third Row */}
-        <div className="flex h-screen">
+        <div className="flex flex-col md:flex-row h-screen">
           {/* Left Panel - Cupcakes */}
           <div className="flex-1 relative overflow-hidden">
             <video
@@ -427,14 +426,56 @@ const HomeExplore = () => {
               loop
               playsInline
             >
-              <source src="/videos/video2.mp4" type="video/mp4" />
+              <source src="/videos/video9.mp4" type="video/mp4" />
 
             </video>
-              </div>
+          </div>
 
           {/* Middle Panel - Tacos */}
           <div className="flex-1 relative overflow-hidden">
-          <video
+            <video
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src="/videos/video10.mp4" type="video/mp4" />
+            </video>
+          </div>
+
+          {/* Right Panel - Wings */}
+          <div className="flex-1 relative overflow-hidden">
+            <video
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src="/videos/video8.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+
+        {/* Fourth Row */}
+        <div className="flex flex-col md:flex-row h-screen">
+          {/* Left Panel - Soba */}
+          <div className="flex-1 relative overflow-hidden">
+            <video
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src="/videos/video2.mp4" type="video/mp4" />
+            </video>
+          </div>
+
+          {/* Middle Panel - Avocado Salad */}
+          <div className="flex-1 relative overflow-hidden">
+            <video
               className="w-full h-full object-cover"
               autoPlay
               muted
@@ -443,135 +484,19 @@ const HomeExplore = () => {
             >
               <source src="/videos/video4.mp4" type="video/mp4" />
             </video>
-            </div>
-
-          {/* Right Panel - Wings */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1400&auto=format&fit=crop"
-              alt="Wings - Tacos & Wings"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-
-        {/* Fourth Row */}
-        <div className="flex h-screen">
-          {/* Left Panel - Soba */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=1400&auto=format&fit=crop"
-              alt="Soba - Ramen & Noodles"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Middle Panel - Avocado Salad */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1522184216315-dc2f3f3b9f98?q=80&w=1400&auto=format&fit=crop"
-              alt="Avocado Salad - Bowls & Salads"
-              className="w-full h-full object-cover"
-            />
           </div>
 
           {/* Right Panel - Additional Food */}
           <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1516685018646-549198525c1b?q=80&w=1400&auto=format&fit=crop"
-              alt="Lasagna - Additional Dishes"
+          <video
               className="w-full h-full object-cover"
-            />
-          </div>
-                  </div>
-
-        {/* Fifth Row - Desserts & Bakes */}
-        <div className="flex h-screen">
-          {/* Left Panel - Cookies */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1400&auto=format&fit=crop"
-              alt="Cookies - Desserts & Bakes"
-              className="w-full h-full object-cover"
-            />
-                  </div>
-
-          {/* Middle Panel - Cheesecake */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?q=80&w=1400&auto=format&fit=crop"
-              alt="Cheesecake - Desserts & Bakes"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Right Panel - Brownie */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1540126034813-121bf29033c8?q=80&w=1400&auto=format&fit=crop"
-              alt="Brownie - Desserts & Bakes"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-
-        {/* Sixth Row - More Desserts & Tacos */}
-        <div className="flex h-screen">
-          {/* Left Panel - Cupcakes */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?q=80&w=1400&auto=format&fit=crop"
-              alt="Cupcakes - Desserts & Bakes"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Middle Panel - Tacos */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?q=80&w=1400&auto=format&fit=crop"
-              alt="Tacos - Tacos & Wings"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Right Panel - Wings */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1400&auto=format&fit=crop"
-              alt="Wings - Tacos & Wings"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-
-        {/* Seventh Row - More Tacos & Wings */}
-        <div className="flex h-screen">
-          {/* Left Panel - Nachos */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1541542684-4a1a72e1c8a3?q=80&w=1400&auto=format&fit=crop"
-              alt="Nachos - Tacos & Wings"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Middle Panel - Quesadilla */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1523986371872-9d3ba2e2f642?q=80&w=1400&auto=format&fit=crop"
-              alt="Quesadilla - Tacos & Wings"
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Right Panel - Additional Food */}
-          <div className="flex-1 relative overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1516685018646-549198525c1b?q=80&w=1400&auto=format&fit=crop"
-              alt="Lasagna - Additional Dishes"
-              className="w-full h-full object-cover"
-            />
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              <source src="/videos/video12.mp4" type="video/mp4" />
+            </video>
           </div>
         </div>
       </main>

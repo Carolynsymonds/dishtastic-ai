@@ -1337,6 +1337,250 @@ function createMotionOptimizedImagePrompt(prompt: string, parameters: any): stri
   return `Professional food photography setup for video animation: ${prompt}. Perfect for motion generation, optimal ingredient placement, clear textures, studio lighting, ready for dynamic movement, high resolution commercial quality.`;
 }
 
+// Veo video generation with Google Gemini API
+async function generateVideoWithVeo(prompt: string, parameters: any): Promise<any> {
+  console.log('🎬 Starting Veo video generation...');
+  
+  try {
+    if (!geminiApiKey) {
+      throw new Error('Gemini API key not found. Please add GEMINI_API_KEY to your Supabase secrets.');
+    }
+
+    // Create enhanced prompt optimized for Veo
+    const enhancedPrompt = await createVeoOptimizedPrompt(prompt, parameters);
+    console.log('Enhanced Veo prompt:', enhancedPrompt);
+
+    // Map parameters to Veo format
+    const veoParams = mapParametersToVeo(parameters);
+    console.log('Mapped Veo parameters:', veoParams);
+
+    // Generate video with Veo through Gemini API
+    const videoResponse = await callVeoAPI(enhancedPrompt, veoParams);
+    
+    console.log('✅ Veo video generation completed');
+    return videoResponse;
+
+  } catch (error) {
+    console.error('❌ Veo video generation failed:', error);
+    throw error;
+  }
+}
+
+// Create Veo-optimized prompt
+async function createVeoOptimizedPrompt(prompt: string, parameters: any): Promise<string> {
+  if (!openAIApiKey) {
+    return createBasicVeoPrompt(prompt, parameters);
+  }
+
+  try {
+    const systemPrompt = getVeoSystemPrompt();
+    
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-2025-04-14',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Create a Veo-optimized video prompt for: "${prompt}"` }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      }),
+    });
+
+    if (!response.ok) {
+      console.log('OpenAI enhancement failed, using basic prompt');
+      return createBasicVeoPrompt(prompt, parameters);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+
+  } catch (error) {
+    console.error('Error enhancing prompt for Veo:', error);
+    return createBasicVeoPrompt(prompt, parameters);
+  }
+}
+
+// Veo system prompt for optimization
+function getVeoSystemPrompt(): string {
+  return `You are an expert at creating cinematic video prompts for Google's Veo model.
+
+Veo excels at:
+- Realistic camera movements and cinematography
+- Natural lighting and shadows
+- Fluid motion and physics
+- High-quality textures and details
+- Professional video production aesthetics
+
+For food content, emphasize:
+- Appetizing close-ups with shallow depth of field
+- Natural lighting that highlights textures
+- Smooth camera movements (pan, tilt, dolly)
+- Steam, bubbling, or natural motion
+- Professional food photography aesthetics
+
+Create a concise, descriptive prompt (max 150 words) that leverages Veo's strengths.`;
+}
+
+// Create basic Veo prompt without AI enhancement
+function createBasicVeoPrompt(prompt: string, parameters: any): string {
+  const dishInfo = parseDishName(prompt);
+  
+  let enhancedPrompt = prompt;
+  
+  // Add cinematography elements
+  enhancedPrompt += ', cinematic lighting, professional food photography';
+  
+  // Add camera movement based on parameters
+  if (parameters.VideoStyle === 'dynamic') {
+    enhancedPrompt += ', smooth camera movement, dynamic angles';
+  } else {
+    enhancedPrompt += ', steady camera, elegant composition';
+  }
+  
+  // Add duration context
+  if (parameters.Length === 'long') {
+    enhancedPrompt += ', extended sequence showing preparation and final dish';
+  } else {
+    enhancedPrompt += ', focused shot highlighting the main subject';
+  }
+  
+  return enhancedPrompt;
+}
+
+// Map current parameters to Veo format
+function mapParametersToVeo(parameters: any): any {
+  const veoParams: any = {
+    resolution: "1080p",
+    fps: 24
+  };
+
+  // Map aspect ratio from Scale parameter
+  if (parameters.Scale) {
+    switch (parameters.Scale.toLowerCase()) {
+      case 'square':
+      case '1:1':
+        veoParams.aspect_ratio = "1:1";
+        break;
+      case 'landscape':
+      case '16:9':
+      case 'widescreen':
+        veoParams.aspect_ratio = "16:9";
+        break;
+      case 'portrait':
+      case '9:16':
+      case 'vertical':
+        veoParams.aspect_ratio = "9:16";
+        break;
+      default:
+        veoParams.aspect_ratio = "16:9";
+    }
+  }
+
+  // Map duration from Length parameter
+  if (parameters.Length) {
+    switch (parameters.Length.toLowerCase()) {
+      case 'short':
+        veoParams.duration = 5;
+        break;
+      case 'medium':
+        veoParams.duration = 10;
+        break;
+      case 'long':
+        veoParams.duration = 15;
+        break;
+      default:
+        veoParams.duration = 8;
+    }
+  }
+
+  // Map quality settings
+  if (parameters.VideoStyle) {
+    switch (parameters.VideoStyle.toLowerCase()) {
+      case 'cinematic':
+        veoParams.style = "cinematic";
+        veoParams.quality = "high";
+        break;
+      case 'realistic':
+        veoParams.style = "realistic";
+        veoParams.quality = "high";
+        break;
+      case 'dynamic':
+        veoParams.style = "dynamic";
+        veoParams.camera_motion = "medium";
+        break;
+      default:
+        veoParams.style = "realistic";
+    }
+  }
+
+  return veoParams;
+}
+
+// Call Veo API through Gemini
+async function callVeoAPI(prompt: string, parameters: any): Promise<any> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/veo-3:generateContent?key=${geminiApiKey}`;
+  
+  const requestBody = {
+    contents: [{
+      parts: [{
+        text: prompt
+      }]
+    }],
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 1000,
+    },
+    safetySettings: [
+      {
+        category: "HARM_CATEGORY_HARASSMENT",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE"
+      }
+    ]
+  };
+
+  console.log('Calling Veo API with params:', JSON.stringify(requestBody, null, 2));
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Veo API error response:', errorText);
+    throw new Error(`Veo API error: ${response.status} - ${errorText}`);
+  }
+
+  const result = await response.json();
+  console.log('Veo API response:', result);
+
+  // Extract video URL from response
+  if (result.candidates && result.candidates[0] && result.candidates[0].content) {
+    const content = result.candidates[0].content;
+    
+    // For now, return the response structure - Veo integration may need polling
+    return {
+      type: 'video',
+      content: content.parts[0].text || 'Video generation initiated',
+      url: content.videoUrl || null, // This may not be immediately available
+      format: 'mp4',
+      parameters: parameters,
+      prompt: prompt,
+      provider: 'veo'
+    };
+  }
+
+  throw new Error('Invalid response from Veo API');
+}
 
 async function generateVideo(prompt: string, parameters: any) {
   const requestId = crypto.randomUUID();
@@ -1649,262 +1893,5 @@ async function generateVideoWithRunway(prompt: string, parameters: any) {
   } catch (error) {
     console.error('[RUNWAY]', { requestId, event: 'generation_failed', error: (error as Error).message });
   throw error;
-}
-
-// Veo video generation with Google Gemini API
-async function generateVideoWithVeo(prompt: string, parameters: any): Promise<any> {
-  console.log('🎬 Starting Veo video generation...');
-  
-  try {
-    if (!geminiApiKey) {
-      throw new Error('Gemini API key not found. Please add GEMINI_API_KEY to your Supabase secrets.');
-    }
-
-    // Create enhanced prompt optimized for Veo
-    const enhancedPrompt = await createVeoOptimizedPrompt(prompt, parameters);
-    console.log('Enhanced Veo prompt:', enhancedPrompt);
-
-    // Map parameters to Veo format
-    const veoParams = mapParametersToVeo(parameters);
-    console.log('Mapped Veo parameters:', veoParams);
-
-    // Generate video with Veo through Gemini API
-    const videoResponse = await callVeoAPI(enhancedPrompt, veoParams);
-    
-    console.log('✅ Veo video generation completed');
-    return videoResponse;
-
-  } catch (error) {
-    console.error('❌ Veo video generation failed:', error);
-    throw error;
-  }
-}
-
-// Create Veo-optimized prompt
-async function createVeoOptimizedPrompt(prompt: string, parameters: any): Promise<string> {
-  if (!openAIApiKey) {
-    return createBasicVeoPrompt(prompt, parameters);
-  }
-
-  try {
-    const systemPrompt = getVeoSystemPrompt();
-    
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Create a Veo-optimized video prompt for: "${prompt}"` }
-        ],
-        max_tokens: 500,
-        temperature: 0.7
-      }),
-    });
-
-    if (!response.ok) {
-      console.log('OpenAI enhancement failed, using basic prompt');
-      return createBasicVeoPrompt(prompt, parameters);
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-
-  } catch (error) {
-    console.error('Error enhancing prompt for Veo:', error);
-    return createBasicVeoPrompt(prompt, parameters);
-  }
-}
-
-// Veo system prompt for optimization
-function getVeoSystemPrompt(): string {
-  return `You are an expert at creating cinematic video prompts for Google's Veo model.
-
-Veo excels at:
-- Realistic camera movements and cinematography
-- Natural lighting and shadows
-- Fluid motion and physics
-- High-quality textures and details
-- Professional video production aesthetics
-
-For food content, emphasize:
-- Appetizing close-ups with shallow depth of field
-- Natural lighting that highlights textures
-- Smooth camera movements (pan, tilt, dolly)
-- Steam, bubbling, or natural motion
-- Professional food photography aesthetics
-
-Create a concise, descriptive prompt (max 150 words) that leverages Veo's strengths.`;
-}
-
-// Create basic Veo prompt without AI enhancement
-function createBasicVeoPrompt(prompt: string, parameters: any): string {
-  const dishInfo = parseDishName(prompt);
-  
-  let enhancedPrompt = prompt;
-  
-  // Add cinematography elements
-  enhancedPrompt += ', cinematic lighting, professional food photography';
-  
-  // Add camera movement based on parameters
-  if (parameters.VideoStyle === 'dynamic') {
-    enhancedPrompt += ', smooth camera movement, dynamic angles';
-  } else {
-    enhancedPrompt += ', steady camera, elegant composition';
-  }
-  
-  // Add duration context
-  if (parameters.Length === 'long') {
-    enhancedPrompt += ', extended sequence showing preparation and final dish';
-  } else {
-    enhancedPrompt += ', focused shot highlighting the main subject';
-  }
-  
-  return enhancedPrompt;
-}
-
-// Map current parameters to Veo format
-function mapParametersToVeo(parameters: any): any {
-  const veoParams: any = {
-    resolution: "1080p",
-    fps: 24
-  };
-
-  // Map aspect ratio from Scale parameter
-  if (parameters.Scale) {
-    switch (parameters.Scale.toLowerCase()) {
-      case 'square':
-      case '1:1':
-        veoParams.aspect_ratio = "1:1";
-        break;
-      case 'landscape':
-      case '16:9':
-      case 'widescreen':
-        veoParams.aspect_ratio = "16:9";
-        break;
-      case 'portrait':
-      case '9:16':
-      case 'vertical':
-        veoParams.aspect_ratio = "9:16";
-        break;
-      default:
-        veoParams.aspect_ratio = "16:9";
-    }
-  }
-
-  // Map duration from Length parameter
-  if (parameters.Length) {
-    switch (parameters.Length.toLowerCase()) {
-      case 'short':
-        veoParams.duration = 5;
-        break;
-      case 'medium':
-        veoParams.duration = 10;
-        break;
-      case 'long':
-        veoParams.duration = 15;
-        break;
-      default:
-        veoParams.duration = 8;
-    }
-  }
-
-  // Map quality settings
-  if (parameters.VideoStyle) {
-    switch (parameters.VideoStyle.toLowerCase()) {
-      case 'cinematic':
-        veoParams.style = "cinematic";
-        veoParams.quality = "high";
-        break;
-      case 'realistic':
-        veoParams.style = "realistic";
-        veoParams.quality = "high";
-        break;
-      case 'dynamic':
-        veoParams.style = "dynamic";
-        veoParams.camera_motion = "medium";
-        break;
-      default:
-        veoParams.style = "realistic";
-    }
-  }
-
-  return veoParams;
-}
-
-// Call Veo API through Gemini
-async function callVeoAPI(prompt: string, parameters: any): Promise<any> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/veo-3:generateContent?key=${geminiApiKey}`;
-  
-  const requestBody = {
-    contents: [{
-      parts: [{
-        text: prompt
-      }]
-    }],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 1000,
-    },
-    safetySettings: [
-      {
-        category: "HARM_CATEGORY_HARASSMENT",
-        threshold: "BLOCK_MEDIUM_AND_ABOVE"
-      }
-    ]
-  };
-
-  // Add video-specific parameters if this is a video generation
-  if (parameters.aspect_ratio || parameters.duration) {
-    requestBody.generationConfig = {
-      ...requestBody.generationConfig,
-      videoConfig: {
-        aspectRatio: parameters.aspect_ratio || "16:9",
-        duration: `${parameters.duration || 8}s`,
-        fps: parameters.fps || 24
-      }
-    };
-  }
-
-  console.log('Calling Veo API with params:', JSON.stringify(requestBody, null, 2));
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('Veo API error response:', errorText);
-    throw new Error(`Veo API error: ${response.status} - ${errorText}`);
-  }
-
-  const result = await response.json();
-  console.log('Veo API response:', result);
-
-  // Extract video URL from response
-  if (result.candidates && result.candidates[0] && result.candidates[0].content) {
-    const content = result.candidates[0].content;
-    
-    // For now, return the response structure - Veo integration may need polling
-    return {
-      type: 'video',
-      content: content.parts[0].text || 'Video generation initiated',
-      url: content.videoUrl || null, // This may not be immediately available
-      format: 'mp4',
-      parameters: parameters,
-      prompt: prompt,
-      provider: 'veo'
-    };
-  }
-
-  throw new Error('Invalid response from Veo API');
 }
 }

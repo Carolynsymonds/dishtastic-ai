@@ -13,6 +13,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import ExploreHeader from "@/components/ExploreHeader";
+import Footer from "@/components/Footer";
+import { VerificationModal } from "@/components/VerificationModal";
 
 const VideoDisplay = () => {
   const [searchParams] = useSearchParams();
@@ -21,6 +24,8 @@ const VideoDisplay = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [mediaError, setMediaError] = useState(false);
   const [showSignupDialog, setShowSignupDialog] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [verificationModalPurpose, setVerificationModalPurpose] = useState<'unlock-analysis' | 'download-report'>('unlock-analysis');
   
   useEffect(() => {
     console.log('[VIDEO-DISPLAY] Component mounted');
@@ -59,25 +64,19 @@ const VideoDisplay = () => {
     setIsLoading(false);
   }, [searchParams]);
   
-  const { url: videoUrl, prompt, type, format, parameters } = contentData || {};
+  const { url: videoUrl, content, prompt, type, format, parameters } = contentData || {};
   
-  const handleDownload = () => {
-    if (videoUrl) {
-      const a = document.createElement('a');
-      a.href = videoUrl;
-      if (type === 'video') {
-        a.download = `generated-video.${format || 'mp4'}`;
-      } else {
-        a.download = `generated-image.${format || 'jpg'}`;
-      }
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
+  // Handle base64 image content
+  const mediaUrl = type === 'image' && content ? `data:image/${format || 'png'};base64,${content}` : videoUrl;
+  
+  const handleUnlock = () => {
+    setVerificationModalPurpose('unlock-analysis');
+    setShowVerificationModal(true);
   };
 
-  const handleUnlock = () => {
-    setShowSignupDialog(true);
+  const handleDownload = () => {
+    setVerificationModalPurpose('download-report');
+    setShowVerificationModal(true);
   };
 
   const handleSignupConfirm = () => {
@@ -85,46 +84,29 @@ const VideoDisplay = () => {
     navigate('/signup');
   };
 
-  const handleShare = async () => {
-    if (navigator.share && videoUrl) {
-      try {
-        await navigator.share({
-          title: `Generated ${type === 'video' ? 'Video' : 'Image'}`,
-          text: prompt || `Check out this AI-generated ${type}!`,
-          url: window.location.href
-        });
-      } catch (error) {
-        // Fallback to copying URL
-        navigator.clipboard.writeText(window.location.href);
-        toast.success(`${type === 'video' ? 'Video' : 'Content'} link copied to clipboard!`);
-      }
-    } else if (videoUrl) {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success(`${type === 'video' ? 'Video' : 'Content'} link copied to clipboard!`);
-    }
-  };
+
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="p-8 text-center max-w-md">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <h2 className="text-lg font-semibold mb-2">Loading Content...</h2>
-          <p className="text-muted-foreground">Please wait while we prepare your generated content.</p>
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <Card className="p-8 text-center max-w-md bg-gray-900 border-gray-700">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-white" />
+          <h2 className="text-lg font-semibold mb-2 text-white">Loading Content...</h2>
+          <p className="text-gray-300">Please wait while we prepare your generated content.</p>
         </Card>
       </div>
     );
   }
 
-  if (!videoUrl) {
+  if (!mediaUrl) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="p-8 text-center max-w-md">
-          <h1 className="text-2xl font-bold mb-4">Content Not Found</h1>
-          <p className="text-muted-foreground mb-6">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <Card className="p-8 text-center max-w-md bg-gray-900 border-gray-700">
+          <h1 className="text-2xl font-bold mb-4 text-white">Content Not Found</h1>
+          <p className="text-gray-300 mb-6">
             The requested content could not be found or the URL is invalid.
           </p>
-          <Button onClick={() => navigate('/')} className="w-full">
+          <Button onClick={() => navigate('/')} className="w-full bg-primary hover:bg-primary/90">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
@@ -134,51 +116,27 @@ const VideoDisplay = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Button>
-            
-            <Button variant="outline" size="sm" onClick={() => navigate('/')}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Generate Another
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-black">
+      <ExploreHeader />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 pt-24">
+        <h1 className="text-4xl md:text-6xl font-bold text-center text-white mb-8 leading-tight">
+            Results
+          </h1>
         <div className="max-w-6xl mx-auto space-y-6">
-          {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Generated Results</h1>
-            <p className="text-muted-foreground">Your AI-generated content is ready!</p>
-          </div>
 
           {/* Grid of 4 boxes (2x2) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Box 1 - Actual Generated Content */}
-            <Card className="overflow-hidden relative">
-              <div className="absolute top-4 left-4 z-10">
-                <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                  ✓ Generated
-                </span>
-              </div>
+            <Card className="overflow-hidden relative bg-gray-900 border-gray-700">
+
               {mediaError ? (
-                <div className="flex flex-col items-center justify-center p-12 bg-muted/50 min-h-[300px]">
-                  <p className="text-muted-foreground mb-4">Failed to load {type === 'video' ? 'video' : 'image'}</p>
+                <div className="flex flex-col items-center justify-center p-12 bg-gray-800 min-h-[300px]">
+                  <p className="text-gray-300 mb-4">Failed to load {type === 'video' ? 'video' : 'image'}</p>
                   <Button 
                     variant="outline" 
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
                     onClick={() => {
                       setMediaError(false);
                       window.location.reload();
@@ -189,9 +147,12 @@ const VideoDisplay = () => {
                 </div>
               ) : type === 'video' ? (
                 <video 
-                  src={videoUrl} 
+                  src={mediaUrl} 
                   controls 
                   loop
+                  autoPlay
+                  muted
+                  playsInline
                   className="w-full h-auto min-h-[300px] bg-black"
                   poster="/placeholder.svg"
                   onError={() => {
@@ -205,7 +166,7 @@ const VideoDisplay = () => {
                 </video>
               ) : (
                 <img
-                  src={videoUrl}
+                  src={mediaUrl}
                   alt="Generated content"
                   className="w-full h-auto min-h-[300px] object-cover bg-black"
                   onError={() => {
@@ -215,15 +176,12 @@ const VideoDisplay = () => {
                   onLoad={() => console.log('[VIDEO-DISPLAY] Image loaded successfully')}
                 />
               )}
-              <div className="p-4 bg-white">
+              <div className="p-4 bg-gray-800">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Style: Original</span>
+                  <span className="text-sm font-medium text-gray-300">Style: Original</span>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={handleShare}>
-                      <Share2 className="w-4 h-4 mr-1" />
-                      Share
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleDownload}>
+                   
+                    <Button variant="ghost" size="sm" className="text-white hover:bg-gray-800 border-0" onClick={handleDownload}>
                       <Download className="w-4 h-4 mr-1" />
                       Download
                     </Button>
@@ -233,65 +191,62 @@ const VideoDisplay = () => {
             </Card>
 
             {/* Box 2 - Locked Variant */}
-            <Card className="overflow-hidden relative opacity-75">
-              <div className="absolute inset-0 bg-black/20 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 text-center">
-                  <Lock className="w-8 h-8 mx-auto mb-3 text-gray-600" />
-                  <h3 className="font-semibold mb-2">Premium Variant</h3>
-                  <p className="text-sm text-gray-600 mb-3">Cinematic Style</p>
-                  <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleUnlock}>
-                    <Crown className="w-4 h-4 mr-2" />
+            <Card className="overflow-hidden relative opacity-75 bg-black border-gray-800">
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700">
+                  <Lock className="w-8 h-8 mx-auto mb-3 text-gray-300" />
+                  <h3 className="font-semibold mb-2 text-white">Premium Variant</h3>
+                  <p className="text-sm text-gray-300 mb-3">Cinematic Style</p>
+                  <Button size="sm" className="bg-white text-black hover:bg-gray-200" onClick={handleUnlock}>
                     Unlock
                   </Button>
                 </div>
               </div>
-              <div className="min-h-[300px] bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+              <div className="min-h-[300px] bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center">
                 <div className="text-6xl opacity-20">🎬</div>
               </div>
-              <div className="p-4 bg-white">
-                <span className="text-sm font-medium text-gray-500">Style: Cinematic</span>
+              <div className="p-4 bg-gray-800">
+                <span className="text-sm font-medium text-gray-400">Style: Cinematic</span>
               </div>
             </Card>
 
             {/* Box 3 - Locked Variant */}
-            <Card className="overflow-hidden relative opacity-75">
-              <div className="absolute inset-0 bg-black/20 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 text-center">
-                  <Lock className="w-8 h-8 mx-auto mb-3 text-gray-600" />
-                  <h3 className="font-semibold mb-2">Premium Variant</h3>
-                  <p className="text-sm text-gray-600 mb-3">Artistic Style</p>
-                  <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleUnlock}>
-                    <Crown className="w-4 h-4 mr-2" />
+            <Card className="overflow-hidden relative opacity-75 bg-black border-gray-800">
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700">
+                  <Lock className="w-8 h-8 mx-auto mb-3 text-gray-300" />
+                  <h3 className="font-semibold mb-2 text-white">Premium Variant</h3>
+                  <p className="text-sm text-gray-300 mb-3">Artistic Style</p>
+                  <Button size="sm" className="bg-white text-black hover:bg-gray-200" onClick={handleUnlock}>
                     Unlock
                   </Button>
                 </div>
               </div>
-              <div className="min-h-[300px] bg-gradient-to-br from-blue-100 to-teal-100 flex items-center justify-center">
+              <div className="min-h-[300px] bg-gradient-to-br from-blue-900 to-teal-900 flex items-center justify-center">
                 <div className="text-6xl opacity-20">🎨</div>
               </div>
-              <div className="p-4 bg-white">
-                <span className="text-sm font-medium text-gray-500">Style: Artistic</span>
+              <div className="p-4 bg-gray-800">
+                <span className="text-sm font-medium text-gray-400">Style: Artistic</span>
               </div>
             </Card>
 
             {/* Box 4 - Locked Variant */}
-            <Card className="overflow-hidden relative opacity-75">
-              <div className="absolute inset-0 bg-black/20 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
-                <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 text-center">
-                  <Lock className="w-8 h-8 mx-auto mb-3 text-gray-600" />
-                  <h3 className="font-semibold mb-2">Premium Variant</h3>
-                  <p className="text-sm text-gray-600 mb-3">Professional Style</p>
-                  <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleUnlock}>
-                    <Crown className="w-4 h-4 mr-2" />
+            <Card className="overflow-hidden relative opacity-75 bg-black border-gray-800">
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 text-center border border-gray-700">
+                  <Lock className="w-8 h-8 mx-auto mb-3 text-gray-300" />
+                  <h3 className="font-semibold mb-2 text-white">Premium Variant</h3>
+                  <p className="text-sm text-gray-300 mb-3">Professional Style</p>
+                  <Button size="sm" className="bg-white text-black hover:bg-gray-200" onClick={handleUnlock}>
                     Unlock
                   </Button>
                 </div>
               </div>
-              <div className="min-h-[300px] bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+              <div className="min-h-[300px] bg-gradient-to-br from-amber-900 to-orange-900 flex items-center justify-center">
                 <div className="text-6xl opacity-20">💼</div>
               </div>
-              <div className="p-4 bg-white">
-                <span className="text-sm font-medium text-gray-500">Style: Professional</span>
+              <div className="p-4 bg-gray-800">
+                <span className="text-sm font-medium text-gray-400">Style: Professional</span>
               </div>
             </Card>
           </div>
@@ -324,9 +279,19 @@ const VideoDisplay = () => {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};
+        </AlertDialog>
+
+        {/* Verification Modal */}
+        <VerificationModal
+          isOpen={showVerificationModal}
+          onClose={() => setShowVerificationModal(false)}
+          dishesData={[contentData]}
+          purpose={verificationModalPurpose}
+        />
+
+        <Footer />
+      </div>
+    );
+  };
 
 export default VideoDisplay;

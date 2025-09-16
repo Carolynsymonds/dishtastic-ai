@@ -48,7 +48,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-1.5 px-2 py-1 text-[10px] rounded-md bg-muted hover:bg-muted/80 text-foreground border border-border shadow-sm">
+        <button className="flex items-center gap-1.5 px-2 py-1 text-[8px] md:text-[10px] rounded-md bg-muted hover:bg-muted/80 text-foreground border border-border shadow-sm">
           <Settings className="w-3 h-3" />
           <span>Options</span>
         </button>
@@ -72,7 +72,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
                 variant={config.scale === "Portrait" ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleConfigChange('scale', 'Portrait')}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${config.scale === "Portrait" ? "bg-black text-white hover:bg-gray-800" : ""}`}
               >
                 <Smartphone className="w-4 h-4" />
                 Portrait
@@ -81,7 +81,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
                 variant={config.scale === "Square" ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleConfigChange('scale', 'Square')}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${config.scale === "Square" ? "bg-black text-white hover:bg-gray-800" : ""}`}
               >
                 <Square className="w-4 h-4" />
                 Square
@@ -90,7 +90,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
                 variant={config.scale === "Landscape" ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleConfigChange('scale', 'Landscape')}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${config.scale === "Landscape" ? "bg-black text-white hover:bg-gray-800" : ""}`}
               >
                 <Monitor className="w-4 h-4" />
                 Landscape
@@ -108,7 +108,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
                 variant={config.length === 1 ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleConfigChange('length', 1)}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${config.length === 1 ? "bg-black text-white hover:bg-gray-800" : ""}`}
               >
                 <Clock className="w-4 h-4" />
                 1s
@@ -117,7 +117,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
                 variant={config.length === 2 ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleConfigChange('length', 2)}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${config.length === 2 ? "bg-black text-white hover:bg-gray-800" : ""}`}
               >
                 <Clock className="w-4 h-4" />
                 2s
@@ -126,7 +126,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
                 variant={config.length === 5 ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleConfigChange('length', 5)}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${config.length === 5 ? "bg-black text-white hover:bg-gray-800" : ""}`}
               >
                 <Clock className="w-4 h-4" />
                 5s
@@ -135,7 +135,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
                 variant={config.length === 10 ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleConfigChange('length', 10)}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${config.length === 10 ? "bg-black text-white hover:bg-gray-800" : ""}`}
               >
                 <Clock className="w-4 h-4" />
                 10s
@@ -144,7 +144,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
                 variant={config.length === 15 ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleConfigChange('length', 15)}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${config.length === 15 ? "bg-black text-white hover:bg-gray-800" : ""}`}
               >
                 <Clock className="w-4 h-4" />
                 15s
@@ -233,7 +233,7 @@ export default function OptionsDialog({ onConfigChange }: OptionsDialogProps) {
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="bg-black text-white hover:bg-gray-800"
           >
             Save
           </Button>

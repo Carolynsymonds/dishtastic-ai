@@ -166,7 +166,7 @@ const ExploreVideos = () => {
           <div className="absolute inset-0 bg-black bg-opacity-10 flex flex-col items-center justify-center">
           <div className="space-y-6">
             <h1 className="hidden md:block text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight px-0">
-              Create Stunning Food Reels
+              Create Stunning Food Insta Reels
             </h1>
             
             {/* Chat Box */}
