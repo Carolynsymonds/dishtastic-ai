@@ -152,35 +152,6 @@ const ExploreImages = () => {
       uploadedImage: uploadedImages.length > 0 ? uploadedImages[0] : undefined
     };
 
-    // Store dish prompt in database
-    try {
-      console.log('[PROMPT_SAVE] Attempting to save prompt to database');
-      const { data: userData } = await supabase.auth.getUser();
-      console.log('[PROMPT_SAVE] User data:', userData.user?.id ? 'authenticated' : 'anonymous');
-      
-      const insertData = {
-        user_id: userData.user?.id || null,
-        prompt: textareaValue.trim(),
-        generation_type: generationType,
-        parameters: parametersWithImage,
-        user_ip: null, // Could be added later if needed
-        user_agent: navigator.userAgent
-      };
-      
-      console.log('[PROMPT_SAVE] Insert data:', insertData);
-      
-      const { data, error } = await supabase.from('dish_prompts').insert(insertData);
-      
-      if (error) {
-        console.error('[PROMPT_SAVE] Database error:', error);
-      } else {
-        console.log('[PROMPT_SAVE] Successfully saved prompt:', data);
-      }
-    } catch (promptError) {
-      console.error('[PROMPT_SAVE] Failed to save prompt:', promptError);
-      // Continue with generation even if saving prompt fails
-    }
-
     try {
       const isVideo = parametersWithImage.Format === 'Video';
       toast.info(isVideo ? "Generating video... This may take up to 2 minutes" : "Generating image...");
@@ -311,8 +282,35 @@ const ExploreImages = () => {
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2 md:gap-3">
-                        <div className="w-5 h-5 md:w-6 md:h-6 bg-black rounded-full flex items-center justify-center">
-                          <Square className="w-2.5 h-2.5 md:w-3 md:h-3 text-white fill-current" />
+                        <div className="relative w-5 h-5 md:w-6 md:h-6">
+                          {/* Progress Ring */}
+                          <svg className="w-5 h-5 md:w-6 md:h-6 transform -rotate-90" viewBox="0 0 24 24">
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              fill="none"
+                              className="text-gray-300 opacity-30"
+                            />
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              fill="none"
+                              strokeDasharray={`${2 * Math.PI * 10}`}
+                              strokeDashoffset={`${2 * Math.PI * 10 * (1 - Math.min(generationTime / 30, 1))}`}
+                              className="text-black transition-all duration-100"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          {/* Stop Button */}
+                          <div className="absolute inset-0 bg-black rounded-full flex items-center justify-center">
+                            <Square className="w-2.5 h-2.5 md:w-3 md:h-3 text-white fill-current" />
+                          </div>
                         </div>
                         <span className="text-xs md:text-sm text-foreground">Running {generationTime.toFixed(1)}s</span>
                       </div>
